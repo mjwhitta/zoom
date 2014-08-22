@@ -85,7 +85,7 @@ $ z -g NUM
 This will cause zoom to open the search result in vim (currently the
 only supported editor)
 
-### Cross-Terminal Shortcuts
+### Persistent shortcuts
 
 When you perform a search with zoom, all results are cached. Using the
 following command will allow you to see the previous search's results
