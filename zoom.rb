@@ -136,8 +136,8 @@ def exe_command(profile, pattern)
         shortcut_cache
     when "grep"
         # Emulate ag/ack as much as possible
-        system("#{profile} #{pattern} | sed -e \"s|$|\\n|\" " \
-               "-e \"s|:|\\n|\" >> #{CACHE_FILE}")
+        system("#{profile} #{pattern} | sed \"s|[:-]|\\n|\" >> " \
+               "#{CACHE_FILE}")
         shortcut_cache
     else
         system("#{profile} #{pattern}")
@@ -315,7 +315,7 @@ def shortcut_cache()
     # Read in cache
     File.open(CACHE_FILE) do |cache|
         start_dir = ""
-        prev_file = nil
+        file = nil
         filename = ""
         first_time = true
         count = 1
@@ -324,28 +324,32 @@ def shortcut_cache()
             line.chomp!
             plain = remove_colors(line)
             if (line.start_with?("ZOOM_EXE_DIR="))
-                start_dir = line.split("=")[1]
-            elsif (plain.scan(/^[0-9]+[:-]/).empty? && !line.empty?)
-                # Filename
-                if (prev_file != line)
-                    prev_file = line
-                    filename = remove_colors(prev_file)
+                # Get directory where search was ran
+                start_dir = line.gsub("ZOOM_EXE_DIR=", "")
+            elsif ((line == "-") || (line == "--") || line.empty?)
+                # Ignore dividers when searching with context and
+                # empty lines
+            elsif (plain.scan(/^[0-9]+[:-]/).empty?)
+                if (file != line)
+                    # Filename
+                    file = line
+                    filename = remove_colors(file)
+
                     if (!first_time)
                         puts
                     end
                     first_time = false
-                    puts "\e[0m#{prev_file}"
+
+                    puts "\e[0m#{file}"
                 end
-            elsif (!line.empty?)
+            elsif (file)
                 # Match
-                if (prev_file)
-                    puts "\e[1;31m[#{count}]\e[0m #{line}"
+                puts "\e[1;31m[#{count}]\e[0m #{line}"
 
-                    lineno = remove_colors(line).split(":")[0]
-                    shct.write("#{lineno} #{start_dir}/#{filename}\n")
+                lineno = remove_colors(line).split(":")[0]
+                shct.write("#{lineno} #{start_dir}/#{filename}\n")
 
-                    count += 1
-                end
+                count += 1
             end
         end
         cache.close
