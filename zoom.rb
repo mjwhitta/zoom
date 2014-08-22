@@ -367,6 +367,10 @@ rc = read_zoomrc
 if (options.has_key?("use"))
     # Override current profile
     prof_name = options["use"]
+    if (!rc["profiles"].has_key?(prof_name))
+        puts "Profile \"#{prof_name}\" does not exist!"
+        exit
+    end
 else
     prof_name = rc["profile"]
 end
