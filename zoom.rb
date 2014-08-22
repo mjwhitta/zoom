@@ -322,9 +322,10 @@ def shortcut_cache()
 
         cache.each do |line|
             line.chomp!
+            plain = remove_colors(line)
             if (line.start_with?("ZOOM_EXE_DIR="))
                 start_dir = line.split("=")[1]
-            elsif (!line.include?(":") && !line.empty?)
+            elsif (plain.scan(/^[0-9]+[:-]/).empty? && !line.empty?)
                 # Filename
                 if (prev_file != line)
                     prev_file = line
