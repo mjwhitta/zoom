@@ -43,43 +43,43 @@ zoom prefixes shortcut tags to ag/ack/grep's search results
 ```bash
 $ z def
 zoom.rb
-[1] 8:    def flags(flags = nil)
-[2] 15:    def info()
-[3] 21:    def initialize(operator, flags = "", env_prepend = "")
-[4] 27:    def operator(operator = nil)
-[5] 39:    def prepend(env_prepend = nil)
-[6] 46:    def to_s()
-[7] 55:def default_zoomrc()
-[8] 59:    # Default ag profiles
-[9] 72:    # Default ack profile
-[10] 89:    # Default grep profile (emulate ag/ack as much as possible)
-[11] 98:        default = ag
-[12] 100:        default = ack
-[13] 102:        default = grep
-[14] 106:    profs["default"] = default
-[15] 116:    # Default editor
-[16] 122:    rc["profile"] = "default"
-[17] 128:def exe_command(profile, pattern)
-[18] 147:def find_in_path(cmd)
-[19] 163:def is_exe?(cmd)
-[20] 168:def open_editor_to_result(editor, result)
-[21] 173:def parse(args)
-[22] 232:        opts.on("--rc", "Create default .zoomrc file") do
-[23] 233:            default_zoomrc
-[24] 261:def read_zoomrc()
-[25] 263:        default_zoomrc
-[26] 278:def remove_colors(str)
-[27] 282:def shortcut_cache()
-[28] 326:def write_zoomrc(rc)
-[29] 385:        rc["profile"] = "default"
-[30] 388:    if (prof != "default")
-[31] 392:        puts "You can't delete the default profile!"
+[TAG#] 8:    def flags(flags = nil)
+[TAG#] 15:    def info()
+[TAG#] 21:    def initialize(operator, flags = "", env_prepend = "")
+[TAG#] 27:    def operator(operator = nil)
+[TAG#] 39:    def prepend(env_prepend = nil)
+[TAG#] 46:    def to_s()
+[TAG#] 55:def default_zoomrc()
+[TAG#] 59:    # Default ag profiles
+[TAG#] 72:    # Default ack profile
+[TAG#] 89:    # Default grep profile (emulate ag/ack as much as possible)
+[TAG#] 98:        default = ag
+[TAG#] 100:        default = ack
+[TAG#] 102:        default = grep
+[TAG#] 106:    profs["default"] = default
+[TAG#] 116:    # Default editor
+[TAG#] 122:    rc["profile"] = "default"
+[TAG#] 128:def exe_command(profile, pattern)
+[TAG#] 147:def find_in_path(cmd)
+[TAG#] 163:def is_exe?(cmd)
+[TAG#] 168:def open_editor_to_result(editor, result)
+[TAG#] 173:def parse(args)
+[TAG#] 232:        opts.on("--rc", "Create default .zoomrc file") do
+[TAG#] 233:            default_zoomrc
+[TAG#] 261:def read_zoomrc()
+[TAG#] 263:        default_zoomrc
+[TAG#] 278:def remove_colors(str)
+[TAG#] 282:def shortcut_cache()
+[TAG#] 326:def write_zoomrc(rc)
+[TAG#] 385:        rc["profile"] = "default"
+[TAG#] 388:    if (prof != "default")
+[TAG#] 392:        puts "You can't delete the default profile!"
 ```
 
 Now you can jump to a search result by typing:
 
 ```bash
-$ z -g NUM
+$ z -g TAG#
 ```
 
 This will cause zoom to open the search result in vim (currently the
