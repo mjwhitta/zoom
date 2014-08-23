@@ -60,7 +60,8 @@ def default_zoomrc()
     if (find_in_path("ag"))
         ag = Profile.new("ag",
                          "-S --color-match \"47;1;30\" " \
-                         "--color-line-number \"0;37\"")
+                         "--color-line-number \"0;37\" " \
+                         "--ignore *.pdf")
         all = Profile.new("ag",
                          "-uS --color-match \"47;1;30\" " \
                          "--color-line-number \"0;37\"")
