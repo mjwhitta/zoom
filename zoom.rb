@@ -270,7 +270,7 @@ def parse(args)
                 "often in a profile. They can then use or modify " \
                 "that profile at any time",
                 "",
-                "EXAMPLES",
+                "EXAMPLES:",
                 "",
                 "Add a profile named test:",
                 "    $ z -a test",
@@ -288,7 +288,10 @@ def parse(args)
                 "    $ z -p \"PATH=/bin\"",
                 "",
                 "Execute the current profile:",
-                "    $ z")
+                "    $ z PATTERN",
+                "",
+                "Search with 3 lines of context after the match:",
+                "    $ z -- -A 3 PATTERN")
     end
     parser.parse!
 
@@ -451,7 +454,7 @@ elsif (options.has_key?("list"))
         else
             puts "### #{name} ###"
         end
-        puts "#{rc["profiles"][name].info}"
+        puts rc["profiles"][name].info
         puts
     end
 elsif (options.has_key?("operator"))
@@ -487,7 +490,8 @@ elsif (options.has_key?("switch"))
         puts "Profile \"#{prof}\" does not exist!"
     end
 elsif (options["which"])
-    puts prof_name
+    puts "### \e[32m#{prof_name}\e[0m ###"
+    puts rc["profiles"][prof_name].info
 else
     # Search and save results
     exe_command(profile, options["pattern"])
