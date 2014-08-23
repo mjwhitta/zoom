@@ -305,7 +305,7 @@ def read_zoomrc()
 end
 
 def remove_colors(str)
-    return str.gsub(/\e\[([0-9;]*m|K)/, "")
+    return str.unpack("C*").pack("U*").gsub(/\e\[([0-9;]*m|K)/, "")
 end
 
 def shortcut_cache()
@@ -344,7 +344,8 @@ def shortcut_cache()
                 end
             elsif (file)
                 # Match
-                puts "\e[1;31m[#{count}]\e[0m #{line}"
+                sanitized = line.dump.gsub("\\e", "\e")[1..-2]
+                puts "\e[1;31m[#{count}]\e[0m #{sanitized}"
 
                 lineno = remove_colors(line).split(":")[0]
                 shct.write("#{lineno} #{start_dir}/#{filename}\n")
