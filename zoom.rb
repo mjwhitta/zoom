@@ -94,6 +94,12 @@ def default_zoomrc()
                        "--exclude-dir=.svn",
                        "GREP_COLORS=\"fn=1;32:ln=0;37:" \
                        "ms=47;1;30:mc=47;1;30:sl=:cx=:bn=:se=\"")
+    if (!all)
+        all = Profile.new("grep",
+                          "--color=always -EHinR",
+                          "GREP_COLORS=\"fn=1;32:ln=0;37:" \
+                          "ms=47;1;30:mc=47;1;30:sl=:cx=:bn=:se=\"")
+    end
 
     if (ag)
         default = ag
@@ -104,14 +110,16 @@ def default_zoomrc()
     end
 
     # Put profiles into rc
-    profs["default"] = default
-    if (ag && all)
-        profs["ag"] = ag
-        profs["all"] = all
-    end
     if (ack)
         profs["ack"] = ack
     end
+    if (ag)
+        profs["ag"] = ag
+    end
+    if (all)
+        profs["all"] = all
+    end
+    profs["default"] = default
     profs["grep"] = grep
 
     # Default editor
@@ -437,13 +445,13 @@ elsif (options.has_key?("flags"))
     write_zoomrc(rc)
 elsif (options.has_key?("list"))
     # List the profiles
-    rc["profiles"].each do |name, prof|
+    rc["profiles"].keys.sort.each do |name|
         if (prof_name == name)
             puts "### \e[32m#{name}\e[0m ###"
         else
             puts "### #{name} ###"
         end
-        puts "#{prof.info}"
+        puts "#{rc["profiles"][name].info}"
         puts
     end
 elsif (options.has_key?("operator"))
