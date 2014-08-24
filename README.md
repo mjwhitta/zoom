@@ -5,8 +5,8 @@
 ### A faster way to use ag/ack/grep
 
 zoom acts as a wrapper for ag/ack/grep or any command really. The goal
-was to provide convenience when searching through codebases via the
-cli.
+was to provide convenience when searching through code-bases via the
+CLI.
 
 ## What is [ag](https://github.com/ggreer/the_silver_searcher)?
 
@@ -82,13 +82,13 @@ Now you can jump to a search result by typing:
 $ z -g TAG#
 ```
 
-This will cause zoom to open the search result in vim (currently the
-only supported editor)
+This will cause zoom to open the search result in vim/emacs (currently
+the only supported editors)
 
 ### Persistent shortcuts
 
 When you perform a search with zoom, all results are cached. Using the
-following command will allow you to see the previous search's results
+following command will allow you to see the previous search results
 again:
 
 ```bash
@@ -113,8 +113,17 @@ These profiles do not need to be limited to ag/ack/grep shortcuts.
 Note: The `default` profile is special and can't be deleted. You can
 however modify it.
 
-## Pentesting
+## Penetration testing
 
 zoom allows to you create profiles for commands other than
-ag/ack/grep. This may make zoom a friendly tool for pentesters who are
-looking for a simple way to store exploits.
+ag/ack/grep. This may make zoom a friendly tool for pen-testers who
+are looking for a simple way to store exploits.
+
+## TODO
+
+ - Need to test to see if any ag/ack/grep flags break functionality.
+ - Sometimes ag thinks files aren't binary when they should (?) be.
+   For example, some pdfs are skipped b/c they are binary files, but
+   some pdfs aren't skipped. Maybe file an issue on the ag Github
+   page.
+ - Make comments/documentation more thorough.
