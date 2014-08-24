@@ -34,6 +34,47 @@ $ ./install_zoom.sh
 
 ```bash
 $ z -h
+Usage: z [OPTIONS] <pattern>
+    -a, --add=NAME                   Add a new profile with specified name
+    -c, --cache                      Show previous results
+    -d, --delete=NAME                Delete profile with specified name
+    -f, --flags=FLAGS                Set flags for current profile
+    -g, --go=NUM                     Open editor to search result NUM
+    -h, --help                       Display this help message
+    -l, --list                       List profiles
+    -o, --operator=OPERATOR          Set operator for current profile
+    -p, --prepend=PREPEND            Set the prepend string for the current profile
+        --rc                         Create default .zoomrc file
+    -r, --rename=NAME                Rename the current profile
+    -s, --switch=NAME                Switch to profile with specified name
+    -u, --use=NAME                   Use specified profile one time only
+    -w, --which                      Display the current profile
+
+zoom allows users to store commands they use often in a profile. They
+can then use or modify that profile at any time
+
+EXAMPLES:
+
+Add a profile named test:
+    $ z -a test
+
+Change the operator of the current profile:
+    $ z -o grep
+
+Change the operator of the profile "test":
+    $ z -u test -o grep
+
+Change the flags of the current profile:
+    $ z -f "--color=always -EHIinR"
+
+Change the prepend string of the current profile:
+    $ z -p "PATH=/bin"
+
+Execute the current profile:
+    $ z PATTERN
+
+Search with 3 lines of context after the match:
+    $ z -- -A 3 PATTERN
 ```
 
 You can use zoom exactly the same way you use ag/ack.
