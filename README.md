@@ -20,6 +20,12 @@ Click the link above, to learn more about ag, and how to install it.
 
 ack is the replacement for grep!
 
+## What is [grep](http://en.wikipedia.org/wiki/Grep)?
+
+If you don't know what grep is, this probably isn't the tool for you.
+You should learn how to properly use grep before using a tool such as
+zoom which attempts to streamline the process for you.
+
 ## How to install
 
 Open a terminal and run the following:
