@@ -266,31 +266,31 @@ def parse(args)
         end
 
         opts.on("",
-                "zoom allows users to store commands they use " \
-                "often in a profile. They can then use or modify " \
-                "that profile at any time",
+                "zoom allows users to store commands/flags they " \
+                "use often into a profile. They can then use or " \
+                "modify that profile at any time.",
                 "",
                 "EXAMPLES:",
                 "",
                 "Add a profile named test:",
-                "    $ z -a test",
+                "    $ z --add test",
                 "",
                 "Change the operator of the current profile:",
-                "    $ z -o grep",
+                "    $ z --operator grep",
                 "",
                 "Change the operator of the profile \"test\":",
-                "    $ z -u test -o grep",
+                "    $ z --use test --operator grep",
                 "",
                 "Change the flags of the current profile:",
-                "    $ z -f \"--color=always -EHIinR\"",
+                "    $ z --flags \"--color=always -EHIinR\"",
                 "",
                 "Change the prepend string of the current profile:",
-                "    $ z -p \"PATH=/bin\"",
+                "    $ z --prepend \"PATH=/bin\"",
                 "",
                 "Execute the current profile:",
                 "    $ z PATTERN",
                 "",
-                "Search with 3 lines of context after the match:",
+                "Pass additional flags to the choosen operator:",
                 "    $ z -- -A 3 PATTERN")
     end
     parser.parse!
