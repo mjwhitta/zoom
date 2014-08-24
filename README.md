@@ -8,6 +8,8 @@ zoom acts as a wrapper for ag/ack/grep or any command really. The goal
 was to provide convenience when searching through code-bases via the
 CLI.
 
+![Example usage](https://bitbucket.org/mjwhitta/zoom/raw/master/zoom.gif)
+
 ## What is [ag](https://github.com/ggreer/the_silver_searcher)?
 
 ag is a faster version of ack!
