@@ -136,10 +136,6 @@ def default_zoomrc()
 end
 
 def exe_command(profile, pattern)
-    File.open(CACHE_FILE, "w") do |file|
-        file.write("ZOOM_EXE_DIR=#{ENV["PWD"]}\n")
-    end
-
     case profile.operator.split("/").last
     when "ag", "ack", "ack-grep"
         system("#{profile} --pager #{PAGER} #{pattern}")
@@ -170,14 +166,33 @@ def find_in_path(cmd)
     return nil
 end
 
+def get_location_of_result(result)
+    count = 0
+    File.open(SHORTCUT_FILE) do |file|
+        file.each do |line|
+            count += 1
+            if (count == result)
+                file.close
+                return line
+            end
+        end
+        file.close
+    end
+    return nil
+end
+
 def is_exe?(cmd)
     exe = Pathname(cmd).expand_path
     return (exe.file? && exe.executable?)
 end
 
 def open_editor_to_result(editor, result)
-    loc = File.readlines(SHORTCUT_FILE)[result.to_i - 1]
-    system("#{editor} +#{loc}")
+    loc = get_location_of_result(result.to_i)
+    if (loc)
+        system("#{editor} +#{loc}")
+    else
+        system("#{editor}")
+    end
 end
 
 def parse(args)
