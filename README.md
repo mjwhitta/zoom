@@ -25,6 +25,20 @@ $ cd zoom
 $ ./install_zoom.sh
 ```
 
+## Mac users
+
+If using the grep operator, you need to install
+[homebrew](http://brew.sh) and then run the following commands before
+using zoom:
+
+```bash
+$ brew install gnu-sed grep
+$ mkdir -p ~/bin
+$ cd ~/bin
+$ ln -s $(which gsed) sed
+$ ln -s $(which ggrep) grep
+```
+
 ## How to use
 
 ```bash
@@ -157,19 +171,6 @@ however modify it.
 zoom allows to you create profiles for commands other than
 ag/ack/grep. This may make zoom a friendly tool for pen-testers who
 are looking for a simple way to store exploits.
-
-## Mac users
-
-Haven't tested yet, but, if using the grep operator, you may need to
-install [homebrew](http://brew.sh) and then run the following commands
-before using zoom:
-
-```bash
-$ brew install gnu-sed
-$ mkdir -p ~/bin
-$ cd ~/bin
-$ ln -s $(which gsed) sed
-```
 
 ## What is [ag](https://github.com/ggreer/the_silver_searcher)?
 
