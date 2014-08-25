@@ -102,6 +102,7 @@ def default_zoomrc()
                           "ms=47;1;30:mc=47;1;30:sl=:cx=:bn=:se=\"")
     end
 
+    # Create default profile
     if (ag)
         default = ag
     elsif (ack)
@@ -124,7 +125,10 @@ def default_zoomrc()
     profs["grep"] = grep
 
     # Default editor
-    editor = find_in_path("vim")
+    editor = find_in_path(ENV["EDITOR"])
+    if (!editor)
+        editor = find_in_path("vim")
+    end
     if (!editor)
         editor = find_in_path("vi")
     end
@@ -151,6 +155,10 @@ def exe_command(profile, pattern)
 end
 
 def find_in_path(cmd)
+    if (!cmd || cmd.empty?)
+        return nil
+    end
+
     if (is_exe?(cmd))
         return cmd
     end
@@ -220,6 +228,12 @@ def parse(args)
             options["delete"] = profile
         end
 
+        opts.on("-e",
+                "--editor=EDITOR",
+                "Use the specified editor") do |editor|
+            options["editor"] = editor
+        end
+
         opts.on("-f",
                 "--flags=FLAGS",
                 "Set flags for current profile") do |flags|
@@ -282,9 +296,19 @@ def parse(args)
         end
 
         opts.on("",
-                "zoom allows users to store commands/flags they " \
-                "use often into a profile. They can then use or " \
-                "modify that profile at any time.",
+                "Do you like to search through code using ag, ack, " \
+                "or grep? Good! This tool is for you! zoom adds " \
+                "some convenience to ag/ack/grep by allowing you " \
+                "to quickly open your search results in your " \
+                "editor of choice. When looking at large " \
+                "code-bases, it can be a pain to have to scroll to " \
+                "find the filename of each result. zoom prints a " \
+                "tag number in front of each result that " \
+                "ag/ack/grep outputs. Then you can quickly open " \
+                "that tag number with zoom to jump straight to the " \
+                "source. zoom is even persistent across all your " \
+                "sessions! You can search in one terminal and jump " \
+                "to a tag in another terminal from any directory!",
                 "",
                 "EXAMPLES:",
                 "",
@@ -302,6 +326,7 @@ def parse(args)
                 "",
                 "Change the prepend string of the current profile:",
                 "    $ z --prepend \"PATH=/bin\"",
+                "    $ z --prepend \"cd /some/path;\"",
                 "",
                 "Execute the current profile:",
                 "    $ z PATTERN",
@@ -457,6 +482,14 @@ elsif (options.has_key?("delete"))
         write_zoomrc(rc)
     else
         puts "You can't delete the default profile!"
+    end
+elsif (options.has_key?("editor"))
+    ed = find_in_path(options["editor"])
+    if (ed)
+        rc["editor"] = ed
+        write_zoomrc(rc)
+    else
+        puts "Editor #{options["editor"]} was not found!"
     end
 elsif (options.has_key?("flags"))
     # Set the flags for the current profile

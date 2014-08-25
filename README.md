@@ -2,18 +2,17 @@
 
 ## Inspired by [sack](https://github.com/sampson-chen/sack)
 
-### A faster way to use ag/ack/grep
+### Quickly open CLI search results in your favorite editor!
 
 Do you like to search through code using ag, ack, or grep? Good! This
 tool is for you! zoom adds some convenience to ag/ack/grep by allowing
-you to quickly open your search results in your editor of choice
-(currently only vim and emacs are supported). When looking at large
-code-bases, it can be a pain to have to scroll to find the filename of
-each result. zoom prints a tag number in front of each result that
-ag/ack/grep outputs. Then you can quickly open that tag number with
-zoom to jump straight to the source. zoom is even persistent across
-all your sessions! You can search in one terminal and jump to a tag in
-another terminal from any directory!
+you to quickly open your search results in your editor of choice. When
+looking at large code-bases, it can be a pain to have to scroll to
+find the filename of each result. zoom prints a tag number in front of
+each result that ag/ack/grep outputs. Then you can quickly open that
+tag number with zoom to jump straight to the source. zoom is even
+persistent across all your sessions! You can search in one terminal
+and jump to a tag in another terminal from any directory!
 
 ## How to install
 
@@ -47,6 +46,7 @@ Usage: z [OPTIONS] <pattern>
     -a, --add=NAME                   Add a new profile with specified name
     -c, --cache                      Show previous results
     -d, --delete=NAME                Delete profile with specified name
+    -e, --editor=EDITOR              Use the specified editor
     -f, --flags=FLAGS                Set flags for current profile
     -g, --go=NUM                     Open editor to search result NUM
     -h, --help                       Display this help message
@@ -59,7 +59,15 @@ Usage: z [OPTIONS] <pattern>
     -u, --use=NAME                   Use specified profile one time only
     -w, --which                      Display the current profile
 
-zoom allows users to store commands/flags they use often into a profile. They can then use or modify that profile at any time.
+Do you like to search through code using ag, ack, or grep? Good! This
+tool is for you! zoom adds some convenience to ag/ack/grep by allowing
+you to quickly open your search results in your editor of choice. When
+looking at large code-bases, it can be a pain to have to scroll to
+find the filename of each result. zoom prints a tag number in front of
+each result that ag/ack/grep outputs. Then you can quickly open that
+tag number with zoom to jump straight to the source. zoom is even
+persistent across all your sessions! You can search in one terminal
+and jump to a tag in another terminal from any directory!
 
 EXAMPLES:
 
@@ -77,6 +85,7 @@ Change the flags of the current profile:
 
 Change the prepend string of the current profile:
     $ z --prepend "PATH=/bin"
+    $ z --prepend "cd /some/path;"
 
 Execute the current profile:
     $ z PATTERN
@@ -89,53 +98,33 @@ You can use zoom basically the same way you use ag/ack/grep.
 
 ## Shortcuts
 
-zoom prefixes shortcut tags to ag/ack/grep's search results like
-below:
+zoom prefixes shortcut tags to ag/ack/grep's search results! If you
+use zoom to search for "find_in_path" in the zoom source directory,
+you would see something like the following:
 
 ```bash
-$ z def
+$ z find_in_path
 zoom.rb
-[TAG] 8:    def flags(flags = nil)
-[TAG] 15:    def info()
-[TAG] 21:    def initialize(operator, flags = "", env_prepend = "")
-[TAG] 27:    def operator(operator = nil)
-[TAG] 39:    def prepend(env_prepend = nil)
-[TAG] 46:    def to_s()
-[TAG] 55:def default_zoomrc()
-[TAG] 59:    # Default ag profiles
-[TAG] 72:    # Default ack profile
-[TAG] 89:    # Default grep profile (emulate ag/ack as much as possible)
-[TAG] 98:        default = ag
-[TAG] 100:        default = ack
-[TAG] 102:        default = grep
-[TAG] 106:    profs["default"] = default
-[TAG] 116:    # Default editor
-[TAG] 122:    rc["profile"] = "default"
-[TAG] 128:def exe_command(profile, pattern)
-[TAG] 147:def find_in_path(cmd)
-[TAG] 163:def is_exe?(cmd)
-[TAG] 168:def open_editor_to_result(editor, result)
-[TAG] 173:def parse(args)
-[TAG] 232:        opts.on("--rc", "Create default .zoomrc file") do
-[TAG] 233:            default_zoomrc
-[TAG] 261:def read_zoomrc()
-[TAG] 263:        default_zoomrc
-[TAG] 278:def remove_colors(str)
-[TAG] 282:def shortcut_cache()
-[TAG] 326:def write_zoomrc(rc)
-[TAG] 385:        rc["profile"] = "default"
-[TAG] 388:    if (prof != "default")
-[TAG] 392:        puts "You can't delete the default profile!"
+[1] 29:            op = find_in_path(operator)
+[2] 33:                self["operator"] = find_in_path("grep")
+[3] 61:    if (find_in_path("ag"))
+[4] 75:    if (find_in_path("ack"))
+[5] 77:    elsif (find_in_path("ack-grep"))
+[6] 128:    editor = find_in_path(ENV["EDITOR"])
+[7] 130:        editor = find_in_path("vim")
+[8] 133:        editor = find_in_path("vi")
+[9] 157:def find_in_path(cmd)
+[10] 456:    if (find_in_path("ag"))
+[11] 458:    elsif (find_in_path("ack"))
+[12] 460:    elsif (find_in_path("ack-grep"))
+[13] 487:    ed = find_in_path(options["editor"])
 ```
 
-Now you can jump to a specific search result by typing:
+Now you can jump to result 9 with the following command:
 
 ```bash
-$ z --go TAG
+$ z --go 9
 ```
-
-This will cause zoom to open the search result in vim/emacs (currently
-the only supported editors)
 
 ### Persistent shortcuts
 
@@ -171,6 +160,17 @@ however modify it.
 zoom allows to you create profiles for commands other than
 ag/ack/grep. This may make zoom a friendly tool for pen-testers who
 are looking for a simple way to store exploits.
+
+## Supported editors
+
+zoom currently works with:
+
+ - vim
+ - emacs
+ - nano
+ - pico
+ - jpico
+ - any editor with `+LINE` as an option in it's man page
 
 ## What is [ag](https://github.com/ggreer/the_silver_searcher)?
 
