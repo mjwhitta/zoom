@@ -51,6 +51,7 @@ end
 RC_FILE = Pathname("~/.zoomrc").expand_path
 CACHE_FILE = Pathname("~/.zoom_cache").expand_path
 SHORTCUT_FILE = Pathname("~/.zoom_shortcuts").expand_path
+PAGER = "~/bin/zoom_pager.sh"
 
 def default_zoomrc()
     rc = Hash.new
@@ -141,12 +142,12 @@ def exe_command(profile, pattern)
 
     case profile.operator.split("/").last
     when "ag", "ack", "ack-grep"
-        system("#{profile} --pager ~/bin/zoom_pager.sh #{pattern}")
+        system("#{profile} --pager #{PAGER} #{pattern}")
         shortcut_cache
     when "grep"
         # Emulate ag/ack as much as possible
-        system("#{profile} #{pattern} | sed \"s|[:-]|\\n|\" >> " \
-               "#{CACHE_FILE}")
+        system("#{profile} #{pattern} | sed \"s|[:-]|\\n|\" | " \
+               "#{PAGER}")
         shortcut_cache
     else
         system("#{profile} #{pattern}")
