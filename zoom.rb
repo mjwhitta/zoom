@@ -124,15 +124,8 @@ def default_zoomrc()
     profs["default"] = default
     profs["grep"] = grep
 
-    # Default editor
-    editor = find_in_path(ENV["EDITOR"])
-    if (!editor)
-        editor = find_in_path("vim")
-    end
-    if (!editor)
-        editor = find_in_path("vi")
-    end
-    rc["editor"] = editor
+    # Default editor (use $EDITOR)
+    rc["editor"] = ""
     rc["profile"] = "default"
     rc["profiles"] = profs
 
@@ -437,6 +430,9 @@ profile = rc["profiles"][prof_name]
 
 # Get executables
 editor = rc["editor"]
+if (editor.empty?)
+    editor = find_in_path(ENV["EDITOR"])
+end
 operator = profile["operator"]
 
 # Make sure executables are found
@@ -484,7 +480,11 @@ elsif (options.has_key?("delete"))
         puts "You can't delete the default profile!"
     end
 elsif (options.has_key?("editor"))
-    ed = find_in_path(options["editor"])
+    if (options["editor"].empty?)
+        ed = ""
+    else
+        ed = find_in_path(options["editor"])
+    end
     if (ed)
         rc["editor"] = ed
         write_zoomrc(rc)
