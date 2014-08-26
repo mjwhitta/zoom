@@ -135,10 +135,16 @@ end
 def exe_command(profile, pattern)
     case profile.operator.split("/").last
     when "ag", "ack", "ack-grep"
+        if (CACHE_FILE.exist?)
+            CACHE_FILE.delete
+        end
         system("#{profile} --pager #{PAGER} #{pattern}")
         shortcut_cache
     when "grep"
         # Emulate ag/ack as much as possible
+        if (CACHE_FILE.exist?)
+            CACHE_FILE.delete
+        end
         system("#{profile} #{pattern} | sed \"s|[:-]|\\n|\" | " \
                "#{PAGER}")
         shortcut_cache
@@ -355,6 +361,10 @@ def remove_colors(str)
 end
 
 def shortcut_cache()
+    if (!CACHE_FILE.exist?)
+        return
+    end
+
     # Open shortcut file for writing
     shct = File.open(SHORTCUT_FILE, "w")
 
