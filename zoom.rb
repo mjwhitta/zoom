@@ -133,18 +133,30 @@ def default_zoomrc()
 end
 
 def exe_command(profile, pattern)
-    case profile.operator.split("/").last
-    when "ag", "ack", "ack-grep"
+    operator = profile.operator.split("/").last
+
+    case operator
+    when "ag", "ack", "ack-grep", "grep"
         if (CACHE_FILE.exist?)
             CACHE_FILE.delete
         end
+
+        if (pattern.include?(" "))
+            # Wrap the last index in parens
+            array = pattern.split(" ")
+            pattern = "#{array[0..-2].join(" ")} \"#{array.last}\""
+        else
+            # Wrap everything in parens
+            pattern = "\"#{pattern}\""
+        end
+    end
+
+    case operator
+    when "ag", "ack", "ack-grep"
         system("#{profile} --pager #{PAGER} #{pattern}")
         shortcut_cache
     when "grep"
         # Emulate ag/ack as much as possible
-        if (CACHE_FILE.exist?)
-            CACHE_FILE.delete
-        end
         system("#{profile} #{pattern} | sed \"s|[:-]|\\n|\" | " \
                "#{PAGER}")
         shortcut_cache
