@@ -186,6 +186,26 @@ If you don't know what grep is, this probably isn't the tool for you.
 You should learn how to properly use grep before using a tool such as
 zoom which attempts to streamline the process for you.
 
+## Known bugs
+
+Commands like:
+
+```bash
+$ z "(extends|implements).*DataType"
+```
+
+will not work, however there is a work around:
+
+```bash
+$ z "\"(extends|implements).*DataType\""
+```
+
+It's dumb and I'm working on a fix. It has something to do with the
+fact that I don't put quotes around the pattern provided to zoom. I do
+this because I still want to be able to pass in additional flags. I'm
+thinking about splitting the provided pattern on " " and then wrapping
+the last index with quotes.
+
 ## TODO
 
  - Need to test to see if any ag/ack/grep flags break functionality.
