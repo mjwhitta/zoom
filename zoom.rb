@@ -356,7 +356,7 @@ def read_zoomrc()
         default_zoomrc
     end
 
-    rc = JSON.parse(File.read(RC_FILE.expand_path))
+    rc = JSON.parse(File.read(RC_FILE))
     profiles = Hash.new
     rc["profiles"].each do |name, prof|
         op = prof["operator"]
