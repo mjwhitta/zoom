@@ -12,6 +12,12 @@ class Profile < Hash
         return self["flags"]
     end
 
+    def self.from_json(json)
+        return Profile.new(json["operator"],
+                           json["flags"],
+                           json["prepend"])
+    end
+
     def info()
         "Prepend : " + self["prepend"] + "\n" +
         "Operator: " + self["operator"] + "\n" +
@@ -359,10 +365,7 @@ def read_zoomrc()
     rc = JSON.parse(File.read(RC_FILE))
     profiles = Hash.new
     rc["profiles"].each do |name, prof|
-        op = prof["operator"]
-        flags = prof["flags"]
-        env_prepend = prof["prepend"]
-        profiles[name] = Profile.new(op, flags, env_prepend)
+        profiles[name] = Profile.from_json(prof)
     end
     rc["profiles"] = profiles
     return rc
