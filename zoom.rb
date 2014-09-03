@@ -415,7 +415,8 @@ def shortcut_cache()
                 end
             elsif (file)
                 # Match
-                sanitized = line.dump.gsub("\\e", "\e")[1..-2]
+                sanitized = line.unpack("C*").pack("U*")
+                    .gsub(/[\u0080-\u00ff]/, "\1".dump[1..-2])
                 puts "\e[1;31m[#{count}]\e[0m #{sanitized}"
 
                 lineno = remove_colors(line).split(":")[0]
