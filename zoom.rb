@@ -6,9 +6,7 @@ require "pathname"
 
 class Profile < Hash
     def flags(flags = nil)
-        if (flags)
-            self["flags"] = flags
-        end
+        self["flags"] = flags if (flags)
         return self["flags"]
     end
 
@@ -43,9 +41,7 @@ class Profile < Hash
     end
 
     def prepend(env_prepend = nil)
-        if (env_prepend)
-            self["prepend"] = env_prepend
-        end
+        self["prepend"] = env_prepend if (env_prepend)
         return self["prepend"]
     end
 
@@ -118,15 +114,9 @@ def default_zoomrc()
     end
 
     # Put profiles into rc
-    if (ack)
-        profs["ack"] = ack
-    end
-    if (ag)
-        profs["ag"] = ag
-    end
-    if (all)
-        profs["all"] = all
-    end
+    profs["ack"] = ack if (ack)
+    profs["ag"] = ag if (ag)
+    profs["all"] = all if (all)
     profs["default"] = default
     profs["grep"] = grep
 
@@ -143,9 +133,7 @@ def exe_command(profile, pattern)
 
     case operator
     when "ag", "ack", "ack-grep", "grep"
-        if (CACHE_FILE.exist?)
-            CACHE_FILE.delete
-        end
+        CACHE_FILE.delete if (CACHE_FILE.exist?)
 
         if (pattern.include?(" "))
             # Wrap the last index in parens
@@ -172,21 +160,14 @@ def exe_command(profile, pattern)
 end
 
 def find_in_path(cmd)
-    if (!cmd || cmd.empty?)
-        return nil
-    end
-
-    if (is_exe?(cmd))
-        return cmd
-    end
+    return nil if (!cmd || cmd.empty?)
+    return cmd if (is_exe?(cmd))
 
     path = ENV["PATH"].split(":").uniq.delete_if do |i|
         i.empty?
     end
     path.each do |dir|
-        if (is_exe?("#{dir}/#{cmd}"))
-            return "#{dir}/#{cmd}"
-        end
+        return "#{dir}/#{cmd}" if (is_exe?("#{dir}/#{cmd}"))
     end
     return nil
 end
@@ -358,9 +339,7 @@ def parse(args)
 end
 
 def read_zoomrc()
-    if (!RC_FILE.exist? && !RC_FILE.symlink?)
-        default_zoomrc
-    end
+    default_zoomrc if (!RC_FILE.exist? && !RC_FILE.symlink?)
 
     rc = JSON.parse(File.read(RC_FILE))
     profiles = Hash.new
@@ -376,9 +355,7 @@ def remove_colors(str)
 end
 
 def shortcut_cache()
-    if (!CACHE_FILE.exist?)
-        return
-    end
+    return if (!CACHE_FILE.exist?)
 
     # Open shortcut file for writing
     shct = File.open(SHORTCUT_FILE, "w")
@@ -406,9 +383,7 @@ def shortcut_cache()
                     file = line
                     filename = remove_colors(file)
 
-                    if (!first_time)
-                        puts
-                    end
+                    puts if (!first_time)
                     first_time = false
 
                     puts "\e[0m#{file}"
@@ -456,9 +431,8 @@ profile = rc["profiles"][prof_name]
 
 # Get executables
 editor = rc["editor"]
-if (editor.empty?)
-    editor = find_in_path(ENV["EDITOR"])
-end
+editor = find_in_path(ENV["EDITOR"]) if (editor.empty?)
+editor = find_in_path("vim") if (editor.empty?)
 operator = profile["operator"]
 
 # Make sure executables are found
@@ -495,9 +469,7 @@ elsif (options.has_key?("delete"))
     # Delete an existing profile
     prof = options["delete"]
 
-    if (prof_name == prof)
-        rc["profile"] = "default"
-    end
+    rc["profile"] = "default" if (prof_name == prof)
 
     if (prof != "default")
         rc["profiles"].delete(prof)
@@ -548,9 +520,7 @@ elsif (options.has_key?("rename"))
     elsif (rc["profiles"].has_key?(prof))
         puts "Profile \"#{prof}\" already exists!"
     elsif (prof_name != prof)
-        if (rc["profile"] == prof_name)
-            rc["profile"] = prof
-        end
+        rc["profile"] = prof if (rc["profile"] == prof_name)
         rc["profiles"][prof] = rc["profiles"][prof_name]
         rc["profiles"].delete(prof_name)
         write_zoomrc(rc)
