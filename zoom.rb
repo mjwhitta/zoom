@@ -391,10 +391,10 @@ def shortcut_cache()
             elsif (file)
                 # Match
                 sanitized = line.unpack("C*").pack("U*")
-                    .gsub(/[\u0080-\u00ff]/, "\1".dump[1..-2])
+                    .gsub(/[\u0080-\u00ff]+/, "\1".dump[1..-2])
                 puts "\e[1;31m[#{count}]\e[0m #{sanitized}"
 
-                lineno = remove_colors(line).split(":")[0]
+                lineno = remove_colors(line).split(/[:-]/)[0]
                 shct.write("#{lineno} #{start_dir}/#{filename}\n")
 
                 count += 1
