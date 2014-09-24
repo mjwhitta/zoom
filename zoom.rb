@@ -197,7 +197,7 @@ def open_editor_to_result(editor, result)
     if (loc)
         system("#{editor} +#{loc}")
     else
-        system("#{editor}")
+        puts "Invalid tag \"#{result}\"!"
     end
 end
 
