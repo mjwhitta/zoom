@@ -444,7 +444,7 @@ profile = rc["profiles"][prof_name]
 # Get executables
 editor = rc["editor"]
 editor = find_in_path(ENV["EDITOR"]) if (editor.empty?)
-editor = find_in_path("vim") if (editor.empty?)
+editor = find_in_path("vim") if (editor.nil? || editor.empty?)
 operator = profile["operator"]
 
 # Make sure executables are found
