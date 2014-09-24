@@ -334,6 +334,18 @@ def parse(args)
     end
     parser.parse!
 
+    case File.basename($0)
+    when "zc"
+        if (CACHE_FILE.exist? && !CACHE_FILE.directory?)
+            shortcut_cache
+        end
+        exit
+    when "zg"
+        options["go"] = args[0]
+    when "zl"
+        options["list"] = true
+    end
+
     options["pattern"] = args.join(" ")
     return options
 end

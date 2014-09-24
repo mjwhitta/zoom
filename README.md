@@ -155,6 +155,15 @@ These profiles do not need to be limited to ag/ack/grep shortcuts.
 Note: The `default` profile is special and can't be deleted. You can
 however modify it.
 
+## Convenient symlinks
+
+If you find it tedious to use zoom with the flags, there are currently
+3 convience symlinks that are supported.
+
+- `zc` is the same as `z --cache` or `z -c`
+- `zg` is the same as `z --go` or `z -g`
+- `zl` is the same as `z --list` or `z -l`
+
 ## Penetration testing
 
 zoom allows to you create profiles for commands other than
