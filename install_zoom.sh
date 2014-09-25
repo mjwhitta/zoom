@@ -10,14 +10,15 @@ mkdir -p ~/bin && cd ~/bin
 
 # Copy
 cp $install_dir/zoom.rb z
-ln -fs z zc
-ln -fs z zg
-ln -fs z zl
+[ ! -e zc ] && ln -fs z zc
+[ ! -e zg ] && ln -fs z zg
+[ ! -e zl ] && ln -fs z zl
 cp $install_dir/zoom_pager.sh .
+chmod u+x z zoom_pager.sh
 
 # Create zoomrc if needed
-if [ ! -e .zoomrc ]; then
-    $install_dir/zoom.rb --rc
+if [ ! -e ~/.zoomrc ]; then
+    ./z --rc
 fi
 
 echo "done!"
