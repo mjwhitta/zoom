@@ -407,7 +407,7 @@ def shortcut_cache()
                 puts "\e[1;31m[#{count}]\e[0m #{sanitized}"
 
                 lineno = remove_colors(line).split(/[:-]/)[0]
-                shct.write("#{lineno} #{start_dir}/#{filename}\n")
+                shct.write("#{lineno} '#{start_dir}/#{filename}'\n")
 
                 count += 1
             end
