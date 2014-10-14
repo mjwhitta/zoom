@@ -3,6 +3,7 @@
 require "json"
 require "optparse"
 require "pathname"
+require "shellwords"
 
 class Profile < Hash
     def flags(flags = nil)
@@ -49,11 +50,6 @@ class Profile < Hash
         [self["prepend"], self["operator"], self["flags"]].join(" ")
     end
 end
-
-RC_FILE = Pathname("~/.zoomrc").expand_path
-CACHE_FILE = Pathname("~/.zoom_cache").expand_path
-SHORTCUT_FILE = Pathname("~/.zoom_shortcuts").expand_path
-PAGER = "~/bin/zoom_pager.sh"
 
 def default_zoomrc()
     rc = Hash.new
@@ -128,31 +124,18 @@ def default_zoomrc()
     write_zoomrc(rc)
 end
 
-def exe_command(profile, pattern)
+def exe_command(profile, args, pattern)
     operator = profile.operator.split("/").last
 
     case operator
-    when "ag", "ack", "ack-grep", "grep"
-        CACHE_FILE.delete if (CACHE_FILE.exist?)
-
-        if (pattern.include?(" "))
-            # Wrap the last index in parens
-            array = pattern.split(" ")
-            pattern = "#{array[0..-2].join(" ")} \"#{array.last}\""
-        else
-            # Wrap everything in parens
-            pattern = "\"#{pattern}\""
-        end
-    end
-
-    case operator
     when "ag", "ack", "ack-grep"
-        system("#{profile} --pager #{PAGER} #{pattern}")
+        system("#{profile} --pager \"#{PAGER}\" #{args} " \
+               "#{pattern.shellescape}")
         shortcut_cache
     when "grep"
         # Emulate ag/ack as much as possible
-        system("#{profile} #{pattern} | sed \"s|[:-]|\\n|\" | " \
-               "#{PAGER}")
+        system("#{profile} #{args} #{pattern.shellescape} | " \
+               "sed \"s|[:-]|\\n|\" | #{PAGER}")
         shortcut_cache
     else
         system("#{profile} #{pattern}")
@@ -178,11 +161,9 @@ def get_location_of_result(result)
         file.each do |line|
             count += 1
             if (count == result)
-                file.close
                 return line
             end
         end
-        file.close
     end
     return nil
 end
@@ -203,6 +184,7 @@ end
 
 def parse(args)
     options = Hash.new
+    options["pager"] = false
     parser = OptionParser.new do |opts|
         opts.banner =
             "Usage: #{File.basename($0)} [OPTIONS] <pattern>"
@@ -257,6 +239,11 @@ def parse(args)
                 "--operator=OPERATOR",
                 "Set operator for current profile") do |op|
             options["operator"] = op
+        end
+
+        opts.on("--pager",
+                "Treate zoom as a pager, for use with ag and ack") do
+            options["pager"] = true
         end
 
         opts.on("-p",
@@ -346,7 +333,8 @@ def parse(args)
         options["list"] = true
     end
 
-    options["pattern"] = args.join(" ")
+    options["pattern"] = args.delete_at(-1)
+    options["subargs"] = args.join(" ")
     return options
 end
 
@@ -412,17 +400,19 @@ def shortcut_cache()
                 count += 1
             end
         end
-        cache.close
     end
-    shct.close
 end
 
 def write_zoomrc(rc)
     File.open(RC_FILE, "w") do |file|
         file.write(JSON.pretty_generate(rc))
-        file.close
     end
 end
+
+RC_FILE = Pathname("~/.zoomrc").expand_path
+CACHE_FILE = Pathname("~/.zoom_cache").expand_path
+SHORTCUT_FILE = Pathname("~/.zoom_shortcuts").expand_path
+PAGER = "#{File.expand_path($0)} --pager"
 
 # Parse cli args and read in rc file
 options = parse(ARGV)
@@ -454,7 +444,14 @@ elsif (!operator)
     puts "Operator command \"#{profile["operator"]}\" was not found!"
 end
 
-if (options.has_key?("go"))
+if (options["pager"])
+    File.open(CACHE_FILE, "w") do |f|
+        f.write("ZOOM_EXE_DIR=#{Dir.pwd}\n")
+        $stdin.each_line do |line|
+            f.write(line)
+        end
+    end
+elsif (options.has_key?("go"))
     # If passing in search result number, open it in editor
     open_editor_to_result(editor, options["go"])
 elsif (options.has_key?("add"))
@@ -551,5 +548,5 @@ elsif (options["which"])
     puts rc["profiles"][prof_name].info
 else
     # Search and save results
-    exe_command(profile, options["pattern"])
+    exe_command(profile, options["subargs"], options["pattern"])
 end

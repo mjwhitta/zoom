@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# No longer used
 
 CACHE_FILE=~/.zoom_cache
 
