@@ -24,6 +24,13 @@ $ cd zoom
 $ ./install_zoom.sh
 ```
 
+The default install directory is `~/bin`. You can change this by
+passing in the install directory of you choice like below:
+
+```bash
+$ ./install_zoom.sh ~/scripts
+```
+
 ## Mac users
 
 If using the grep operator, you need to install
