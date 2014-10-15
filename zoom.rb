@@ -129,13 +129,28 @@ def exe_command(profile, args, pattern)
 
     case operator
     when "ag", "ack", "ack-grep"
-        system("#{profile} --pager \"#{PAGER}\" #{args} " \
-               "#{pattern.shellescape}")
+        CACHE_FILE.delete if (CACHE_FILE.exist?)
+
+        if (!pattern.nil? && !pattern.empty?)
+            system("#{profile} --pager \"#{PAGER}\" #{args} " \
+                   "#{pattern.shellescape}")
+        else
+            system("#{profile} --pager \"#{PAGER}\" #{args}")
+        end
+
         shortcut_cache
     when "grep"
+        CACHE_FILE.delete if (CACHE_FILE.exist?)
+
         # Emulate ag/ack as much as possible
-        system("#{profile} #{args} #{pattern.shellescape} | " \
-               "sed \"s|[:-]|\\n|\" | #{PAGER}")
+        if (!pattern.nil? && !pattern.empty?)
+            system("#{profile} #{args} #{pattern.shellescape} | " \
+                   "sed \"s|[:]|\\n|\" | #{PAGER}")
+        else
+            system("#{profile} #{args} | sed \"s|[:]|\\n|\" | " \
+                   "#{PAGER}")
+        end
+
         shortcut_cache
     else
         system("#{profile} #{pattern}")
