@@ -145,10 +145,10 @@ def exe_command(profile, args, pattern)
         # Emulate ag/ack as much as possible
         if (!pattern.nil? && !pattern.empty?)
             system("#{profile} #{args} #{pattern.shellescape} | " \
-                   "sed \"s|[:]|\\n|\" | #{PAGER}")
+                   "sed \"s|\\[K[:-]|\\[K\\n|\" | #{PAGER}")
         else
-            system("#{profile} #{args} | sed \"s|[:]|\\n|\" | " \
-                   "#{PAGER}")
+            system("#{profile} #{args} | " \
+                   "sed \"s|\\[K[:-]|\\[K\\n|\" | #{PAGER}")
         end
 
         shortcut_cache
