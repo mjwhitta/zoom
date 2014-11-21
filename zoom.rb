@@ -121,6 +121,9 @@ def default_zoomrc()
     rc["profile"] = "default"
     rc["profiles"] = profs
 
+    # Reset last command to be empty
+    rc["last_command"] = Hash.new
+
     write_zoomrc(rc)
 end
 
@@ -200,6 +203,7 @@ end
 def parse(args)
     options = Hash.new
     options["pager"] = false
+    options["repeat"] = false
     parser = OptionParser.new do |opts|
         opts.banner =
             "Usage: #{File.basename($0)} [OPTIONS] <pattern>"
@@ -268,13 +272,16 @@ def parse(args)
             options["prepend"] = env_prepend
         end
 
+        opts.on("-r", "--repeat", "Repeat the last zoom command") do
+            options["repeat"] = true
+        end
+
         opts.on("--rc", "Create default .zoomrc file") do
             default_zoomrc
             exit
         end
 
-        opts.on("-r",
-                "--rename=NAME",
+        opts.on("--rename=NAME",
                 "Rename the current profile") do |name|
             options["rename"] = name
         end
@@ -331,6 +338,9 @@ def parse(args)
                 "Execute the current profile:",
                 "    $ z PATTERN",
                 "",
+                "Repeat the previous zoom command:",
+                "    $ z --repeat",
+                "",
                 "Pass additional flags to the choosen operator:",
                 "    $ z -- -A 3 PATTERN")
     end
@@ -346,6 +356,8 @@ def parse(args)
         options["go"] = args[0]
     when "zl"
         options["list"] = true
+    when "zr"
+        options["repeat"] = true
     end
 
     options["pattern"] = args.delete_at(-1)
@@ -362,6 +374,12 @@ def read_zoomrc()
         profiles[name] = Profile.from_json(prof)
     end
     rc["profiles"] = profiles
+    if (rc.has_key?("last_command"))
+        if (rc["last_command"].has_key?("profile"))
+            profile = Profile.from_json(rc["last_command"]["profile"])
+            rc["last_command"]["profile"] = profile
+        end
+    end
     return rc
 end
 
@@ -466,6 +484,15 @@ if (options["pager"])
             f.write(line)
         end
     end
+elsif (options["repeat"])
+    if (rc.has_key?("last_command"))
+        if (rc["last_command"].has_key?("profile"))
+            # Search and save results
+            exe_command(rc["last_command"]["profile"],
+                        rc["last_command"]["subargs"],
+                        rc["last_command"]["pattern"])
+        end
+    end
 elsif (options.has_key?("go"))
     # If passing in search result number, open it in editor
     open_editor_to_result(editor, options["go"])
@@ -562,6 +589,13 @@ elsif (options["which"])
     puts "### \e[32m#{prof_name}\e[0m ###"
     puts rc["profiles"][prof_name].info
 else
+    # Store last command
+    rc["last_command"] = Hash.new
+    rc["last_command"]["profile"] = profile
+    rc["last_command"]["subargs"] = options["subargs"]
+    rc["last_command"]["pattern"] = options["pattern"]
+    write_zoomrc(rc)
+
     # Search and save results
     exe_command(profile, options["subargs"], options["pattern"])
 end

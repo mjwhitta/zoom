@@ -37,6 +37,7 @@ cp $cwd/zoom.rb z
 [ ! -e zc ] && ln -fs z zc
 [ ! -e zg ] && ln -fs z zg
 [ ! -e zl ] && ln -fs z zl
+[ ! -e zr ] && ln -fs z zr
 
 # Create zoomrc if needed
 if [ ! -e ~/.zoomrc ]; then

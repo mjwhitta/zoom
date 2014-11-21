@@ -4,15 +4,7 @@
 
 ### Quickly open CLI search results in your favorite editor!
 
-Do you like to search through code using ag, ack, or grep? Good! This
-tool is for you! zoom adds some convenience to ag/ack/grep by allowing
-you to quickly open your search results in your editor of choice. When
-looking at large code-bases, it can be a pain to have to scroll to
-find the filename of each result. zoom prints a tag number in front of
-each result that ag/ack/grep outputs. Then you can quickly open that
-tag number with zoom to jump straight to the source. zoom is even
-persistent across all your sessions! You can search in one terminal
-and jump to a tag in another terminal from any directory!
+Do you like to search through code using ag, ack, or grep? Good! This tool is for you! zoom adds some convenience to ag/ack/grep by allowing you to quickly open your search results in your editor of choice. When looking at large code-bases, it can be a pain to have to scroll to find the filename of each result. zoom prints a tag number in front of each result that ag/ack/grep outputs. Then you can quickly open that tag number with zoom to jump straight to the source. zoom is even persistent across all your sessions! You can search in one terminal and jump to a tag in another terminal from any directory!
 
 ## How to install
 
@@ -24,8 +16,7 @@ $ cd zoom
 $ ./install_zoom.sh
 ```
 
-The default install directory is `~/bin`. You can change this by
-passing in the install directory of you choice like below:
+The default install directory is `~/bin`. You can change this by passing in the install directory of you choice like below:
 
 ```bash
 $ ./install_zoom.sh ~/scripts
@@ -33,9 +24,7 @@ $ ./install_zoom.sh ~/scripts
 
 ## Mac users
 
-If using the grep operator, you need to install
-[homebrew](http://brew.sh) and then run the following commands before
-using zoom:
+If using the grep operator, you need to install [homebrew](http://brew.sh) and then run the following commands before using zoom:
 
 ```bash
 $ brew install gnu-sed grep
@@ -59,22 +48,16 @@ Usage: z [OPTIONS] <pattern>
     -h, --help                       Display this help message
     -l, --list                       List profiles
     -o, --operator=OPERATOR          Set operator for current profile
+        --pager                      Treate zoom as a pager, for use with ag and ack
     -p, --prepend=PREPEND            Set the prepend string for the current profile
+    -r, --repeat                     Repeat the last zoom command
         --rc                         Create default .zoomrc file
-    -r, --rename=NAME                Rename the current profile
+        --rename=NAME                Rename the current profile
     -s, --switch=NAME                Switch to profile with specified name
     -u, --use=NAME                   Use specified profile one time only
     -w, --which                      Display the current profile
 
-Do you like to search through code using ag, ack, or grep? Good! This
-tool is for you! zoom adds some convenience to ag/ack/grep by allowing
-you to quickly open your search results in your editor of choice. When
-looking at large code-bases, it can be a pain to have to scroll to
-find the filename of each result. zoom prints a tag number in front of
-each result that ag/ack/grep outputs. Then you can quickly open that
-tag number with zoom to jump straight to the source. zoom is even
-persistent across all your sessions! You can search in one terminal
-and jump to a tag in another terminal from any directory!
+Do you like to search through code using ag, ack, or grep? Good! This tool is for you! zoom adds some convenience to ag/ack/grep by allowing you to quickly open your search results in your editor of choice. When looking at large code-bases, it can be a pain to have to scroll to find the filename of each result. zoom prints a tag number in front of each result that ag/ack/grep outputs. Then you can quickly open that tag number with zoom to jump straight to the source. zoom is even persistent across all your sessions! You can search in one terminal and jump to a tag in another terminal from any directory!
 
 EXAMPLES:
 
@@ -97,6 +80,9 @@ Change the prepend string of the current profile:
 Execute the current profile:
     $ z PATTERN
 
+Repeat the previous zoom command:
+    $ z --repeat
+
 Pass additional flags to the choosen operator:
     $ z -- -A 3 PATTERN
 ```
@@ -105,9 +91,7 @@ You can use zoom basically the same way you use ag/ack/grep.
 
 ## Shortcuts
 
-zoom prefixes shortcut tags to ag/ack/grep's search results! If you
-use zoom to search for "find_in_path" in the zoom source directory,
-you would see something like the following:
+zoom prefixes shortcut tags to ag/ack/grep's search results! If you use zoom to search for "find_in_path" in the zoom source directory, you would see something like the following:
 
 ```bash
 $ z find_in_path
@@ -135,23 +119,17 @@ $ z --go 9
 
 ### Persistent shortcuts
 
-When you perform a search with zoom, all results are cached. Using the
-following command will allow you to see the previous search results
-again:
+When you perform a search with zoom, all results are cached. Using the following command will allow you to see the previous search results again:
 
 ```bash
 $ z --cache
 ```
 
-This means your tags/shortcuts are persistent across all sessions. You
-can use other terminals to view your search results or to open them in
-an editor.
+This means your tags/shortcuts are persistent across all sessions. You can use other terminals to view your search results or to open them in an editor.
 
 ## Profiles
 
-Profiles allow you to create shortcuts to your favorite commands. Some
-profiles are created for you when you first run zoom. Use the
-following command to list your profiles:
+Profiles allow you to create shortcuts to your favorite commands. Some profiles are created for you when you first run zoom. Use the following command to list your profiles:
 
 ```bash
 $ z --list
@@ -159,23 +137,20 @@ $ z --list
 
 These profiles do not need to be limited to ag/ack/grep shortcuts.
 
-Note: The `default` profile is special and can't be deleted. You can
-however modify it.
+Note: The `default` profile is special and can't be deleted. You can however modify it.
 
 ## Convenient symlinks
 
-If you find it tedious to use zoom with the flags, there are currently
-3 convience symlinks that are supported.
+If you find it tedious to use zoom with the flags, there are currently 3 convience symlinks that are supported.
 
 - `zc` is the same as `z --cache` or `z -c`
 - `zg` is the same as `z --go` or `z -g`
 - `zl` is the same as `z --list` or `z -l`
+- `zr` is the same as `z --repeat` or `z -r`
 
 ## Penetration testing
 
-zoom allows to you create profiles for commands other than
-ag/ack/grep. This may make zoom a friendly tool for pen-testers who
-are looking for a simple way to store exploits.
+zoom allows to you create profiles for commands other than ag/ack/grep. This may make zoom a friendly tool for pen-testers who are looking for a simple way to store exploits.
 
 ## Supported editors
 
@@ -198,15 +173,10 @@ ack is the replacement for grep!
 
 ## What is [grep](http://en.wikipedia.org/wiki/Grep)?
 
-If you don't know what grep is, this probably isn't the tool for you.
-You should learn how to properly use grep before using a tool such as
-zoom which attempts to streamline the process for you.
+If you don't know what grep is, this probably isn't the tool for you. You should learn how to properly use grep before using a tool such as zoom which attempts to streamline the process for you.
 
 ## TODO
 
  - Need to test to see if any ag/ack/grep flags break functionality.
- - Sometimes ag thinks files aren't binary when they should (?) be.
-   For example, some pdfs are skipped b/c they are binary files, but
-   some pdfs aren't skipped. Maybe file an issue on the ag Github
-   page.
+ - Sometimes ag thinks files aren't binary when they should (?) be. For example, some pdfs are skipped b/c they are binary files, but some pdfs aren't skipped. Maybe file an issue on the ag Github page.
  - Make comments/documentation more thorough.
