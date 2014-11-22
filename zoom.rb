@@ -208,9 +208,11 @@ def parse(args)
         opts.banner =
             "Usage: #{File.basename($0)} [OPTIONS] <pattern>"
 
-        opts.on("-a",
-                "--add=NAME",
-                "Add a new profile with specified name") do |profile|
+        opts.on(
+            "-a",
+            "--add=NAME",
+            "Add a new profile with specified name"
+        ) do |profile|
             options["add"] = profile
         end
 
@@ -221,27 +223,35 @@ def parse(args)
             exit
         end
 
-        opts.on("-d",
-                "--delete=NAME",
-                "Delete profile with specified name") do |profile|
+        opts.on(
+            "-d",
+            "--delete=NAME",
+            "Delete profile with specified name"
+        ) do |profile|
             options["delete"] = profile
         end
 
-        opts.on("-e",
-                "--editor=EDITOR",
-                "Use the specified editor") do |editor|
+        opts.on(
+            "-e",
+            "--editor=EDITOR",
+            "Use the specified editor"
+        ) do |editor|
             options["editor"] = editor
         end
 
-        opts.on("-f",
-                "--flags=FLAGS",
-                "Set flags for current profile") do |flags|
+        opts.on(
+            "-f",
+            "--flags=FLAGS",
+            "Set flags for current profile"
+        ) do |flags|
             options["flags"] = flags
         end
 
-        opts.on("-g",
-                "--go=NUM",
-                "Open editor to search result NUM") do |g|
+        opts.on(
+            "-g",
+            "--go=NUM",
+            "Open editor to search result NUM"
+        ) do |g|
             options["go"] = g
         end
 
@@ -254,21 +264,26 @@ def parse(args)
             options["list"] = true
         end
 
-        opts.on("-o",
-                "--operator=OPERATOR",
-                "Set operator for current profile") do |op|
+        opts.on(
+            "-o",
+            "--operator=OPERATOR",
+            "Set operator for current profile"
+        ) do |op|
             options["operator"] = op
         end
 
-        opts.on("--pager",
-                "Treate zoom as a pager, for use with ag and ack") do
+        opts.on(
+            "--pager",
+            "Treate zoom as a pager, for use with ag and ack"
+        ) do
             options["pager"] = true
         end
 
-        opts.on("-p",
-                "--prepend=PREPEND",
-                "Set the prepend string for the current " \
-                "profile") do |env_prepend|
+        opts.on(
+            "-p",
+            "--prepend=PREPEND",
+            "Set the prepend string for the current profile"
+        ) do |env_prepend|
             options["prepend"] = env_prepend
         end
 
@@ -281,20 +296,26 @@ def parse(args)
             exit
         end
 
-        opts.on("--rename=NAME",
-                "Rename the current profile") do |name|
+        opts.on(
+            "--rename=NAME",
+            "Rename the current profile"
+        ) do |name|
             options["rename"] = name
         end
 
-        opts.on("-s",
-                "--switch=NAME",
-                "Switch to profile with specified name") do |profile|
+        opts.on(
+            "-s",
+            "--switch=NAME",
+            "Switch to profile with specified name"
+        ) do |profile|
             options["switch"] = profile
         end
 
-        opts.on("-u",
-                "--use=NAME",
-                "Use specified profile one time only") do |profile|
+        opts.on(
+            "-u",
+            "--use=NAME",
+            "Use specified profile one time only"
+        ) do |profile|
             options["use"] = profile
         end
 
@@ -302,47 +323,54 @@ def parse(args)
             options["which"] = true
         end
 
-        opts.on("",
-                "Do you like to search through code using ag, ack, " \
-                "or grep? Good! This tool is for you! zoom adds " \
-                "some convenience to ag/ack/grep by allowing you " \
-                "to quickly open your search results in your " \
-                "editor of choice. When looking at large " \
-                "code-bases, it can be a pain to have to scroll to " \
-                "find the filename of each result. zoom prints a " \
-                "tag number in front of each result that " \
-                "ag/ack/grep outputs. Then you can quickly open " \
-                "that tag number with zoom to jump straight to the " \
-                "source. zoom is even persistent across all your " \
-                "sessions! You can search in one terminal and jump " \
-                "to a tag in another terminal from any directory!",
-                "",
-                "EXAMPLES:",
-                "",
-                "Add a profile named test:",
-                "    $ z --add test",
-                "",
-                "Change the operator of the current profile:",
-                "    $ z --operator grep",
-                "",
-                "Change the operator of the profile \"test\":",
-                "    $ z --use test --operator grep",
-                "",
-                "Change the flags of the current profile:",
-                "    $ z --flags \"--color=always -EHIinR\"",
-                "",
-                "Change the prepend string of the current profile:",
-                "    $ z --prepend \"PATH=/bin\"",
-                "    $ z --prepend \"cd /some/path;\"",
-                "",
-                "Execute the current profile:",
-                "    $ z PATTERN",
-                "",
-                "Repeat the previous zoom command:",
-                "    $ z --repeat",
-                "",
-                "Pass additional flags to the choosen operator:",
-                "    $ z -- -A 3 PATTERN")
+        opts.on(
+            "",
+            "Do you like to search through code using ag, ack, or " \
+            "grep? Good! This tool is for you! zoom adds some " \
+            "convenience to ag/ack/grep by allowing you to quickly " \
+            "open your search results in your editor of choice. " \
+            "When looking at large code-bases, it can be a pain to " \
+            "have to scroll to find the filename of each result. " \
+            "zoom prints a tag number in front of each result that " \
+            "ag/ack/grep outputs. Then you can quickly open that " \
+            "tag number with zoom to jump straight to the source. " \
+            "zoom is even persistent across all your sessions! You " \
+            "can search in one terminal and jump to a tag in " \
+            "another terminal from any directory!",
+            "",
+            "EXAMPLES:",
+            "",
+            "Add a profile named test:",
+            "    $ z --add test",
+            "",
+            "Change the operator of the current profile:",
+            "    $ z --operator grep",
+            "",
+            "Change the operator of the profile \"test\":",
+            "    $ z --use test --operator grep",
+            "",
+            "Change the flags of the current profile:",
+            "    $ z --flags \"--color=always -EHIinR\"",
+            "",
+            "Change the prepend string of the current profile:",
+            "    $ z --prepend \"PATH=/bin\"",
+            "    $ z --prepend \"cd /some/path;\"",
+            "",
+            "Execute the current profile:",
+            "    $ z PATTERN",
+            "",
+            "Repeat the previous zoom command:",
+            "    $ z --repeat",
+            "",
+            "Pass additional flags to the choosen operator:",
+            "    $ z -- -A 3 PATTERN",
+            "",
+            "Open a tag:",
+            "    $ z --go 10",
+            "",
+            "Open multiple tags:",
+            "    $ z --go 10,20,30-40"
+        )
     end
     parser.parse!
 
@@ -363,6 +391,23 @@ def parse(args)
     options["pattern"] = args.delete_at(-1)
     options["subargs"] = args.join(" ")
     return options
+end
+
+def parse_tags(go)
+    tags = Array.new
+    go.split(",").each do |num|
+        if (!num.scan(/^[0-9]+$/).empty?)
+            tags.push(num.to_i)
+        elsif (!num.scan(/^[0-9]+-[0-9]+$/).empty?)
+            range = num.split("-")
+            (range[0].to_i..range[1].to_i).each do |i|
+                tags.push(i)
+            end
+        else
+            puts "#{num} was not formatted properly. Ignoring."
+        end
+    end
+    return tags
 end
 
 def read_zoomrc()
@@ -494,8 +539,10 @@ elsif (options["repeat"])
         end
     end
 elsif (options.has_key?("go"))
-    # If passing in search result number, open it in editor
-    open_editor_to_result(editor, options["go"])
+    # If passing in search result tags, open them in editor
+    parse_tags(options["go"]).each do |tag|
+        open_editor_to_result(editor, tag)
+    end
 elsif (options.has_key?("add"))
     # Add a new profile
     prof = options["add"]

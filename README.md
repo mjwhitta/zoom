@@ -85,6 +85,12 @@ Repeat the previous zoom command:
 
 Pass additional flags to the choosen operator:
     $ z -- -A 3 PATTERN
+
+Open a tag:
+    $ z --go 10
+
+Open multiple tags:
+    $ z --go 10,20,30-40
 ```
 
 You can use zoom basically the same way you use ag/ack/grep.
