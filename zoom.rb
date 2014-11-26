@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require "io/wait"
 require "json"
 require "optparse"
 require "pathname"
@@ -540,8 +541,45 @@ elsif (options["repeat"])
     end
 elsif (options.has_key?("go"))
     # If passing in search result tags, open them in editor
-    parse_tags(options["go"]).each do |tag|
-        open_editor_to_result(editor, tag)
+    tags = parse_tags(options["go"])
+
+    # Open first result with no prompt
+    tag = tags.delete_at(0)
+    open_editor_to_result(editor, tag)
+
+    # Open remaining results with prompts
+    tags.each do |tag|
+        print "Do you want to open result #{tag} [y]/n/q/l?: "
+
+        answer = nil
+        while (!answer)
+            begin
+                system("stty raw -echo")
+                if $stdin.ready?
+                    answer = $stdin.getc.chr
+                else
+                    sleep 0.1
+                end
+            ensure
+                system("stty -raw echo")
+            end
+        end
+        puts
+
+        case answer
+        when "n", "N"
+            # Do nothing
+        when "l", "L"
+            # Open this result, then exit
+            open_editor_to_result(editor, tag)
+            exit
+        when "q", "Q", "\x03"
+            # Quit or ^C
+            exit
+        else
+            # Do nothing
+            open_editor_to_result(editor, tag)
+        end
     end
 elsif (options.has_key?("add"))
     # Add a new profile
