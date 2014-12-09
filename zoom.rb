@@ -76,7 +76,7 @@ def default_zoomrc()
                 "-S",
                 '--color-match "47;1;30"',
                 '--color-line-number "0;37"',
-                "--ignore *.pdf"
+                '--ignore="*.pdf"'
             ].join(" ").strip
         )
         all = Profile.new(
