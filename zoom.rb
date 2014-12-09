@@ -72,9 +72,12 @@ def default_zoomrc()
     if (find_in_path("ag"))
         ag = Profile.new(
             "ag",
-            "-S --color-match \"47;1;30\" " \
-            "--color-line-number \"0;37\" " \
-            "--ignore *.pdf"
+            [
+                "-S",
+                '--color-match "47;1;30"',
+                '--color-line-number "0;37"',
+                "--ignore *.pdf"
+            ].join(" ").strip
         )
         all = Profile.new(
             "ag",
@@ -106,18 +109,36 @@ def default_zoomrc()
     # Default grep profile (emulate ag/ack as much as possible)
     grep = Profile.new(
         "grep",
-        "--color=always -EHIinR " \
-        "--exclude-dir=.bzr --exclude-dir=.git " \
-        "--exclude-dir=.svn",
-        "GREP_COLORS=\"fn=1;32:ln=0;37:" \
-        "ms=47;1;30:mc=47;1;30:sl=:cx=:bn=:se=\""
+        [
+            "--color=always",
+            "-EHIinR",
+            "--exclude-dir=.bzr",
+            "--exclude-dir=.git",
+            "--exclude-dir=.svn"
+        ].join(" ").strip,
+        [
+            'GREP_COLORS="',
+            "fn=1;32:",
+            "ln=0;37:",
+            "ms=47;1;30:",
+            "mc=47;1;30:",
+            "sl=:cx=:bn=:se=",
+            '"'
+        ].join.strip
     )
     if (!all)
         all = Profile.new(
             "grep",
             "--color=always -EHinR",
-            "GREP_COLORS=\"fn=1;32:ln=0;37:" \
-            "ms=47;1;30:mc=47;1;30:sl=:cx=:bn=:se=\""
+            [
+                'GREP_COLORS="',
+                "fn=1;32:",
+                "ln=0;37:",
+                "ms=47;1;30:",
+                "mc=47;1;30:",
+                "sl=:cx=:bn=:se=",
+                '"'
+            ].join.strip
         )
     end
 
@@ -131,7 +152,7 @@ def default_zoomrc()
     end
 
     # Create find profile
-    find = Profile.new("find", ". -name", "")
+    find = Profile.new("find", ". -name")
 
     # Put profiles into rc
     profs["ack"] = ack if (ack)
