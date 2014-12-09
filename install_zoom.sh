@@ -35,6 +35,7 @@ mkdir -p $INSTALL_DIR && cd $INSTALL_DIR
 # Copy
 cp $cwd/zoom.rb z
 [ ! -e zc ] && ln -fs z zc
+[ ! -e zf ] && ln -fs z zf
 [ ! -e zg ] && ln -fs z zg
 [ ! -e zl ] && ln -fs z zl
 [ ! -e zr ] && ln -fs z zr

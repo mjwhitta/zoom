@@ -47,6 +47,10 @@ class Profile < Hash
         return self["prepend"]
     end
 
+    def scan(pattern)
+        to_s.scan(pattern)
+    end
+
     def to_s()
         [self["prepend"], self["operator"], self["flags"]].join(" ")
     end
@@ -110,12 +114,16 @@ def default_zoomrc()
         default = grep
     end
 
+    # Create find profile
+    find = Profile.new("find", ". -name", "")
+
     # Put profiles into rc
     profs["ack"] = ack if (ack)
     profs["ag"] = ag if (ag)
     profs["all"] = all if (all)
     profs["default"] = default
     profs["grep"] = grep
+    profs["zoom_find"] = find
 
     # Default editor (use $EDITOR)
     rc["editor"] = ""
@@ -157,7 +165,19 @@ def exe_command(profile, args, pattern)
 
         shortcut_cache
     else
-        system("#{profile} #{pattern}")
+        if (!profile.scan(/find \. -name/).empty?)
+            CACHE_FILE.delete if (CACHE_FILE.exist?)
+
+            if (!pattern.nil? && !pattern.empty?)
+                system("#{profile} #{args} \"#{pattern}\" | #{PAGER}")
+            else
+                system("#{profile} #{args} \"*\" | #{PAGER}")
+            end
+
+            shortcut_cache
+        else
+            system("#{profile} #{pattern}")
+        end
     end
 end
 
@@ -195,7 +215,7 @@ end
 def open_editor_to_result(editor, result)
     loc = get_location_of_result(result.to_i)
     if (loc)
-        system("#{editor} +#{loc}")
+        system("#{editor} #{loc}")
     else
         puts "Invalid tag \"#{result}\"!"
     end
@@ -246,6 +266,10 @@ def parse(args)
             "Set flags for current profile"
         ) do |flags|
             options["flags"] = flags
+        end
+
+        opts.on("--find", "Use the zoom_find profile") do
+            options["use"] = "zoom_find"
         end
 
         opts.on(
@@ -381,6 +405,8 @@ def parse(args)
             shortcut_cache
         end
         exit
+    when "zf"
+        options["use"] = "zoom_find"
     when "zg"
         options["go"] = args[0]
     when "zl"
@@ -457,15 +483,22 @@ def shortcut_cache()
                 # Ignore dividers when searching with context and
                 # empty lines
             elsif (plain.scan(/^[0-9]+[:-]/).empty?)
-                if (file != line)
-                    # Filename
-                    file = line
-                    filename = remove_colors(file)
+                if (plain.scan(/^\.\//).empty?)
+                    if (file != line)
+                        # Filename
+                        file = line
+                        filename = remove_colors(file)
 
-                    puts if (!first_time)
-                    first_time = false
+                        puts if (!first_time)
+                        first_time = false
 
-                    puts "\e[0m#{file}"
+                        puts "\e[0m#{file}"
+                    end
+                else
+                    # Operator was probably find
+                    puts "\e[1;31m[#{count}]\e[0m #{line}"
+                    shct.write("'#{start_dir}/#{line}'\n")
+                    count += 1
                 end
             elsif (file)
                 # Match
@@ -474,7 +507,7 @@ def shortcut_cache()
                 puts "\e[1;31m[#{count}]\e[0m #{sanitized}"
 
                 lineno = remove_colors(line).split(/[:-]/)[0]
-                shct.write("#{lineno} '#{start_dir}/#{filename}'\n")
+                shct.write("+#{lineno} '#{start_dir}/#{filename}'\n")
 
                 count += 1
             end
@@ -608,8 +641,12 @@ elsif (options.has_key?("delete"))
     rc["profile"] = "default" if (prof_name == prof)
 
     if (prof != "default")
-        rc["profiles"].delete(prof)
-        write_zoomrc(rc)
+        if (prof != "zoom_find")
+            rc["profiles"].delete(prof)
+            write_zoomrc(rc)
+        else
+            puts "You can't delete the zoom_find profile!"
+        end
     else
         puts "You can't delete the default profile!"
     end
@@ -626,9 +663,13 @@ elsif (options.has_key?("editor"))
         puts "Editor #{options["editor"]} was not found!"
     end
 elsif (options.has_key?("flags"))
-    # Set the flags for the current profile
-    rc["profiles"][prof_name].flags(options["flags"])
-    write_zoomrc(rc)
+    if (prof_name != "zoom_find")
+        # Set the flags for the current profile
+        rc["profiles"][prof_name].flags(options["flags"])
+        write_zoomrc(rc)
+    else
+        puts "You can't modify the zoom_find profile!"
+    end
 elsif (options.has_key?("list"))
     # List the profiles
     rc["profiles"].keys.sort.each do |name|
@@ -641,18 +682,28 @@ elsif (options.has_key?("list"))
         puts
     end
 elsif (options.has_key?("operator"))
-    # Set the operator for the current profile
-    rc["profiles"][prof_name].operator(options["operator"])
-    write_zoomrc(rc)
+    if (prof_name != "zoom_find")
+        # Set the operator for the current profile
+        rc["profiles"][prof_name].operator(options["operator"])
+        write_zoomrc(rc)
+    else
+        puts "You can't modify the zoom_find profile!"
+    end
 elsif (options.has_key?("prepend"))
-    # Set the prepend string for the current profile
-    rc["profiles"][prof_name].prepend(options["prepend"])
-    write_zoomrc(rc)
+    if (prof_name != "zoom_find")
+        # Set the prepend string for the current profile
+        rc["profiles"][prof_name].prepend(options["prepend"])
+        write_zoomrc(rc)
+    else
+        puts "You can't modify the zoom_find profile!"
+    end
 elsif (options.has_key?("rename"))
     # Rename the current profile
     prof = options["rename"]
     if (prof_name == "default")
         puts "You can't rename the default profile!"
+    elsif (prof_name == "zoom_find")
+        puts "You can't rename the zoom_find profile!"
     elsif (rc["profiles"].has_key?(prof))
         puts "Profile \"#{prof}\" already exists!"
     elsif (prof_name != prof)
