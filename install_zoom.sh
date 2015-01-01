@@ -40,9 +40,4 @@ cp $cwd/zoom.rb z
 [ ! -e zl ] && ln -fs z zl
 [ ! -e zr ] && ln -fs z zr
 
-# Create zoomrc if needed
-if [ ! -e ~/.zoomrc ]; then
-    ./z --rc
-fi
-
 echo "done!"
