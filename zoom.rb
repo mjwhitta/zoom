@@ -64,6 +64,16 @@ class Profile < Hash
     end
 end
 
+def default_zoominfo()
+    info = Hash.new
+    info["profile"] = "default"
+
+    # Reset last command to be empty
+    info["last_command"] = Hash.new
+
+    write_zoominfo(info)
+end
+
 def default_zoomrc()
     rc = Hash.new
     profs = Hash.new
@@ -164,11 +174,7 @@ def default_zoomrc()
 
     # Default editor (use $EDITOR)
     rc["editor"] = ""
-    rc["profile"] = "default"
     rc["profiles"] = profs
-
-    # Reset last command to be empty
-    rc["last_command"] = Hash.new
 
     write_zoomrc(rc)
 end
@@ -360,6 +366,7 @@ def parse(args)
         end
 
         opts.on("--rc", "Create default .zoomrc file") do
+            default_zoominfo
             default_zoomrc
             exit
         end
@@ -480,6 +487,19 @@ def parse_tags(go)
     return tags
 end
 
+def read_zoominfo()
+    default_zoominfo if (!INFO_FILE.exist? && !INFO_FILE.symlink?)
+
+    info = JSON.parse(File.read(INFO_FILE))
+    if (info.has_key?("last_command"))
+        if (info["last_command"].has_key?("profile"))
+            profile = Profile.from_json(info["last_command"]["profile"])
+            info["last_command"]["profile"] = profile
+        end
+    end
+    return info
+end
+
 def read_zoomrc()
     default_zoomrc if (!RC_FILE.exist? && !RC_FILE.symlink?)
 
@@ -489,12 +509,6 @@ def read_zoomrc()
         profiles[name] = Profile.from_json(prof)
     end
     rc["profiles"] = profiles
-    if (rc.has_key?("last_command"))
-        if (rc["last_command"].has_key?("profile"))
-            profile = Profile.from_json(rc["last_command"]["profile"])
-            rc["last_command"]["profile"] = profile
-        end
-    end
     return rc
 end
 
@@ -558,19 +572,27 @@ def shortcut_cache()
     end
 end
 
+def write_zoominfo(info)
+    File.open(INFO_FILE, "w") do |file|
+        file.write(JSON.pretty_generate(info))
+    end
+end
+
 def write_zoomrc(rc)
     File.open(RC_FILE, "w") do |file|
         file.write(JSON.pretty_generate(rc))
     end
 end
 
-RC_FILE = Pathname("~/.zoomrc").expand_path
 CACHE_FILE = Pathname("~/.zoom_cache").expand_path
-SHORTCUT_FILE = Pathname("~/.zoom_shortcuts").expand_path
+INFO_FILE = Pathname("~/.zoominfo").expand_path
 PAGER = "#{File.expand_path($0)} --pager"
+RC_FILE = Pathname("~/.zoomrc").expand_path
+SHORTCUT_FILE = Pathname("~/.zoom_shortcuts").expand_path
 
 # Parse cli args and read in rc file
 options = parse(ARGV)
+info = read_zoominfo
 rc = read_zoomrc
 
 # Get info from rc
@@ -582,7 +604,7 @@ if (options.has_key?("use"))
         exit
     end
 else
-    prof_name = rc["profile"]
+    prof_name = info["profile"]
 end
 profile = rc["profiles"][prof_name]
 
@@ -607,13 +629,13 @@ if (options["pager"])
         end
     end
 elsif (options["repeat"])
-    if (rc.has_key?("last_command"))
-        if (rc["last_command"].has_key?("profile"))
+    if (info.has_key?("last_command"))
+        if (info["last_command"].has_key?("profile"))
             # Search and save results
             exe_command(
-                rc["last_command"]["profile"],
-                rc["last_command"]["subargs"],
-                rc["last_command"]["pattern"]
+                info["last_command"]["profile"],
+                info["last_command"]["subargs"],
+                info["last_command"]["pattern"]
             )
         end
     end
@@ -683,11 +705,12 @@ elsif (options.has_key?("delete"))
     # Delete an existing profile
     prof = options["delete"]
 
-    rc["profile"] = "default" if (prof_name == prof)
+    info["profile"] = "default" if (prof_name == prof)
 
     if (prof != "default")
         if (prof != "zoom_find")
             rc["profiles"].delete(prof)
+            write_zoominfo(info)
             write_zoomrc(rc)
         else
             puts "You can't delete the zoom_find profile!"
@@ -752,17 +775,18 @@ elsif (options.has_key?("rename"))
     elsif (rc["profiles"].has_key?(prof))
         puts "Profile \"#{prof}\" already exists!"
     elsif (prof_name != prof)
-        rc["profile"] = prof if (rc["profile"] == prof_name)
+        info["profile"] = prof if (info["profile"] == prof_name)
         rc["profiles"][prof] = rc["profiles"][prof_name]
         rc["profiles"].delete(prof_name)
+        write_zoominfo(info)
         write_zoomrc(rc)
     end
 elsif (options.has_key?("switch"))
     # Switch profiles
     prof = options["switch"]
     if (rc["profiles"].has_key?(prof))
-        rc["profile"] = prof
-        write_zoomrc(rc)
+        info["profile"] = prof
+        write_zoominfo(info)
     else
         puts "Profile \"#{prof}\" does not exist!"
     end
@@ -771,11 +795,11 @@ elsif (options["which"])
     puts rc["profiles"][prof_name].info
 else
     # Store last command
-    rc["last_command"] = Hash.new
-    rc["last_command"]["profile"] = profile
-    rc["last_command"]["subargs"] = options["subargs"]
-    rc["last_command"]["pattern"] = options["pattern"]
-    write_zoomrc(rc)
+    info["last_command"] = Hash.new
+    info["last_command"]["profile"] = profile
+    info["last_command"]["subargs"] = options["subargs"]
+    info["last_command"]["pattern"] = options["pattern"]
+    write_zoominfo(info)
 
     # Search and save results
     exe_command(profile, options["subargs"], options["pattern"])
