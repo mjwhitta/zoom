@@ -642,6 +642,7 @@ elsif (options["repeat"])
 elsif (options.has_key?("go"))
     # If passing in search result tags, open them in editor
     tags = parse_tags(options["go"])
+    exit if (tags.empty?)
 
     # Open first result with no prompt
     tag = tags.delete_at(0)
