@@ -1,10 +1,10 @@
-# zoom
+# Zoom
 
 ## Inspired by [sack](https://github.com/sampson-chen/sack)
 
 ### Quickly open CLI search results in your favorite editor!
 
-Do you like to search through code using ag, ack, or grep? Good! This tool is for you! zoom adds some convenience to ag/ack/grep by allowing you to quickly open your search results in your editor of choice. When looking at large code-bases, it can be a pain to have to scroll to find the filename of each result. zoom prints a tag number in front of each result that ag/ack/grep outputs. Then you can quickly open that tag number with zoom to jump straight to the source. zoom is even persistent across all your sessions! You can search in one terminal and jump to a tag in another terminal from any directory!
+Do you like to search through code using ag, ack, or grep? Good! This tool is for you! Zoom adds some convenience to ag/ack/grep by allowing you to quickly open your search results in your editor of choice. When looking at large code-bases, it can be a pain to have to scroll to find the filename of each result. Zoom prints a tag number in front of each result that ag/ack/grep outputs. Then you can quickly open that tag number with Zoom to jump straight to the source. Zoom is even persistent across all your sessions! You can search in one terminal and jump to a tag in another terminal from any directory!
 
 ## How to install
 
@@ -24,7 +24,7 @@ $ ./install_zoom.sh ~/scripts
 
 ## Mac users
 
-If using the grep operator, you need to install [homebrew](http://brew.sh) and then run the following commands before using zoom:
+If using the grep operator, you need to install [homebrew](http://brew.sh) and then run the following commands before using Zoom:
 
 ```bash
 $ brew install gnu-sed grep
@@ -44,6 +44,7 @@ Usage: z [OPTIONS] <pattern>
     -d, --delete=NAME                Delete profile with specified name
     -e, --editor=EDITOR              Use the specified editor
     -f, --flags=FLAGS                Set flags for current profile
+        --find                       Use the zoom_find profile
     -g, --go=NUM                     Open editor to search result NUM
     -h, --help                       Display this help message
     -l, --list                       List profiles
@@ -56,8 +57,6 @@ Usage: z [OPTIONS] <pattern>
     -s, --switch=NAME                Switch to profile with specified name
     -u, --use=NAME                   Use specified profile one time only
     -w, --which                      Display the current profile
-
-Do you like to search through code using ag, ack, or grep? Good! This tool is for you! zoom adds some convenience to ag/ack/grep by allowing you to quickly open your search results in your editor of choice. When looking at large code-bases, it can be a pain to have to scroll to find the filename of each result. zoom prints a tag number in front of each result that ag/ack/grep outputs. Then you can quickly open that tag number with zoom to jump straight to the source. zoom is even persistent across all your sessions! You can search in one terminal and jump to a tag in another terminal from any directory!
 
 EXAMPLES:
 
@@ -93,11 +92,11 @@ Open multiple tags:
     $ z --go 10,20,30-40
 ```
 
-You can use zoom basically the same way you use ag/ack/grep.
+You can use Zoom basically the same way you use ag/ack/grep.
 
 ## Shortcuts
 
-zoom prefixes shortcut tags to ag/ack/grep's search results! If you use zoom to search for "find_in_path" in the zoom source directory, you would see something like the following:
+Zoom prefixes shortcut tags to ag/ack/grep's search results! If you use Zoom to search for "find_in_path" in the Zoom source directory, you would see something like the following:
 
 ```bash
 $ z find_in_path
@@ -125,7 +124,7 @@ $ z --go 9
 
 ### Persistent shortcuts
 
-When you perform a search with zoom, all results are cached. Using the following command will allow you to see the previous search results again:
+When you perform a search with Zoom, all results are cached. Using the following command will allow you to see the previous search results again:
 
 ```bash
 $ z --cache
@@ -135,7 +134,7 @@ This means your tags/shortcuts are persistent across all sessions. You can use o
 
 ## Profiles
 
-Profiles allow you to create shortcuts to your favorite commands. Some profiles are created for you when you first run zoom. Use the following command to list your profiles:
+Profiles allow you to create shortcuts to your favorite commands. Some profiles are created for you when you first run Zoom. Use the following command to list your profiles:
 
 ```bash
 $ z --list
@@ -147,7 +146,7 @@ Note: The `default` profile is special and can't be deleted. You can however mod
 
 ## Convenient symlinks
 
-If you find it tedious to use zoom with the flags, there are currently 4 convience symlinks that are supported.
+If you find it tedious to use Zoom with the flags, there are currently 4 convience symlinks that are supported.
 
 - `zc` is the same as `z --cache` or `z -c`
 - `zg` is the same as `z --go` or `z -g`
@@ -156,11 +155,11 @@ If you find it tedious to use zoom with the flags, there are currently 4 convien
 
 ## Penetration testing
 
-zoom allows to you create profiles for commands other than ag/ack/grep. This may make zoom a friendly tool for pen-testers who are looking for a simple way to store exploits.
+Zoom allows to you create profiles for commands other than ag/ack/grep. This may make Zoom a friendly tool for pen-testers who are looking for a simple way to store exploits.
 
 ## Supported editors
 
-zoom currently works with:
+Zoom currently works with:
 
  - vim
  - emacs
@@ -179,7 +178,7 @@ ack is the replacement for grep!
 
 ## What is [grep](http://en.wikipedia.org/wiki/Grep)?
 
-If you don't know what grep is, this probably isn't the tool for you. You should learn how to properly use grep before using a tool such as zoom which attempts to streamline the process for you.
+If you don't know what grep is, this probably isn't the tool for you. You should learn how to properly use grep before using a tool such as Zoom which attempts to streamline the process for you.
 
 ## TODO
 

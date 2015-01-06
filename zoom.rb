@@ -348,7 +348,7 @@ def parse(args)
 
         opts.on(
             "--pager",
-            "Treate zoom as a pager, for use with ag and ack"
+            "Treate Zoom as a pager, for use with ag and ack"
         ) do
             options["pager"] = true
         end
@@ -361,7 +361,7 @@ def parse(args)
             options["prepend"] = env_prepend
         end
 
-        opts.on("-r", "--repeat", "Repeat the last zoom command") do
+        opts.on("-r", "--repeat", "Repeat the last Zoom command") do
             options["repeat"] = true
         end
 
@@ -401,15 +401,15 @@ def parse(args)
         opts.on(
             "",
             "Do you like to search through code using ag, ack, or " \
-            "grep? Good! This tool is for you! zoom adds some " \
+            "grep? Good! This tool is for you! Zoom adds some " \
             "convenience to ag/ack/grep by allowing you to quickly " \
             "open your search results in your editor of choice. " \
             "When looking at large code-bases, it can be a pain to " \
             "have to scroll to find the filename of each result. " \
-            "zoom prints a tag number in front of each result that " \
+            "Zoom prints a tag number in front of each result that " \
             "ag/ack/grep outputs. Then you can quickly open that " \
-            "tag number with zoom to jump straight to the source. " \
-            "zoom is even persistent across all your sessions! You " \
+            "tag number with Zoom to jump straight to the source. " \
+            "Zoom is even persistent across all your sessions! You " \
             "can search in one terminal and jump to a tag in " \
             "another terminal from any directory!",
             "",
@@ -434,7 +434,7 @@ def parse(args)
             "Execute the current profile:",
             "    $ z PATTERN",
             "",
-            "Repeat the previous zoom command:",
+            "Repeat the previous Zoom command:",
             "    $ z --repeat",
             "",
             "Pass additional flags to the choosen operator:",
