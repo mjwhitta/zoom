@@ -339,6 +339,20 @@ def parse(args)
         end
 
         opts.on(
+            "--list-profile-names",
+            "List profile names for completion functions"
+        ) do
+            options["list-profile-names"] = true
+        end
+
+        opts.on(
+            "--list-tags",
+            "List tags for completion functions"
+        ) do
+            options["list-tags"] = true
+        end
+
+        opts.on(
             "-o",
             "--operator=OPERATOR",
             "Set operator for current profile"
@@ -572,6 +586,38 @@ def shortcut_cache()
     end
 end
 
+def tags_from_cache()
+    return if (!CACHE_FILE.exist?)
+
+    # Open shortcut file for writing
+    shct = File.open(SHORTCUT_FILE, "r")
+
+    # Read in cache
+    File.open(CACHE_FILE) do |cache|
+        count = 1
+
+        cache.each do |line|
+            line.chomp!
+            plain = remove_colors(line)
+            if (line.start_with?("ZOOM_EXE_DIR="))
+                # Ignore this line
+            elsif ((line == "-") || (line == "--") || line.empty?)
+                # Ignore dividers when searching with context and
+                # empty lines
+            elsif (plain.scan(/^[0-9]+[:-]/).empty?)
+                if (!plain.scan(/^\.\//).empty?)
+                    # Operator was probably find
+                    puts count
+                    count += 1
+                end
+            else
+                puts count
+                count += 1
+            end
+        end
+    end
+end
+
 def write_zoominfo(info)
     File.open(INFO_FILE, "w") do |file|
         file.write(JSON.pretty_generate(info))
@@ -750,6 +796,13 @@ elsif (options.has_key?("list"))
         puts rc["profiles"][name].info
         puts
     end
+elsif (options.has_key?("list-profile-names"))
+    # List the profile names
+    rc["profiles"].keys.sort.each do |name|
+        puts name
+    end
+elsif (options.has_key?("list-tags"))
+    tags_from_cache
 elsif (options.has_key?("operator"))
     if (prof_name != "zoom_find")
         # Set the operator for the current profile

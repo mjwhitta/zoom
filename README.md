@@ -48,10 +48,12 @@ Usage: z [OPTIONS] <pattern>
     -g, --go=NUM                     Open editor to search result NUM
     -h, --help                       Display this help message
     -l, --list                       List profiles
+        --list-profile-names         List profile names for completion functions
+        --list-tags                  List tags for completion functions
     -o, --operator=OPERATOR          Set operator for current profile
-        --pager                      Treate zoom as a pager, for use with ag and ack
+        --pager                      Treate Zoom as a pager, for use with ag and ack
     -p, --prepend=PREPEND            Set the prepend string for the current profile
-    -r, --repeat                     Repeat the last zoom command
+    -r, --repeat                     Repeat the last Zoom command
         --rc                         Create default .zoomrc file
         --rename=NAME                Rename the current profile
     -s, --switch=NAME                Switch to profile with specified name
@@ -79,7 +81,7 @@ Change the prepend string of the current profile:
 Execute the current profile:
     $ z PATTERN
 
-Repeat the previous zoom command:
+Repeat the previous Zoom command:
     $ z --repeat
 
 Pass additional flags to the choosen operator:
@@ -179,6 +181,22 @@ ack is the replacement for grep!
 ## What is [grep](http://en.wikipedia.org/wiki/Grep)?
 
 If you don't know what grep is, this probably isn't the tool for you. You should learn how to properly use grep before using a tool such as Zoom which attempts to streamline the process for you.
+
+## ZSH completion function
+
+For some simple zsh completion with Zoom, you can add the following to
+your `~/.zshrc`:
+
+```bash
+fpath=(/path/to/zoom/repo $fpath)
+```
+
+You may need to run the following command to update your completion
+functions:
+
+```bash
+$ rm -f ~/.zcompdump; compinit
+```
 
 ## TODO
 

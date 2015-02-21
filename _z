@@ -1,0 +1,73 @@
+#compdef z zg
+# --------------------------------------------------------------------
+# Description
+# --------------------------------------------------------------------
+#
+# Completion script for z (https://bitbucket.org/mjwhitta/zoom)
+#
+# --------------------------------------------------------------------
+# Authors
+# --------------------------------------------------------------------
+#
+# Miles Whittaker <https://bitbucket.org/mjwhitta>
+#
+# --------------------------------------------------------------------
+
+zoom_flags=(
+    "(-a --add)"{-a,--add}"[Add a new profile with specified name]"
+    "(-c --cache)"{-c,--cache}"[Show previous results]"
+    "(-d --delete)"{-d,--delete}"[Delete profile with specified name]"
+    "(-e --editor)"{-e,--editor}"[Use the specified editor]"
+    "(-f --flags)"{-f,--flags}"[Set flags for current profile]"
+    "--find[Use the zoom_find profile]"
+    "(-g --go)"{-g,--go}"[Open editor to specific tag]"
+    "(-h --help)"{-h,--help}"[Display this help message]"
+    "(-l --list)"{-l,--list}"[List profiles]"
+    "--list-profile-names[List profile names for completion functions]"
+    "--list-tags[List tags for completion functions]"
+    "(-o --operator)"{-o,--operator}"[Set operator for current profile]"
+    "--pager[Treate Zoom as a pager, for use with ag and ack]"
+    "(-p --prepend)"{-p,--prepend}"[Set the prepend string for the current profile]"
+    "(-r --repeat)"{-r,--repeat}"[Repeat the last Zoom command]"
+    "--rc[Create default .zoomrc file]"
+    "--rename[Rename the current profile]"
+    "(-s --switch)"{-s,--switch}"[Switch to profile with specified name]"
+    "(-u --use)"{-u,--use}"[Use specified profile one time only]"
+    "(-w --which)"{-w,--which}"[Display the current profile]"
+)
+
+if [[ ${words[1]} == "z" ]]; then
+    case "${words[CURRENT - 1]}" in
+        "-d"|"--delete")
+            if [[ -n $(command -v z) ]]; then
+                compadd $(z --list-profile-names)
+            fi
+            ;;
+        "-e"|"--editor")
+            editors=(emacs jpico nano pico vim)
+            compadd $editors
+            ;;
+        "-g"|"--go")
+            if [[ -n $(command -v z) ]]; then
+                compadd $(z --list-tags)
+            fi
+            ;;
+        "-s"|"--switch")
+            if [[ -n $(command -v z) ]]; then
+                compadd $(z --list-profile-names)
+            fi
+            ;;
+        "-u"|"--use")
+            if [[ -n $(command -v z) ]]; then
+                compadd $(z --list-profile-names)
+            fi
+            ;;
+        *)
+            _arguments $zoom_flags
+            ;;
+    esac
+elif [[ ${words[1]} == "zg" ]]; then
+    if [[ -n $(command -v z) ]]; then
+        compadd $(z --list-tags)
+    fi
+fi
