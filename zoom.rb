@@ -93,6 +93,15 @@ def default_zoomrc()
             "ag",
             '-uS --color-match "47;1;30" --color-line-number "0;37"'
         )
+        passwords = Profile.new(
+            "ag",
+            [
+                "-uS",
+                '--color-match "47;1;30"',
+                '--color-line-number "0;37"',
+                "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
+            ].join(" ").strip
+        )
     else
         ag = nil
         all = nil
@@ -150,6 +159,23 @@ def default_zoomrc()
                 '"'
             ].join.strip
         )
+        passwords = Profile.new(
+            "grep",
+            [
+                "--color=always",
+                "-EHinR",
+                "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
+            ].join(" ").strip,
+            [
+                'GREP_COLORS="',
+                "fn=1;32:",
+                "ln=0;37:",
+                "ms=47;1;30:",
+                "mc=47;1;30:",
+                "sl=:cx=:bn=:se=",
+                '"'
+            ].join.strip
+        )
     end
 
     # Create default profile
@@ -170,6 +196,7 @@ def default_zoomrc()
     profs["all"] = all if (all)
     profs["default"] = default
     profs["grep"] = grep
+    profs["passwords"] = passwords
     profs["zoom_find"] = find
 
     # Default editor (use $EDITOR)
