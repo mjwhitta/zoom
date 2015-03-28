@@ -11,7 +11,7 @@ Do you like to search through code using ag, ack, or grep? Good! This tool is fo
 Open a terminal and run the following:
 
 ```bash
-$ git clone https://bitbucket.org/mjwhitta/zoom
+$ git clone https://gitlab.com/mjwhitta/zoom
 $ cd zoom
 $ ./install_zoom.sh
 ```
