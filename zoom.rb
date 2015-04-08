@@ -7,6 +7,10 @@ require "pathname"
 require "shellwords"
 
 class Profile < Hash
+    def exe(args, pattern)
+        system("#{self.to_s} #{args} #{pattern}")
+    end
+
     def flags(flags = nil)
         self["flags"] = flags if (flags)
         return self["flags"]
@@ -252,7 +256,7 @@ def exe_command(profile, args, pattern)
 
             shortcut_cache
         else
-            system("#{profile} #{args} #{pattern}")
+            profile.exe(args, pattern)
         end
     end
 end
