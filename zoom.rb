@@ -252,7 +252,7 @@ def exe_command(profile, args, pattern)
 
             shortcut_cache
         else
-            system("#{profile} #{pattern}")
+            system("#{profile} #{args} #{pattern}")
         end
     end
 end
