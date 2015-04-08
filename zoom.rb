@@ -389,7 +389,7 @@ def parse(args)
 
         opts.on(
             "--pager",
-            "Treate Zoom as a pager, for use with ag and ack"
+            "Treat Zoom as a pager (internal use only)"
         ) do
             options["pager"] = true
         end

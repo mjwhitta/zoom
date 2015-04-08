@@ -51,7 +51,7 @@ Usage: z [OPTIONS] <pattern>
         --list-profile-names         List profile names for completion functions
         --list-tags                  List tags for completion functions
     -o, --operator=OPERATOR          Set operator for current profile
-        --pager                      Treate Zoom as a pager, for use with ag and ack
+        --pager                      Treat Zoom as a pager (internal use only)
     -p, --prepend=PREPEND            Set the prepend string for the current profile
     -r, --repeat                     Repeat the last Zoom command
         --rc                         Create default .zoomrc file
