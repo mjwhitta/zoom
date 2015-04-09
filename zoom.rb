@@ -7,12 +7,17 @@ require "pathname"
 require "shellwords"
 
 class Profile < Hash
+    def append(append = nil)
+        self["append"] = append if (append)
+        return self["append"]
+    end
+
     def colors
         ""
     end
 
     def exe(args, pattern)
-        system("#{self.to_s} #{args} #{pattern}")
+        system("#{self.to_s} #{args} #{pattern} #{self.append}")
     end
 
     def flags(flags = nil)
@@ -24,24 +29,27 @@ class Profile < Hash
         return Object::const_get(json["class"]).new(
             json["operator"],
             json["flags"],
-            json["prepend"]
+            json["prepend"],
+            json["append"]
         )
     end
 
     def info()
         [
-            "Class : " + self.class.to_s,
+            "Class   : " + self.class.to_s,
             "Prepend : " + self["prepend"],
             "Operator: " + self["operator"],
-            "Flags   : " + self["flags"]
+            "Flags   : " + self["flags"],
+            "Append  : " + self["append"]
         ].join("\n").strip
     end
 
-    def initialize(operator, flags = "", env_prepend = "")
+    def initialize(operator, flags = "", envprepend = "", append = "")
         self["class"] = self.class.to_s
         self.operator(operator)
         self.flags(flags)
-        self.prepend(env_prepend)
+        self.prepend(envprepend)
+        self.append(append)
     end
 
     def operator(operator = nil)
@@ -56,8 +64,8 @@ class Profile < Hash
         return self["operator"]
     end
 
-    def prepend(env_prepend = nil)
-        self["prepend"] = env_prepend if (env_prepend)
+    def prepend(envprepend = nil)
+        self["prepend"] = envprepend if (envprepend)
         return self["prepend"]
     end
 
@@ -84,18 +92,14 @@ class AgProfile < Profile
         if (!pattern.nil? && !pattern.empty?)
             system(
                 "#{self.to_s} --pager \"#{PAGER}\" #{args} " \
-                "#{pattern.shellescape}"
+                "#{pattern.shellescape} #{self.append}"
             )
         else
-            system("#{self.to_s} --pager \"#{PAGER}\" #{args}")
+            system(
+                "#{self.to_s} --pager \"#{PAGER}\" #{args} " \
+                "#{self.append}"
+            )
         end
-    end
-
-    def initialize(operator, flags = "", env_prepend = "")
-        self["class"] = self.class.to_s
-        self.operator(operator)
-        self.flags(flags)
-        self.prepend(env_prepend)
     end
 
     def to_s()
@@ -117,18 +121,14 @@ class AckProfile < Profile
         if (!pattern.nil? && !pattern.empty?)
             system(
                 "#{self.to_s} --pager \"#{PAGER}\" #{args} " \
-                "#{pattern.shellescape}"
+                "#{pattern.shellescape} #{self.append}"
             )
         else
-            system("#{self.to_s} --pager \"#{PAGER}\" #{args}")
+            system(
+                "#{self.to_s} --pager \"#{PAGER}\" #{args} " \
+                "#{self.append}"
+            )
         end
-    end
-
-    def initialize(operator, flags = "", env_prepend = "")
-        self["class"] = self.class.to_s
-        self.operator(operator)
-        self.flags(flags)
-        self.prepend(env_prepend)
     end
 end
 
@@ -149,39 +149,31 @@ class GrepProfile < Profile
         # Emulate ag/ack as much as possible
         if (!pattern.nil? && !pattern.empty?)
             system(
-                "#{self.to_s} #{args} #{pattern.shellescape} | " \
-                "sed \"s|\\[K[:-]|\\[K\\n|\" | #{PAGER}"
+                "#{self.to_s} #{args} #{pattern.shellescape} " \
+                "#{self.append} | sed \"s|\\[K[:-]|\\[K\\n|\" | " \
+                "#{PAGER}"
             )
         else
             system(
-                "#{self.to_s} #{args} | " \
+                "#{self.to_s} #{args} #{self.append} | " \
                 "sed \"s|\\[K[:-]|\\[K\\n|\" | #{PAGER}"
             )
         end
-    end
-
-    def initialize(operator, flags = "", env_prepend = "")
-        self["class"] = self.class.to_s
-        self.operator(operator)
-        self.flags(flags)
-        self.prepend(env_prepend)
     end
 end
 
 class FindProfile < Profile
     def exe(args, pattern)
         if (!pattern.nil? && !pattern.empty?)
-            system("#{self.to_s} #{args} \"#{pattern}\" | #{PAGER}")
+            system(
+                "#{self.to_s} #{args} \"#{pattern}\" " \
+                "#{self.append} | #{PAGER}"
+            )
         else
-            system("#{self.to_s} #{args} \"*\" | #{PAGER}")
+            system(
+                "#{self.to_s} #{args} \"*\" #{self.append} | #{PAGER}"
+            )
         end
-    end
-
-    def initialize(operator, flags = "", env_prepend = "")
-        self["class"] = self.class.to_s
-        self.operator(operator)
-        self.flags(flags)
-        self.prepend(env_prepend)
     end
 end
 
@@ -205,7 +197,9 @@ def default_zoomrc()
         all = AgProfile.new("ag", "-uS")
         passwords = AgProfile.new(
             "ag",
-            "-uS \"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
+            "-uS",
+            "",
+            "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
         )
     else
         ag = nil
@@ -241,11 +235,9 @@ def default_zoomrc()
     all = GrepProfile.new("grep", "--color=always -EHinR") if (!all)
     passwords = GrepProfile.new(
         "grep",
-        [
-            "--color=always",
-            "-EHinR",
-            "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
-        ].join(" ").strip
+        "--color=always -EHinR",
+        "",
+        "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
     ) if (!passwords)
 
     # Create default profile
@@ -430,8 +422,8 @@ def parse(args)
             "-p",
             "--prepend=PREPEND",
             "Set the prepend string for the current profile"
-        ) do |env_prepend|
-            options["prepend"] = env_prepend
+        ) do |envprepend|
+            options["prepend"] = envprepend
         end
 
         opts.on("-r", "--repeat", "Repeat the last Zoom command") do
