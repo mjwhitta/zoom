@@ -7,6 +7,10 @@ require "pathname"
 require "shellwords"
 
 class Profile < Hash
+    def colors
+        ""
+    end
+
     def exe(args, pattern)
         system("#{self.to_s} #{args} #{pattern}")
     end
@@ -17,7 +21,7 @@ class Profile < Hash
     end
 
     def self.from_json(json)
-        return Profile.new(
+        return Object::const_get(json["class"]).new(
             json["operator"],
             json["flags"],
             json["prepend"]
@@ -26,6 +30,7 @@ class Profile < Hash
 
     def info()
         [
+            "Class : " + self.class.to_s,
             "Prepend : " + self["prepend"],
             "Operator: " + self["operator"],
             "Flags   : " + self["flags"]
@@ -33,6 +38,7 @@ class Profile < Hash
     end
 
     def initialize(operator, flags = "", env_prepend = "")
+        self["class"] = self.class.to_s
         self.operator(operator)
         self.flags(flags)
         self.prepend(env_prepend)
@@ -61,10 +67,121 @@ class Profile < Hash
 
     def to_s()
         [
+            self.colors,
             self["prepend"],
             self["operator"],
             self["flags"]
         ].join(" ").strip
+    end
+end
+
+class AgProfile < Profile
+    def colors
+        '--color-match "47;1;30" --color-line-number "0;37"'
+    end
+
+    def exe(args, pattern)
+        if (!pattern.nil? && !pattern.empty?)
+            system(
+                "#{self.to_s} --pager \"#{PAGER}\" #{args} " \
+                "#{pattern.shellescape}"
+            )
+        else
+            system("#{self.to_s} --pager \"#{PAGER}\" #{args}")
+        end
+    end
+
+    def initialize(operator, flags = "", env_prepend = "")
+        self["class"] = self.class.to_s
+        self.operator(operator)
+        self.flags(flags)
+        self.prepend(env_prepend)
+    end
+
+    def to_s()
+        [
+            self["prepend"],
+            self["operator"],
+            self.colors,
+            self["flags"]
+        ].join(" ").strip
+    end
+end
+
+class AckProfile < Profile
+    def colors
+        'ACK_COLOR_LINENO=white ACK_COLOR_MATCH="black on_white"'
+    end
+
+    def exe(args, pattern)
+        if (!pattern.nil? && !pattern.empty?)
+            system(
+                "#{self.to_s} --pager \"#{PAGER}\" #{args} " \
+                "#{pattern.shellescape}"
+            )
+        else
+            system("#{self.to_s} --pager \"#{PAGER}\" #{args}")
+        end
+    end
+
+    def initialize(operator, flags = "", env_prepend = "")
+        self["class"] = self.class.to_s
+        self.operator(operator)
+        self.flags(flags)
+        self.prepend(env_prepend)
+    end
+end
+
+class GrepProfile < Profile
+    def colors
+        [
+            'GREP_COLORS="',
+            "fn=1;32:",
+            "ln=0;37:",
+            "ms=47;1;30:",
+            "mc=47;1;30:",
+            "sl=:cx=:bn=:se=",
+            '"'
+        ].join.strip
+    end
+
+    def exe(args, pattern)
+        # Emulate ag/ack as much as possible
+        if (!pattern.nil? && !pattern.empty?)
+            system(
+                "#{self.to_s} #{args} #{pattern.shellescape} | " \
+                "sed \"s|\\[K[:-]|\\[K\\n|\" | #{PAGER}"
+            )
+        else
+            system(
+                "#{self.to_s} #{args} | " \
+                "sed \"s|\\[K[:-]|\\[K\\n|\" | #{PAGER}"
+            )
+        end
+    end
+
+    def initialize(operator, flags = "", env_prepend = "")
+        self["class"] = self.class.to_s
+        self.operator(operator)
+        self.flags(flags)
+        self.prepend(env_prepend)
+    end
+end
+
+class FindProfile < Profile
+    def exe(args, pattern)
+        if (!pattern.nil? && !pattern.empty?)
+            system("#{self.to_s} #{args} \"#{pattern}\" | #{PAGER}")
+        else
+            system("#{self.to_s} #{args} \"*\" | #{PAGER}")
+        end
+    end
+
+    def initialize(operator, flags = "", env_prepend = "")
+        self["class"] = self.class.to_s
+        self.operator(operator)
+        self.flags(flags)
+        self.prepend(env_prepend)
     end
 end
 
@@ -84,31 +201,16 @@ def default_zoomrc()
 
     # Default ag profiles
     if (find_in_path("ag"))
-        ag = Profile.new(
+        ag = AgProfile.new("ag", "-S --ignore=\"*.pdf\"")
+        all = AgProfile.new("ag", "-uS")
+        passwords = AgProfile.new(
             "ag",
-            [
-                "-S",
-                '--color-match "47;1;30"',
-                '--color-line-number "0;37"',
-                '--ignore="*.pdf"'
-            ].join(" ").strip
-        )
-        all = Profile.new(
-            "ag",
-            '-uS --color-match "47;1;30" --color-line-number "0;37"'
-        )
-        passwords = Profile.new(
-            "ag",
-            [
-                "-uS",
-                '--color-match "47;1;30"',
-                '--color-line-number "0;37"',
-                "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
-            ].join(" ").strip
+            "-uS \"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
         )
     else
         ag = nil
         all = nil
+        passwords = nil
     end
 
     # Default ack profile
@@ -120,17 +222,13 @@ def default_zoomrc()
         cmd = nil
     end
     if (cmd)
-        ack = Profile.new(
-            cmd,
-            "--smart-case",
-            'ACK_COLOR_LINENO=white ACK_COLOR_MATCH="black on_white"'
-        )
+        ack = AckProfile.new(cmd, "--smart-case")
     else
         ack = nil
     end
 
     # Default grep profile (emulate ag/ack as much as possible)
-    grep = Profile.new(
+    grep = GrepProfile.new(
         "grep",
         [
             "--color=always",
@@ -138,49 +236,17 @@ def default_zoomrc()
             "--exclude-dir=.bzr",
             "--exclude-dir=.git",
             "--exclude-dir=.svn"
-        ].join(" ").strip,
-        [
-            'GREP_COLORS="',
-            "fn=1;32:",
-            "ln=0;37:",
-            "ms=47;1;30:",
-            "mc=47;1;30:",
-            "sl=:cx=:bn=:se=",
-            '"'
-        ].join.strip
+        ].join(" ").strip
     )
-    if (!all)
-        all = Profile.new(
-            "grep",
-            "--color=always -EHinR",
-            [
-                'GREP_COLORS="',
-                "fn=1;32:",
-                "ln=0;37:",
-                "ms=47;1;30:",
-                "mc=47;1;30:",
-                "sl=:cx=:bn=:se=",
-                '"'
-            ].join.strip
-        )
-        passwords = Profile.new(
-            "grep",
-            [
-                "--color=always",
-                "-EHinR",
-                "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
-            ].join(" ").strip,
-            [
-                'GREP_COLORS="',
-                "fn=1;32:",
-                "ln=0;37:",
-                "ms=47;1;30:",
-                "mc=47;1;30:",
-                "sl=:cx=:bn=:se=",
-                '"'
-            ].join.strip
-        )
-    end
+    all = GrepProfile.new("grep", "--color=always -EHinR") if (!all)
+    passwords = GrepProfile.new(
+        "grep",
+        [
+            "--color=always",
+            "-EHinR",
+            "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
+        ].join(" ").strip
+    ) if (!passwords)
 
     # Create default profile
     if (ag)
@@ -192,7 +258,7 @@ def default_zoomrc()
     end
 
     # Create find profile
-    find = Profile.new("find", ". -name")
+    find = FindProfile.new("find", ". -name")
 
     # Put profiles into rc
     profs["ack"] = ack if (ack)
@@ -214,50 +280,12 @@ def exe_command(profile, args, pattern)
     operator = profile.operator.split("/").last
 
     case operator
-    when "ag", "ack", "ack-grep"
+    when "ag", "ack", "ack-grep", "grep", "find"
         CACHE_FILE.delete if (CACHE_FILE.exist?)
-
-        if (!pattern.nil? && !pattern.empty?)
-            system(
-                "#{profile} --pager \"#{PAGER}\" #{args} " \
-                "#{pattern.shellescape}"
-            )
-        else
-            system("#{profile} --pager \"#{PAGER}\" #{args}")
-        end
-
-        shortcut_cache
-    when "grep"
-        CACHE_FILE.delete if (CACHE_FILE.exist?)
-
-        # Emulate ag/ack as much as possible
-        if (!pattern.nil? && !pattern.empty?)
-            system(
-                "#{profile} #{args} #{pattern.shellescape} | " \
-                "sed \"s|\\[K[:-]|\\[K\\n|\" | #{PAGER}"
-            )
-        else
-            system(
-                "#{profile} #{args} | " \
-                "sed \"s|\\[K[:-]|\\[K\\n|\" | #{PAGER}"
-            )
-        end
-
+        profile.exe(args, pattern)
         shortcut_cache
     else
-        if (!profile.scan(/find \. -name/).empty?)
-            CACHE_FILE.delete if (CACHE_FILE.exist?)
-
-            if (!pattern.nil? && !pattern.empty?)
-                system("#{profile} #{args} \"#{pattern}\" | #{PAGER}")
-            else
-                system("#{profile} #{args} \"*\" | #{PAGER}")
-            end
-
-            shortcut_cache
-        else
-            profile.exe(args, pattern)
-        end
+        profile.exe(args, pattern)
     end
 end
 
