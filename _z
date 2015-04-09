@@ -44,7 +44,12 @@ if [[ ${words[1]} == "z" ]]; then
                 compadd $(z --list-profile-names)
             fi
             ;;
-        "-e"|"--editor")
+        "-e"|"--edit")
+            if [[ -n $(command -v z) ]]; then
+                compadd $(z --list-profile-names)
+            fi
+            ;;
+        "--editor")
             editors=(emacs jpico nano pico vim)
             compadd $editors
             ;;

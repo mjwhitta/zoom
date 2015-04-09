@@ -64,18 +64,16 @@ Usage: z [OPTIONS] <pattern>
     -a, --add=NAME                   Add a new profile with specified name
     -c, --cache                      Show previous results
     -d, --delete=NAME                Delete profile with specified name
-    -e, --editor=EDITOR              Use the specified editor
+    -e, --edit=NAME                  Edit profile with specified name
+        --editor=EDITOR              Use the specified editor
         --examples                   Show some examples
-    -f, --flags=FLAGS                Set flags for current profile
         --find                       Use the zoom_find profile
     -g, --go=NUM                     Open editor to search result NUM
     -h, --help                       Display this help message
     -l, --list                       List profiles
         --list-profile-names         List profile names for completion functions
         --list-tags                  List tags for completion functions
-    -o, --operator=OPERATOR          Set operator for current profile
         --pager                      Treat Zoom as a pager (internal use only)
-    -p, --prepend=PREPEND            Set the prepend string for the current profile
     -r, --repeat                     Repeat the last Zoom command
         --rc                         Create default .zoomrc file
         --rename=NAME                Rename the current profile

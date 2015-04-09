@@ -6,6 +6,8 @@ require "optparse"
 require "pathname"
 require "shellwords"
 
+# TODO support user defined custom Profiles
+
 class Profile < Hash
     def append(append = nil)
         self["append"] = append if (append)
@@ -13,6 +15,7 @@ class Profile < Hash
     end
 
     def colors
+        # TODO color support
         ""
     end
 
@@ -350,6 +353,13 @@ def parse(args)
 
         opts.on(
             "-e",
+            "--edit=NAME",
+            "Edit profile with specified name"
+        ) do |profile|
+            options["edit"] = profile
+        end
+
+        opts.on(
             "--editor=EDITOR",
             "Use the specified editor"
         ) do |editor|
@@ -363,18 +373,8 @@ def parse(args)
                 "Add a profile named test:",
                 "    $ z --add test",
                 "",
-                "Change the operator of the current profile:",
-                "    $ z --operator grep",
-                "",
-                "Change the operator of the profile \"test\":",
-                "    $ z --use test --operator grep",
-                "",
-                "Change the flags of the current profile:",
-                "    $ z --flags \"--color=always -EHIinR\"",
-                "",
-                "Change the prepend string of the current profile:",
-                "    $ z --prepend \"PATH=/bin\"",
-                "    $ z --prepend \"cd /some/path;\"",
+                "Edit a profile named test:",
+                "    $ z --edit test",
                 "",
                 "Execute the current profile:",
                 "    $ z PATTERN",
@@ -392,14 +392,6 @@ def parse(args)
                 "    $ z --go 10,20,30-40"
             ].join("\n")
             exit
-        end
-
-        opts.on(
-            "-f",
-            "--flags=FLAGS",
-            "Set flags for current profile"
-        ) do |flags|
-            options["flags"] = flags
         end
 
         opts.on("--find", "Use the zoom_find profile") do
@@ -438,26 +430,10 @@ def parse(args)
         end
 
         opts.on(
-            "-o",
-            "--operator=OPERATOR",
-            "Set operator for current profile"
-        ) do |op|
-            options["operator"] = op
-        end
-
-        opts.on(
             "--pager",
             "Treat Zoom as a pager (internal use only)"
         ) do
             options["pager"] = true
-        end
-
-        opts.on(
-            "-p",
-            "--prepend=PREPEND",
-            "Set the prepend string for the current profile"
-        ) do |envprepend|
-            options["prepend"] = envprepend
         end
 
         opts.on("-r", "--repeat", "Repeat the last Zoom command") do
@@ -790,22 +766,56 @@ elsif (options.has_key?("add"))
     # Add a new profile
     prof = options["add"]
 
-    if (find_in_path("ag"))
-        op = "ag"
-    elsif (find_in_path("ack"))
-        op = "ack"
-    elsif (find_in_path("ack-grep"))
-        op = "ack-grep"
-    else
-        op = "grep"
+    if (rc["profiles"].has_key?(prof))
+        puts "Profile \"#{prof}\" already exists!"
+        exit
     end
 
-    if (!rc["profiles"].has_key?(prof))
-        rc["profiles"][prof] = Profile.new(op)
-        write_zoomrc(rc)
+    if (find_in_path("ag"))
+        default_op = "ag"
+    elsif (find_in_path("ack"))
+        default_op = "ack"
+    elsif (find_in_path("ack-grep"))
+        default_op = "ack-grep"
     else
-        puts "Profile \"#{prof}\" already exists!"
+        default_op = "grep"
     end
+
+    case default_op
+    when "ag"
+        puts "Enter class (default AgProfile):"
+        clas = gets.chomp
+        clas = "AgProfile" if (clas.nil? || clas.empty?)
+    when "ack", "ack-grep"
+        puts "Enter class (default AckProfile):"
+        clas = gets.chomp
+        clas = "AckProfile" if (clas.nil? || clas.empty?)
+    when "grep"
+        puts "Enter class (default GrepProfile):"
+        clas = gets.chomp
+        clas = "GrepProfile" if (clas.nil? || clas.empty?)
+    end
+
+    puts "Enter operator (default #{default_op}):"
+    op = find_in_path(gets.chomp)
+    op = default_op if (op.nil? || op.empty?)
+
+    puts "Enter flags (default \"\"):"
+    flags = gets.chomp
+
+    puts "Enter prepend (default \"\"):"
+    envprepend = gets.chomp
+
+    puts "Enter append (default \"\"):"
+    append = gets.chomp
+
+    rc["profiles"][prof] = Object::const_get(clas).new(
+        op,
+        flags,
+        envprepend,
+        append
+    )
+    write_zoomrc(rc)
 elsif (options.has_key?("delete"))
     # Delete an existing profile
     prof = options["delete"]
@@ -823,6 +833,54 @@ elsif (options.has_key?("delete"))
     else
         puts "You can't delete the default profile!"
     end
+elsif (options.has_key?("edit"))
+    # Edit profile
+    prof = options["edit"]
+
+    if (!rc["profiles"].has_key?(prof))
+        puts "Profile \"#{prof}\" doesn't exist!"
+        exit
+    end
+
+    if (prof == "zoom_find")
+        puts "You can't modify the zoom_find profile!"
+        exit
+    end
+
+    # Defaults
+    clas = rc["profiles"][prof].class.to_s
+    op = rc["profiles"][prof].operator
+    flags = rc["profiles"][prof].flags
+    envprepend = rc["profiles"][prof].prepend
+    append = rc["profiles"][prof].append
+
+    puts "Enter class (default #{clas}):"
+    new_clas = gets.chomp
+    new_clas = clas if (new_clas.nil? || new_clas.empty?)
+
+    puts "Enter operator (default #{op}):"
+    new_op = find_in_path(gets.chomp)
+    new_op = op if (new_op.nil? || new_op.empty?)
+
+    puts "Enter flags (default \"#{flags}\"):"
+    new_flags = gets.chomp
+    new_flags = flags if (new_flags.nil? || new_flags.empty?)
+
+    puts "Enter prepend (default \"#{envprepend}\"):"
+    new_env = gets.chomp
+    new_env = envprepend if (new_env.nil? || new_env.empty?)
+
+    puts "Enter append (default \"#{append}\"):"
+    new_append = gets.chomp
+    new_append = append if (new_append.nil? || new_append.empty?)
+
+    rc["profiles"][prof] = Object::const_get(new_clas).new(
+        new_op,
+        new_flags,
+        new_env,
+        new_append
+    )
+    write_zoomrc(rc)
 elsif (options.has_key?("editor"))
     if (options["editor"].empty?)
         ed = ""
@@ -834,14 +892,6 @@ elsif (options.has_key?("editor"))
         write_zoomrc(rc)
     else
         puts "Editor #{options["editor"]} was not found!"
-    end
-elsif (options.has_key?("flags"))
-    if (prof_name != "zoom_find")
-        # Set the flags for the current profile
-        rc["profiles"][prof_name].flags(options["flags"])
-        write_zoomrc(rc)
-    else
-        puts "You can't modify the zoom_find profile!"
     end
 elsif (options.has_key?("list"))
     # List the profiles
@@ -861,22 +911,6 @@ elsif (options.has_key?("list-profile-names"))
     end
 elsif (options.has_key?("list-tags"))
     tags_from_cache
-elsif (options.has_key?("operator"))
-    if (prof_name != "zoom_find")
-        # Set the operator for the current profile
-        rc["profiles"][prof_name].operator(options["operator"])
-        write_zoomrc(rc)
-    else
-        puts "You can't modify the zoom_find profile!"
-    end
-elsif (options.has_key?("prepend"))
-    if (prof_name != "zoom_find")
-        # Set the prepend string for the current profile
-        rc["profiles"][prof_name].prepend(options["prepend"])
-        write_zoomrc(rc)
-    else
-        puts "You can't modify the zoom_find profile!"
-    end
 elsif (options.has_key?("rename"))
     # Rename the current profile
     prof = options["rename"]
