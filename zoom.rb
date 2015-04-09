@@ -6,8 +6,6 @@ require "optparse"
 require "pathname"
 require "shellwords"
 
-# TODO support user defined custom Profiles
-
 class Profile < Hash
     def append(append = nil)
         self["append"] = append if (append)
@@ -29,12 +27,17 @@ class Profile < Hash
     end
 
     def self.from_json(json)
-        return Object::const_get(json["class"]).new(
-            json["operator"],
-            json["flags"],
-            json["prepend"],
-            json["append"]
-        )
+        begin
+            return Object::const_get(json["class"]).new(
+                json["operator"],
+                json["flags"],
+                json["prepend"],
+                json["append"]
+            )
+        rescue NameError => e
+            puts "Unknown Profile class #{json["class"]}!"
+            exit
+        end
     end
 
     def info()
@@ -668,6 +671,13 @@ def write_zoomrc(rc)
     end
 end
 
+# Load custom profiles
+custom_profiles = Pathname.new("~/.ZoomProfiles.rb").expand_path
+if (custom_profiles.exist?)
+    require_relative custom_profiles
+end
+
+# Global variables
 CACHE_FILE = Pathname("~/.zoom_cache").expand_path
 INFO_FILE = Pathname("~/.zoominfo").expand_path
 PAGER = "#{File.expand_path($0)} --pager"
@@ -705,6 +715,7 @@ elsif (!operator)
     puts "Operator command \"#{profile["operator"]}\" was not found!"
 end
 
+# Main
 if (options["pager"])
     File.open(CACHE_FILE, "w") do |f|
         f.write("ZOOM_EXE_DIR=#{Dir.pwd}\n")
@@ -813,12 +824,17 @@ elsif (options.has_key?("add"))
     puts "Enter append (default \"\"):"
     append = gets.chomp
 
-    rc["profiles"][prof] = Object::const_get(clas).new(
-        op,
-        flags,
-        envprepend,
-        append
-    )
+    begin
+        rc["profiles"][prof] = Object::const_get(clas).new(
+            op,
+            flags,
+            envprepend,
+            append
+        )
+    rescue NameError => e
+        puts "Unknown Profile class #{clas}!"
+        exit
+    end
     write_zoomrc(rc)
 elsif (options.has_key?("delete"))
     # Delete an existing profile
@@ -878,12 +894,17 @@ elsif (options.has_key?("edit"))
     new_append = gets.chomp
     new_append = append if (new_append.nil? || new_append.empty?)
 
-    rc["profiles"][prof] = Object::const_get(new_clas).new(
-        new_op,
-        new_flags,
-        new_env,
-        new_append
-    )
+    begin
+        rc["profiles"][prof] = Object::const_get(new_clas).new(
+            new_op,
+            new_flags,
+            new_env,
+            new_append
+        )
+    rescue NameError => e
+        puts "Unknown Profile class #{new_clas}!"
+        exit
+    end
     write_zoomrc(rc)
 elsif (options.has_key?("editor"))
     if (options["editor"].empty?)
