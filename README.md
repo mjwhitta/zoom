@@ -153,6 +153,15 @@ If you find it tedious to use Zoom with the flags, there are currently
 - `zl` is the same as `z --list` or `z -l`
 - `zr` is the same as `z --repeat` or `z -r`
 
+You can also symlink zoom to a profile name in order to quickly
+execute favorite profiles.
+
+```bash
+$ cd ~/bin
+$ ln -s z test
+$ ./test # same as 'z --use test'
+```
+
 ## Penetration testing
 
 Zoom allows to you create profiles for commands other than
