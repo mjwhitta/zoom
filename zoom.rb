@@ -511,6 +511,10 @@ def parse(args)
         options["list"] = true
     when "zr"
         options["repeat"] = true
+    when "z"
+        # do nothing, this is the normal usage
+    else
+        options["use"] = File.basename($0)
     end
 
     options["pattern"] = args.delete_at(-1)
