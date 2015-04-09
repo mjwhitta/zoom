@@ -18,6 +18,7 @@ zoom_flags=(
     "(-c --cache)"{-c,--cache}"[Show previous results]"
     "(-d --delete)"{-d,--delete}"[Delete profile with specified name]"
     "(-e --editor)"{-e,--editor}"[Use the specified editor]"
+    "--examples[Show some examples]"
     "(-f --flags)"{-f,--flags}"[Set flags for current profile]"
     "--find[Use the zoom_find profile]"
     "(-g --go)"{-g,--go}"[Open editor to specific tag]"

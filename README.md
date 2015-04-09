@@ -65,6 +65,7 @@ Usage: z [OPTIONS] <pattern>
     -c, --cache                      Show previous results
     -d, --delete=NAME                Delete profile with specified name
     -e, --editor=EDITOR              Use the specified editor
+        --examples                   Show some examples
     -f, --flags=FLAGS                Set flags for current profile
         --find                       Use the zoom_find profile
     -g, --go=NUM                     Open editor to search result NUM
@@ -81,39 +82,6 @@ Usage: z [OPTIONS] <pattern>
     -s, --switch=NAME                Switch to profile with specified name
     -u, --use=NAME                   Use specified profile one time only
     -w, --which                      Display the current profile
-
-EXAMPLES:
-
-Add a profile named test:
-    $ z --add test
-
-Change the operator of the current profile:
-    $ z --operator grep
-
-Change the operator of the profile "test":
-    $ z --use test --operator grep
-
-Change the flags of the current profile:
-    $ z --flags "--color=always -EHIinR"
-
-Change the prepend string of the current profile:
-    $ z --prepend "PATH=/bin"
-    $ z --prepend "cd /some/path;"
-
-Execute the current profile:
-    $ z PATTERN
-
-Repeat the previous Zoom command:
-    $ z --repeat
-
-Pass additional flags to the choosen operator:
-    $ z -- -A 3 PATTERN
-
-Open a tag:
-    $ z --go 10
-
-Open multiple tags:
-    $ z --go 10,20,30-40
 ```
 
 You can use Zoom basically the same way you use ag/ack/grep.

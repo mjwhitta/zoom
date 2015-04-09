@@ -69,10 +69,6 @@ class Profile < Hash
         return self["prepend"]
     end
 
-    def scan(pattern)
-        to_s.scan(pattern)
-    end
-
     def to_s()
         [
             self.colors,
@@ -360,6 +356,44 @@ def parse(args)
             options["editor"] = editor
         end
 
+        opts.on("--examples", "Show some examples") do
+            puts [
+                "EXAMPLES:",
+                "",
+                "Add a profile named test:",
+                "    $ z --add test",
+                "",
+                "Change the operator of the current profile:",
+                "    $ z --operator grep",
+                "",
+                "Change the operator of the profile \"test\":",
+                "    $ z --use test --operator grep",
+                "",
+                "Change the flags of the current profile:",
+                "    $ z --flags \"--color=always -EHIinR\"",
+                "",
+                "Change the prepend string of the current profile:",
+                "    $ z --prepend \"PATH=/bin\"",
+                "    $ z --prepend \"cd /some/path;\"",
+                "",
+                "Execute the current profile:",
+                "    $ z PATTERN",
+                "",
+                "Repeat the previous Zoom command:",
+                "    $ z --repeat",
+                "",
+                "Pass additional flags to the choosen operator:",
+                "    $ z -- -A 3 PATTERN",
+                "",
+                "Open a tag:",
+                "    $ z --go 10",
+                "",
+                "Open multiple tags:",
+                "    $ z --go 10,20,30-40"
+            ].join("\n")
+            exit
+        end
+
         opts.on(
             "-f",
             "--flags=FLAGS",
@@ -466,50 +500,23 @@ def parse(args)
         opts.on(
             "",
             "Do you like to search through code using ag, ack, or " \
-            "grep? Good! This tool is for you! Zoom adds some " \
-            "convenience to ag/ack/grep by allowing you to quickly " \
-            "open your search results in your editor of choice. " \
-            "When looking at large code-bases, it can be a pain to " \
-            "have to scroll to find the filename of each result. " \
-            "Zoom prints a tag number in front of each result that " \
-            "ag/ack/grep outputs. Then you can quickly open that " \
+            "grep? Good! This",
+            "tool is for you! Zoom adds some convenience to " \
+            "ag/ack/grep by allowing",
+            "you to quickly open your search results in your " \
+            "editor of choice. When",
+            "looking at large code-bases, it can be a pain to have " \
+            "to scroll to",
+            "find the filename of each result. Zoom prints a tag " \
+            "number in front of",
+            "each result that ag/ack/grep outputs. Then you can " \
+            "quickly open that",
             "tag number with Zoom to jump straight to the source. " \
-            "Zoom is even persistent across all your sessions! You " \
-            "can search in one terminal and jump to a tag in " \
-            "another terminal from any directory!",
-            "",
-            "EXAMPLES:",
-            "",
-            "Add a profile named test:",
-            "    $ z --add test",
-            "",
-            "Change the operator of the current profile:",
-            "    $ z --operator grep",
-            "",
-            "Change the operator of the profile \"test\":",
-            "    $ z --use test --operator grep",
-            "",
-            "Change the flags of the current profile:",
-            "    $ z --flags \"--color=always -EHIinR\"",
-            "",
-            "Change the prepend string of the current profile:",
-            "    $ z --prepend \"PATH=/bin\"",
-            "    $ z --prepend \"cd /some/path;\"",
-            "",
-            "Execute the current profile:",
-            "    $ z PATTERN",
-            "",
-            "Repeat the previous Zoom command:",
-            "    $ z --repeat",
-            "",
-            "Pass additional flags to the choosen operator:",
-            "    $ z -- -A 3 PATTERN",
-            "",
-            "Open a tag:",
-            "    $ z --go 10",
-            "",
-            "Open multiple tags:",
-            "    $ z --go 10,20,30-40"
+            "Zoom is even",
+            "persistent across all your sessions! You can search " \
+            "in one terminal",
+            "and jump to a tag in another terminal from any " \
+            "directory!"
         )
     end
     parser.parse!
