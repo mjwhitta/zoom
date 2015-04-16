@@ -201,7 +201,7 @@ def default_zoomrc()
             "ag",
             "-uS",
             "",
-            "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
+            "\"pass(word|wd)?[^:=,>]? *[:=,>]\""
         )
     else
         ag = nil
@@ -241,7 +241,7 @@ def default_zoomrc()
         "grep",
         "--color=always -EHinR",
         "",
-        "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\" ."
+        "\"pass(word|wd)?[^:=,>]? *[:=,>]\" ."
     )
 
     # Create default profile
