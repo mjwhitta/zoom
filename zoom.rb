@@ -232,15 +232,17 @@ def default_zoomrc()
             "--exclude-dir=.bzr",
             "--exclude-dir=.git",
             "--exclude-dir=.svn"
-        ].join(" ").strip
+        ].join(" ").strip,
+        "",
+        "."
     )
-    all = GrepProfile.new("grep", "--color=always -EHinR") if (!all)
-    passwords = GrepProfile.new(
+    all ||= GrepProfile.new("grep", "--color=always -EHinR")
+    passwords ||= GrepProfile.new(
         "grep",
         "--color=always -EHinR",
         "",
-        "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\""
-    ) if (!passwords)
+        "\"pass(word|wd)?[^:=,]? *[:=,][^\\\"']? *[\\\"']\" ."
+    )
 
     # Create default profile
     if (ag)
@@ -277,7 +279,7 @@ def exe_command(profile, args, pattern)
     when "ag", "ack", "ack-grep", "grep", "find"
         CACHE_FILE.delete if (CACHE_FILE.exist?)
         profile.exe(args, pattern)
-        shortcut_cache
+        shortcut_cache(profile)
     else
         profile.exe(args, pattern)
     end
@@ -323,7 +325,7 @@ def open_editor_to_result(editor, result)
     end
 end
 
-def parse(args)
+def parse(args, profile)
     options = Hash.new
     options["pager"] = false
     options["repeat"] = false
@@ -341,7 +343,7 @@ def parse(args)
 
         opts.on("-c", "--cache", "Show previous results") do
             if (CACHE_FILE.exist? && !CACHE_FILE.directory?)
-                shortcut_cache
+                shortcut_cache(profile)
             end
             exit
         end
@@ -503,7 +505,7 @@ def parse(args)
     case File.basename($0)
     when "zc"
         if (CACHE_FILE.exist? && !CACHE_FILE.directory?)
-            shortcut_cache
+            shortcut_cache(profile)
         end
         exit
     when "zf"
@@ -571,7 +573,7 @@ def remove_colors(str)
     return str.unpack("C*").pack("U*").gsub(/\e\[([0-9;]*m|K)/, "")
 end
 
-def shortcut_cache()
+def shortcut_cache(profile)
     return if (!CACHE_FILE.exist?)
 
     # Open shortcut file for writing
@@ -595,7 +597,8 @@ def shortcut_cache()
                 # Ignore dividers when searching with context and
                 # empty lines
             elsif (plain.scan(/^[0-9]+[:-]/).empty?)
-                if (plain.scan(/^\.\//).empty?)
+                operator = profile.operator.split("/").last
+                if (operator != "find")
                     if (file != line)
                         # Filename
                         file = line
@@ -607,7 +610,7 @@ def shortcut_cache()
                         puts "\e[0m#{file}"
                     end
                 else
-                    # Operator was probably find
+                    # Operator was find
                     puts "\e[1;31m[#{count}]\e[0m #{line}"
                     shct.write("'#{start_dir}/#{line}'\n")
                     count += 1
@@ -685,8 +688,8 @@ RC_FILE = Pathname("~/.zoomrc").expand_path
 SHORTCUT_FILE = Pathname("~/.zoom_shortcuts").expand_path
 
 # Parse cli args and read in rc file
-options = parse(ARGV)
 info = read_zoominfo
+options = parse(ARGV, info["last_command"]["profile"])
 rc = read_zoomrc
 
 # Get info from rc
