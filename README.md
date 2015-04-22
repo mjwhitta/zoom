@@ -217,3 +217,4 @@ $ rm -f ~/.zcompdump; compinit
      some pdfs aren't skipped
    - Maybe file an issue on the ag Github page
  - Make comments/documentation more thorough
+ - Add documentation for making custom classes for profiles
