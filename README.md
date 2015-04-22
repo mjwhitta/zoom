@@ -4,7 +4,15 @@
 
 ### Quickly open CLI search results in your favorite editor!
 
-Do you like to search through code using ag, ack, or grep? Good! This tool is for you! Zoom adds some convenience to ag/ack/grep by allowing you to quickly open your search results in your editor of choice. When looking at large code-bases, it can be a pain to have to scroll to find the filename of each result. Zoom prints a tag number in front of each result that ag/ack/grep outputs. Then you can quickly open that tag number with Zoom to jump straight to the source. Zoom is even persistent across all your sessions! You can search in one terminal and jump to a tag in another terminal from any directory!
+Do you like to search through code using ag, ack, or grep? Good! This
+tool is for you! Zoom adds some convenience to ag/ack/grep by allowing
+you to quickly open your search results in your editor of choice. When
+looking at large code-bases, it can be a pain to have to scroll to
+find the filename of each result. Zoom prints a tag number in front of
+each result that ag/ack/grep outputs. Then you can quickly open that
+tag number with Zoom to jump straight to the source. Zoom is even
+persistent across all your sessions! You can search in one terminal
+and jump to a tag in another terminal from any directory!
 
 ## How to install
 
@@ -16,19 +24,29 @@ $ cd zoom
 $ ./install_zoom.sh
 ```
 
-The default install directory is `~/bin`. You can change this by passing in the install directory of you choice like below:
+The default install directory is `~/bin`. You can change this by
+passing in the install directory of you choice like below:
 
 ```bash
 $ ./install_zoom.sh ~/scripts
 ```
 
 ## Installation from Distro Packages
+
 ### User Packaged
- - ![logo](http://www.monitorix.org/imgs/archlinux.png "arch logo")Arch Linux: in the [AUR](https://aur.archlinux.org/packages/zoom-git) and [Firef0x's Arch Linux Repository](http://firef0x.github.io/archrepo.html).
+
+ - ![logo](http://www.monitorix.org/imgs/archlinux.png "arch logo")
+   Arch Linux: in the
+   [AUR](https://aur.archlinux.org/packages/zoom-git)
+
+ - [Firef0x's](http://firef0x.github.io/archrepo.html) Arch Linux
+   Repository
 
 ## Mac users
 
-If using the grep operator, you need to install [homebrew](http://brew.sh) and then run the following commands before using Zoom:
+If using the grep operator, you need to install
+[homebrew](http://brew.sh) and then run the following commands before
+using Zoom:
 
 ```bash
 $ brew install gnu-sed grep
@@ -102,7 +120,9 @@ You can use Zoom basically the same way you use ag/ack/grep.
 
 ## Shortcuts
 
-Zoom prefixes shortcut tags to ag/ack/grep's search results! If you use Zoom to search for "find_in_path" in the Zoom source directory, you would see something like the following:
+Zoom prefixes shortcut tags to ag/ack/grep's search results! If you
+use Zoom to search for "find_in_path" in the Zoom source directory,
+you would see something like the following:
 
 ```bash
 $ z find_in_path
@@ -130,17 +150,23 @@ $ z --go 9
 
 ### Persistent shortcuts
 
-When you perform a search with Zoom, all results are cached. Using the following command will allow you to see the previous search results again:
+When you perform a search with Zoom, all results are cached. Using the
+following command will allow you to see the previous search results
+again:
 
 ```bash
 $ z --cache
 ```
 
-This means your tags/shortcuts are persistent across all sessions. You can use other terminals to view your search results or to open them in an editor.
+This means your tags/shortcuts are persistent across all sessions. You
+can use other terminals to view your search results or to open them in
+an editor.
 
 ## Profiles
 
-Profiles allow you to create shortcuts to your favorite commands. Some profiles are created for you when you first run Zoom. Use the following command to list your profiles:
+Profiles allow you to create shortcuts to your favorite commands. Some
+profiles are created for you when you first run Zoom. Use the
+following command to list your profiles:
 
 ```bash
 $ z --list
@@ -148,11 +174,13 @@ $ z --list
 
 These profiles do not need to be limited to ag/ack/grep shortcuts.
 
-Note: The `default` profile is special and can't be deleted. You can however modify it.
+Note: The `default` profile is special and can't be deleted. You can
+however modify it.
 
 ## Convenient symlinks
 
-If you find it tedious to use Zoom with the flags, there are currently 4 convience symlinks that are supported.
+If you find it tedious to use Zoom with the flags, there are currently
+4 convience symlinks that are supported.
 
 - `zc` is the same as `z --cache` or `z -c`
 - `zg` is the same as `z --go` or `z -g`
@@ -161,7 +189,9 @@ If you find it tedious to use Zoom with the flags, there are currently 4 convien
 
 ## Penetration testing
 
-Zoom allows to you create profiles for commands other than ag/ack/grep. This may make Zoom a friendly tool for pen-testers who are looking for a simple way to store exploits.
+Zoom allows to you create profiles for commands other than
+ag/ack/grep. This may make Zoom a friendly tool for pentesters who are
+looking for a simple way to store exploits.
 
 ## Supported editors
 
@@ -184,7 +214,9 @@ ack is the replacement for grep!
 
 ## What is [grep](http://en.wikipedia.org/wiki/Grep)?
 
-If you don't know what grep is, this probably isn't the tool for you. You should learn how to properly use grep before using a tool such as Zoom which attempts to streamline the process for you.
+If you don't know what grep is, this probably isn't the tool for you.
+You should learn how to properly use grep before using a tool such as
+Zoom which attempts to streamline the process for you.
 
 ## ZSH completion function
 
@@ -204,6 +236,9 @@ $ rm -f ~/.zcompdump; compinit
 
 ## TODO
 
- - Need to test to see if any ag/ack/grep flags break functionality.
- - Sometimes ag thinks files aren't binary when they should (?) be. For example, some pdfs are skipped b/c they are binary files, but some pdfs aren't skipped. Maybe file an issue on the ag Github page.
- - Make comments/documentation more thorough.
+ - Need to test to see if any ag/ack/grep flags break functionality
+ - Sometimes ag thinks files aren't binary when they should (?) be
+   - For example, some pdfs are skipped b/c they are binary files, but
+     some pdfs aren't skipped
+   - Maybe file an issue on the ag Github page
+ - Make comments/documentation more thorough
