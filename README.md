@@ -22,6 +22,10 @@ The default install directory is `~/bin`. You can change this by passing in the 
 $ ./install_zoom.sh ~/scripts
 ```
 
+## Installation from Distro Packages
+### User Packaged
+ - ![logo](http://www.monitorix.org/imgs/archlinux.png "arch logo")Arch Linux: in the [AUR](https://aur.archlinux.org/packages/zoom-git) and [Firef0x's Arch Linux Repository](http://firef0x.github.io/archrepo.html).
+
 ## Mac users
 
 If using the grep operator, you need to install [homebrew](http://brew.sh) and then run the following commands before using Zoom:
