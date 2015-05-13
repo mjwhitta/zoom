@@ -21,14 +21,14 @@ Open a terminal and run the following:
 ```bash
 $ git clone https://gitlab.com/mjwhitta/zoom
 $ cd zoom
-$ ./install_zoom.sh
+$ ./install.sh
 ```
 
 The default install directory is `~/bin`. You can change this by
 passing in the install directory of you choice like below:
 
 ```bash
-$ ./install_zoom.sh ~/scripts
+$ ./install.sh ~/scripts
 ```
 
 ## Installation from Distro Packages
