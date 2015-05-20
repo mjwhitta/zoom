@@ -250,6 +250,50 @@ class FindProfile < Profile
     end
 end
 
+def add_profile()
+    default_op = "grep"
+    if (find_in_path("ag"))
+        default_op = "ag"
+    elsif (find_in_path("ack"))
+        default_op = "ack"
+    elsif (find_in_path("ack-grep"))
+        default_op = "ack-grep"
+    end
+
+    case default_op
+    when "ag"
+        puts "Enter class (default AgProfile):"
+    when "ack", "ack-grep"
+        puts "Enter class (default AckProfile):"
+    when "grep"
+        puts "Enter class (default GrepProfile):"
+    end
+
+    clas = gets.chomp
+    puts if (!clas.nil? && !clas.empty?)
+
+    case default_op
+    when "ag"
+        clas = "AgProfile" if (clas.nil? || clas.empty?)
+    when "ack", "ack-grep"
+        clas = "AckProfile" if (clas.nil? || clas.empty?)
+    when "grep"
+        clas = "GrepProfile" if (clas.nil? || clas.empty?)
+    end
+
+    default_class = nil
+    begin
+        default_class = Object::const_get(clas).new
+    rescue NameError => e
+        puts "Unknown Profile class #{clas}!"
+        exit ZoomExit::UNKNOWN_PROFILE_CLASS
+    end
+
+    edit_profile(default_class)
+
+    return default_class
+end
+
 def default_zoominfo()
     info = Hash.new
     info["profile"] = "default"
@@ -332,6 +376,47 @@ def default_zoomrc()
     write_zoomrc(rc)
 end
 
+def edit_profile(profile)
+    # Get new operator
+    puts "Enter operator (default #{profile.operator}):"
+
+    op = find_in_path(gets.chomp)
+    puts if (!op.nil? && !op.empty?)
+
+    op = profile.operator if (op.nil? || op.empty?)
+    profile.operator(op) if (op != profile.operator)
+
+    # Get new flags
+    puts "For empty string put \"empty\""
+    puts "Enter flags (default \"#{profile.flags}\"):"
+
+    flags = gets.chomp
+    puts if (!flags.nil? && !flags.empty?)
+
+    flags = get_new_value(flags, profile.flags)
+    profile.flags(flags) if (flags != profile.flags)
+
+    # Get new prepend
+    puts "For empty string put \"empty\""
+    puts "Enter prepend (default \"#{profile.prepend}\"):"
+
+    envprepend = gets.chomp
+    puts if (!envprepend.nil? && !envprepend.empty?)
+
+    envprepend = get_new_value(envprepend, profile.prepend)
+    profile.prepend(envprepend) if (envprepend != profile.prepend)
+
+    # Get new append
+    puts "For empty string put \"empty\""
+    puts "Enter append (default \"#{profile.append}\"):"
+
+    append = gets.chomp
+    puts if (!append.nil? && !append.empty?)
+
+    append = get_new_value(append, profile.append)
+    profile.append(append) if (append != profile.append)
+end
+
 def exe_command(profile, args, pattern)
     operator = profile.operator.split("/").last
 
@@ -369,6 +454,13 @@ def get_location_of_result(result)
         end
     end
     return nil
+end
+
+def get_new_value(val, default)
+    return default if (val.nil? || val.empty?)
+    return "" if (val.downcase == "empty")
+    return "" if (val.downcase == "\"empty\"")
+    return val
 end
 
 def is_exe?(cmd)
@@ -856,55 +948,7 @@ elsif (options.has_key?("add"))
         exit ZoomExit::PROFILE_ALREADY_EXISTS
     end
 
-    if (find_in_path("ag"))
-        default_op = "ag"
-    elsif (find_in_path("ack"))
-        default_op = "ack"
-    elsif (find_in_path("ack-grep"))
-        default_op = "ack-grep"
-    else
-        default_op = "grep"
-    end
-
-    case default_op
-    when "ag"
-        puts "Enter class (default AgProfile):"
-        clas = gets.chomp
-        clas = "AgProfile" if (clas.nil? || clas.empty?)
-    when "ack", "ack-grep"
-        puts "Enter class (default AckProfile):"
-        clas = gets.chomp
-        clas = "AckProfile" if (clas.nil? || clas.empty?)
-    when "grep"
-        puts "Enter class (default GrepProfile):"
-        clas = gets.chomp
-        clas = "GrepProfile" if (clas.nil? || clas.empty?)
-    end
-
-    puts "Enter operator (default #{default_op}):"
-    op = find_in_path(gets.chomp)
-    op = default_op if (op.nil? || op.empty?)
-
-    puts "Enter flags (default \"\"):"
-    flags = gets.chomp
-
-    puts "Enter prepend (default \"\"):"
-    envprepend = gets.chomp
-
-    puts "Enter append (default \"\"):"
-    append = gets.chomp
-
-    begin
-        rc["profiles"][prof] = Object::const_get(clas).new(
-            op,
-            flags,
-            envprepend,
-            append
-        )
-    rescue NameError => e
-        puts "Unknown Profile class #{clas}!"
-        exit ZoomExit::UNKNOWN_PROFILE_CLASS
-    end
+    rc["profiles"][prof] = add_profile
     write_zoomrc(rc)
 elsif (options.has_key?("delete"))
     # Delete an existing profile
@@ -937,44 +981,26 @@ elsif (options.has_key?("edit"))
         exit ZoomExit::CAN_NOT_MODIFY_PROFILE
     end
 
-    # Defaults
     clas = rc["profiles"][prof].class.to_s
-    op = rc["profiles"][prof].operator
-    flags = rc["profiles"][prof].flags
-    envprepend = rc["profiles"][prof].prepend
-    append = rc["profiles"][prof].append
 
     puts "Enter class (default #{clas}):"
+
     new_clas = gets.chomp
+    puts if (!new_clas.nil? && !new_clas.empty?)
+
     new_clas = clas if (new_clas.nil? || new_clas.empty?)
-
-    puts "Enter operator (default #{op}):"
-    new_op = find_in_path(gets.chomp)
-    new_op = op if (new_op.nil? || new_op.empty?)
-
-    puts "Enter flags (default \"#{flags}\"):"
-    new_flags = gets.chomp
-    new_flags = flags if (new_flags.nil? || new_flags.empty?)
-
-    puts "Enter prepend (default \"#{envprepend}\"):"
-    new_env = gets.chomp
-    new_env = envprepend if (new_env.nil? || new_env.empty?)
-
-    puts "Enter append (default \"#{append}\"):"
-    new_append = gets.chomp
-    new_append = append if (new_append.nil? || new_append.empty?)
-
-    begin
-        rc["profiles"][prof] = Object::const_get(new_clas).new(
-            new_op,
-            new_flags,
-            new_env,
-            new_append
-        )
-    rescue NameError => e
-        puts "Unknown Profile class #{new_clas}!"
-        exit ZoomExit::UNKNOWN_PROFILE_CLASS
+    if (new_clas != clas)
+        begin
+            # Not sure if I really want to overwrite flags, prepend,
+            # and append but I think it's safer for now
+            rc["profiles"][prof] = Object::const_get(new_clas).new
+        rescue NameError => e
+            puts "Unknown Profile class #{new_clas}!"
+            exit ZoomExit::UNKNOWN_PROFILE_CLASS
+        end
     end
+
+    edit_profile(rc["profiles"][prof])
     write_zoomrc(rc)
 elsif (options.has_key?("editor"))
     if (options["editor"].empty?)
