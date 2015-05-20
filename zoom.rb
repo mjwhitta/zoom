@@ -6,6 +6,15 @@ require "optparse"
 require "pathname"
 require "shellwords"
 
+class ZoomExit
+    GOOD = 0
+    INVALID_OPTION = 1
+    UNKNOWN_PROFILE_CLASS = 2
+    PROFILE_DOES_NOT_EXIST = 3
+    PROFILE_ALREADY_EXISTS = 4
+    CAN_NOT_MODIFY_PROFILE = 5
+end
+
 class Profile < Hash
     def append(append = nil)
         self["append"] = append if (append)
@@ -36,7 +45,7 @@ class Profile < Hash
             )
         rescue NameError => e
             puts "Unknown Profile class #{json["class"]}!"
-            exit
+            exit ZoomExit::UNKNOWN_PROFILE_CLASS
         end
     end
 
@@ -50,7 +59,12 @@ class Profile < Hash
         ].join("\n").strip
     end
 
-    def initialize(operator, flags = "", envprepend = "", append = "")
+    def initialize(
+        operator = "echo",
+        flags = "",
+        envprepend = "",
+        append = ""
+    )
         self["class"] = self.class.to_s
         self.operator(operator)
         self.flags(flags)
@@ -104,6 +118,15 @@ class AgProfile < Profile
         end
     end
 
+    def initialize(
+        operator = "ag",
+        flags = "-S --ignore=\"*.pdf\"",
+        envprepend = "",
+        append = ""
+    )
+        super(operator, flags, envprepend, append)
+    end
+
     def to_s()
         [
             self["prepend"],
@@ -131,6 +154,30 @@ class AckProfile < Profile
                 "#{self.append}"
             )
         end
+    end
+
+    def initialize(
+        operator = nil,
+        flags = "--smart-case",
+        envprepend = "",
+        append = ""
+    )
+        # Special case because of debian
+        if (find_in_path("ack"))
+            operator ||= "ack"
+        elsif (find_in_path("ack-grep"))
+            operator ||= "ack-grep"
+        else
+            # Oops
+            operator ||= "echo"
+            if (operator == "echo")
+                flags = "#"
+                envprepend = ""
+                append = ""
+            end
+        end
+
+        super(operator, flags, envprepend, append)
     end
 end
 
@@ -162,6 +209,21 @@ class GrepProfile < Profile
             )
         end
     end
+
+    def initialize(
+        operator = "grep",
+        flags = [
+            "--color=always",
+            "-EHIinR",
+            "--exclude-dir=.bzr",
+            "--exclude-dir=.git",
+            "--exclude-dir=.svn"
+        ].join(" ").strip,
+        envprepend = "",
+        append = "."
+    )
+        super(operator, flags, envprepend, append)
+    end
 end
 
 class FindProfile < Profile
@@ -176,6 +238,15 @@ class FindProfile < Profile
                 "#{self.to_s} #{args} \"*\" #{self.append} | #{PAGER}"
             )
         end
+    end
+
+    def initialize(
+        operator = "find",
+        flags = ". -name",
+        envprepend = "",
+        append = ""
+    )
+        super(operator, flags, envprepend, append)
     end
 end
 
@@ -195,14 +266,14 @@ def default_zoomrc()
 
     # Default ag profiles
     if (find_in_path("ag"))
-        ag = AgProfile.new("ag", "-S --ignore=\"*.pdf\"")
-        all = AgProfile.new("ag", "-uS")
-        passwords = AgProfile.new(
-            "ag",
-            "-uS",
-            "",
-            "\"pass(word|wd)?[^:=,>]? *[:=,>]\""
-        )
+        ag = AgProfile.new
+
+        all = AgProfile.new
+        all.flags("-uS")
+
+        passwords = AgProfile.new
+        passwords.flags("-uS")
+        passwords.append("\"pass(word|wd)?[^:=,>]? *[:=,>]\"")
     else
         ag = nil
         all = nil
@@ -210,39 +281,28 @@ def default_zoomrc()
     end
 
     # Default ack profile
-    if (find_in_path("ack"))
-        cmd = "ack"
-    elsif (find_in_path("ack-grep"))
-        cmd = "ack-grep"
-    else
-        cmd = nil
-    end
-    if (cmd)
-        ack = AckProfile.new(cmd, "--smart-case")
+    if (find_in_path("ack") || find_in_path("ack-grep"))
+        ack = AckProfile.new
+
+        if (!passwords)
+            passwords = AckProfile.new
+            passwords.append("\"pass(word|wd)?[^:=,>]? *[:=,>]\"")
+        end
     else
         ack = nil
     end
 
     # Default grep profile (emulate ag/ack as much as possible)
-    grep = GrepProfile.new(
-        "grep",
-        [
-            "--color=always",
-            "-EHIinR",
-            "--exclude-dir=.bzr",
-            "--exclude-dir=.git",
-            "--exclude-dir=.svn"
-        ].join(" ").strip,
-        "",
-        "."
-    )
-    all ||= GrepProfile.new("grep", "--color=always -EHinR")
-    passwords ||= GrepProfile.new(
-        "grep",
-        "--color=always -EHinR",
-        "",
-        "\"pass(word|wd)?[^:=,>]? *[:=,>]\" ."
-    )
+    grep = GrepProfile.new
+    if (!all)
+        all = GrepProfile.new
+        all.flags("--color=always -EHinR")
+    end
+    if (!passwords)
+        passwords = GrepProfile.new
+        passwords.flags("--color=always -EHinR")
+        passwords.append("\"pass(word|wd)?[^:=,>]? *[:=,>]\" .")
+    end
 
     # Create default profile
     if (ag)
@@ -254,7 +314,7 @@ def default_zoomrc()
     end
 
     # Create find profile
-    find = FindProfile.new("find", ". -name")
+    find = FindProfile.new
 
     # Put profiles into rc
     profs["ack"] = ack if (ack)
@@ -345,7 +405,7 @@ def parse(args, profile)
             if (CACHE_FILE.exist? && !CACHE_FILE.directory?)
                 shortcut_cache(profile)
             end
-            exit
+            exit ZoomExit::GOOD
         end
 
         opts.on(
@@ -396,7 +456,7 @@ def parse(args, profile)
                 "Open multiple tags:",
                 "    $ z --go 10,20,30-40"
             ].join("\n")
-            exit
+            exit ZoomExit::GOOD
         end
 
         opts.on("--find", "Use the zoom_find profile") do
@@ -413,7 +473,7 @@ def parse(args, profile)
 
         opts.on("-h", "--help", "Display this help message") do
             puts opts
-            exit
+            exit ZoomExit::GOOD
         end
 
         opts.on("-l", "--list", "List profiles") do
@@ -448,7 +508,7 @@ def parse(args, profile)
         opts.on("--rc", "Create default .zoomrc file") do
             default_zoominfo
             default_zoomrc
-            exit
+            exit ZoomExit::GOOD
         end
 
         opts.on(
@@ -500,14 +560,21 @@ def parse(args, profile)
             "directory!"
         )
     end
-    parser.parse!
+
+    begin
+        parser.parse!
+    rescue OptionParser::InvalidOption => e
+        puts e.message
+        puts parser
+        exit ZoomExit::INVALID_OPTION
+    end
 
     case File.basename($0)
     when "zc"
         if (CACHE_FILE.exist? && !CACHE_FILE.directory?)
             shortcut_cache(profile)
         end
-        exit
+        exit ZoomExit::GOOD
     when "zf"
         options["use"] = "zoom_find"
     when "zg"
@@ -698,7 +765,7 @@ if (options.has_key?("use"))
     prof_name = options["use"]
     if (!rc["profiles"].has_key?(prof_name))
         puts "Profile \"#{prof_name}\" does not exist!"
-        exit
+        exit ZoomExit::PROFILE_DOES_NOT_EXIST
     end
 else
     prof_name = info["profile"]
@@ -740,7 +807,7 @@ elsif (options["repeat"])
 elsif (options.has_key?("go"))
     # If passing in search result tags, open them in editor
     tags = parse_tags(options["go"])
-    exit if (tags.empty?)
+    exit ZoomExit::GOOD if (tags.empty?)
 
     # Open first result with no prompt
     tag = tags.delete_at(0)
@@ -771,10 +838,10 @@ elsif (options.has_key?("go"))
         when "l", "L"
             # Open this result, then exit
             open_editor_to_result(editor, tag)
-            exit
+            exit ZoomExit::GOOD
         when "q", "Q", "\x03"
             # Quit or ^C
-            exit
+            exit ZoomExit::GOOD
         else
             # Do nothing
             open_editor_to_result(editor, tag)
@@ -786,7 +853,7 @@ elsif (options.has_key?("add"))
 
     if (rc["profiles"].has_key?(prof))
         puts "Profile \"#{prof}\" already exists!"
-        exit
+        exit ZoomExit::PROFILE_ALREADY_EXISTS
     end
 
     if (find_in_path("ag"))
@@ -836,7 +903,7 @@ elsif (options.has_key?("add"))
         )
     rescue NameError => e
         puts "Unknown Profile class #{clas}!"
-        exit
+        exit ZoomExit::UNKNOWN_PROFILE_CLASS
     end
     write_zoomrc(rc)
 elsif (options.has_key?("delete"))
@@ -862,12 +929,12 @@ elsif (options.has_key?("edit"))
 
     if (!rc["profiles"].has_key?(prof))
         puts "Profile \"#{prof}\" doesn't exist!"
-        exit
+        exit ZoomExit::PROFILE_DOES_NOT_EXIST
     end
 
     if (prof == "zoom_find")
         puts "You can't modify the zoom_find profile!"
-        exit
+        exit ZoomExit::CAN_NOT_MODIFY_PROFILE
     end
 
     # Defaults
@@ -906,7 +973,7 @@ elsif (options.has_key?("edit"))
         )
     rescue NameError => e
         puts "Unknown Profile class #{new_clas}!"
-        exit
+        exit ZoomExit::UNKNOWN_PROFILE_CLASS
     end
     write_zoomrc(rc)
 elsif (options.has_key?("editor"))
