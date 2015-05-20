@@ -13,6 +13,7 @@ class ZoomExit
     PROFILE_DOES_NOT_EXIST = 3
     PROFILE_ALREADY_EXISTS = 4
     CAN_NOT_MODIFY_PROFILE = 5
+    MISSING_ARGUMENT = 6
 end
 
 class Profile < Hash
@@ -659,6 +660,10 @@ def parse(args, profile)
         puts e.message
         puts parser
         exit ZoomExit::INVALID_OPTION
+    rescue OptionParser::MissingArgument => e
+        puts e.message
+        puts parser
+        exit ZoomExit::MISSING_ARGUMENT
     end
 
     case File.basename($0)
