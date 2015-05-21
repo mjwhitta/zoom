@@ -421,13 +421,17 @@ end
 def exe_command(profile, args, pattern)
     operator = profile.operator.split("/").last
 
-    case operator
-    when "ag", "ack", "ack-grep", "grep", "find"
-        CACHE_FILE.delete if (CACHE_FILE.exist?)
-        profile.exe(args, pattern)
-        shortcut_cache(profile)
-    else
-        profile.exe(args, pattern)
+    begin
+        case operator
+        when "ag", "ack", "ack-grep", "grep", "find"
+            CACHE_FILE.delete if (CACHE_FILE.exist?)
+            profile.exe(args, pattern)
+            shortcut_cache(profile)
+        else
+            profile.exe(args, pattern)
+        end
+    rescue Interrupt
+        # ^C
     end
 end
 
@@ -886,8 +890,12 @@ end
 if (options["pager"])
     File.open(CACHE_FILE, "w") do |f|
         f.write("ZOOM_EXE_DIR=#{Dir.pwd}\n")
-        $stdin.each_line do |line|
-            f.write(line)
+        begin
+            $stdin.each_line do |line|
+                f.write(line)
+            end
+        rescue Interrupt
+            # ^C
         end
     end
 elsif (options["repeat"])
