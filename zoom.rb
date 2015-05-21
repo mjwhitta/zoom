@@ -121,7 +121,7 @@ class AgProfile < Profile
 
     def initialize(
         operator = "ag",
-        flags = "-S --ignore=\"*.pdf\"",
+        flags = "-S",
         envprepend = "",
         append = ""
     )

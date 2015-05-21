@@ -212,9 +212,5 @@ $ rm -f ~/.zcompdump; compinit
 ## TODO
 
  - Need to test to see if any ag/ack/grep flags break functionality
- - Sometimes ag thinks files aren't binary when they should (?) be
-   - For example, some pdfs are skipped b/c they are binary files, but
-     some pdfs aren't skipped
-   - Maybe file an issue on the ag Github page
  - Make comments/documentation more thorough
  - Add documentation for making custom classes for profiles
