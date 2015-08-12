@@ -19,13 +19,13 @@ and jump to a tag in another terminal from any directory!
 Open a terminal and run the following:
 
 ```bash
-$ git clone https://gitlab.com/mjwhitta/zoom
+$ git clone https://gitlab.com/mjwhitta/zoom.git
 $ cd zoom
 $ ./install.sh
 ```
 
 The default install directory is `~/bin`. You can change this by
-passing in the install directory of you choice like below:
+passing in the install directory of your choice like below:
 
 ```bash
 $ ./install.sh ~/scripts
