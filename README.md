@@ -146,9 +146,10 @@ however modify it.
 ## Convenient symlinks
 
 If you find it tedious to use Zoom with the flags, there are currently
-4 convience symlinks that are supported.
+5 convience symlinks that are supported.
 
 - `zc` is the same as `z --cache` or `z -c`
+- `zf` is the same as `z --find`
 - `zg` is the same as `z --go` or `z -g`
 - `zl` is the same as `z --list` or `z -l`
 - `zr` is the same as `z --repeat` or `z -r`
