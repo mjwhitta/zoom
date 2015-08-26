@@ -35,11 +35,11 @@ $ ./install.sh ~/scripts
 
 ### User Packaged
 
- - ![logo](http://www.monitorix.org/imgs/archlinux.png "arch logo")
+- ![logo](http://www.monitorix.org/imgs/archlinux.png "arch logo")
    Arch Linux: in the
    [AUR](https://aur.archlinux.org/packages/zoom-git)
 
- - [Firef0x's](http://firef0x.github.io/archrepo.html) Arch Linux
+- [Firef0x's](http://firef0x.github.io/archrepo.html) Arch Linux
    Repository
 
 ## Mac users
@@ -172,12 +172,12 @@ looking for a simple way to store exploits.
 
 Zoom currently works with:
 
- - vim
- - emacs
- - nano
- - pico
- - jpico
- - any editor with `+LINE` as an option in it's man page
+- vim
+- emacs
+- nano
+- pico
+- jpico
+- any editor with `+LINE` as an option in it's man page
 
 ## What is [ag](https://github.com/ggreer/the_silver_searcher)?
 
@@ -211,6 +211,7 @@ $ rm -f ~/.zcompdump; compinit
 
 ## TODO
 
- - Need to test to see if any ag/ack/grep flags break functionality
- - Make comments/documentation more thorough
- - Add documentation for making custom classes for profiles
+- Convert to ruby gem
+- Need to test to see if any ag/ack/grep flags break functionality
+- Make comments/documentation more thorough
+- Add documentation for making custom classes for profiles
