@@ -6,7 +6,7 @@ require "optparse"
 require "pathname"
 require "shellwords"
 
-class ZoomExit
+class Exit
     GOOD = 0
     INVALID_OPTION = 1
     UNKNOWN_PROFILE_CLASS = 2
@@ -46,11 +46,11 @@ class Profile < Hash
             )
         rescue NameError => e
             puts "Unknown Profile class #{json["class"]}!"
-            exit ZoomExit::UNKNOWN_PROFILE_CLASS
+            exit Exit::UNKNOWN_PROFILE_CLASS
         end
     end
 
-    def info()
+    def info
         [
             "Class   : " + self.class.to_s,
             "Prepend : " + self["prepend"],
@@ -90,7 +90,7 @@ class Profile < Hash
         return self["prepend"]
     end
 
-    def to_s()
+    def to_s
         [
             self.colors,
             self["prepend"],
@@ -128,7 +128,7 @@ class AgProfile < Profile
         super(operator, flags, envprepend, append)
     end
 
-    def to_s()
+    def to_s
         [
             self["prepend"],
             self["operator"],
@@ -251,7 +251,7 @@ class FindProfile < Profile
     end
 end
 
-def add_profile()
+def add_profile
     default_op = "grep"
     if (find_in_path("ag"))
         default_op = "ag"
@@ -287,7 +287,7 @@ def add_profile()
         default_class = Object::const_get(clas).new
     rescue NameError => e
         puts "Unknown Profile class #{clas}!"
-        exit ZoomExit::UNKNOWN_PROFILE_CLASS
+        exit Exit::UNKNOWN_PROFILE_CLASS
     end
 
     edit_profile(default_class)
@@ -295,7 +295,7 @@ def add_profile()
     return default_class
 end
 
-def default_zoominfo()
+def default_zoominfo
     info = Hash.new
     info["profile"] = "default"
 
@@ -305,7 +305,7 @@ def default_zoominfo()
     write_zoominfo(info)
 end
 
-def default_zoomrc()
+def default_zoomrc
     rc = Hash.new
     profs = Hash.new
 
@@ -502,7 +502,7 @@ def parse(args, profile)
             if (CACHE_FILE.exist? && !CACHE_FILE.directory?)
                 shortcut_cache(profile)
             end
-            exit ZoomExit::GOOD
+            exit Exit::GOOD
         end
 
         opts.on(
@@ -553,7 +553,7 @@ def parse(args, profile)
                 "Open multiple tags:",
                 "    $ z --go 10,20,30-40"
             ].join("\n")
-            exit ZoomExit::GOOD
+            exit Exit::GOOD
         end
 
         opts.on("--find", "Use the zoom_find profile") do
@@ -570,7 +570,7 @@ def parse(args, profile)
 
         opts.on("-h", "--help", "Display this help message") do
             puts opts
-            exit ZoomExit::GOOD
+            exit Exit::GOOD
         end
 
         opts.on("-l", "--list", "List profiles") do
@@ -605,7 +605,7 @@ def parse(args, profile)
         opts.on("--rc", "Create default .zoomrc file") do
             default_zoominfo
             default_zoomrc
-            exit ZoomExit::GOOD
+            exit Exit::GOOD
         end
 
         opts.on(
@@ -663,11 +663,11 @@ def parse(args, profile)
     rescue OptionParser::InvalidOption => e
         puts e.message
         puts parser
-        exit ZoomExit::INVALID_OPTION
+        exit Exit::INVALID_OPTION
     rescue OptionParser::MissingArgument => e
         puts e.message
         puts parser
-        exit ZoomExit::MISSING_ARGUMENT
+        exit Exit::MISSING_ARGUMENT
     end
 
     case File.basename($0)
@@ -675,7 +675,7 @@ def parse(args, profile)
         if (CACHE_FILE.exist? && !CACHE_FILE.directory?)
             shortcut_cache(profile)
         end
-        exit ZoomExit::GOOD
+        exit Exit::GOOD
     when "zf"
         options["use"] = "zoom_find"
     when "zg"
@@ -712,7 +712,7 @@ def parse_tags(go)
     return tags
 end
 
-def read_zoominfo()
+def read_zoominfo
     default_zoominfo if (!INFO_FILE.exist? && !INFO_FILE.symlink?)
 
     info = JSON.parse(File.read(INFO_FILE))
@@ -725,7 +725,7 @@ def read_zoominfo()
     return info
 end
 
-def read_zoomrc()
+def read_zoomrc
     default_zoomrc if (!RC_FILE.exist? && !RC_FILE.symlink?)
 
     rc = JSON.parse(File.read(RC_FILE))
@@ -798,7 +798,7 @@ def shortcut_cache(profile)
     end
 end
 
-def tags_from_cache()
+def tags_from_cache
     return if (!CACHE_FILE.exist?)
 
     # Open shortcut file for writing
@@ -866,7 +866,7 @@ if (options.has_key?("use"))
     prof_name = options["use"]
     if (!rc["profiles"].has_key?(prof_name))
         puts "Profile \"#{prof_name}\" does not exist!"
-        exit ZoomExit::PROFILE_DOES_NOT_EXIST
+        exit Exit::PROFILE_DOES_NOT_EXIST
     end
 else
     prof_name = info["profile"]
@@ -912,7 +912,7 @@ elsif (options["repeat"])
 elsif (options.has_key?("go"))
     # If passing in search result tags, open them in editor
     tags = parse_tags(options["go"])
-    exit ZoomExit::GOOD if (tags.empty?)
+    exit Exit::GOOD if (tags.empty?)
 
     # Open first result with no prompt
     tag = tags.delete_at(0)
@@ -943,10 +943,10 @@ elsif (options.has_key?("go"))
         when "l", "L"
             # Open this result, then exit
             open_editor_to_result(editor, tag)
-            exit ZoomExit::GOOD
+            exit Exit::GOOD
         when "q", "Q", "\x03"
             # Quit or ^C
-            exit ZoomExit::GOOD
+            exit Exit::GOOD
         else
             # Do nothing
             open_editor_to_result(editor, tag)
@@ -958,7 +958,7 @@ elsif (options.has_key?("add"))
 
     if (rc["profiles"].has_key?(prof))
         puts "Profile \"#{prof}\" already exists!"
-        exit ZoomExit::PROFILE_ALREADY_EXISTS
+        exit Exit::PROFILE_ALREADY_EXISTS
     end
 
     rc["profiles"][prof] = add_profile
@@ -986,12 +986,12 @@ elsif (options.has_key?("edit"))
 
     if (!rc["profiles"].has_key?(prof))
         puts "Profile \"#{prof}\" doesn't exist!"
-        exit ZoomExit::PROFILE_DOES_NOT_EXIST
+        exit Exit::PROFILE_DOES_NOT_EXIST
     end
 
     if (prof == "zoom_find")
         puts "You can't modify the zoom_find profile!"
-        exit ZoomExit::CAN_NOT_MODIFY_PROFILE
+        exit Exit::CAN_NOT_MODIFY_PROFILE
     end
 
     clas = rc["profiles"][prof].class.to_s
@@ -1009,7 +1009,7 @@ elsif (options.has_key?("edit"))
             rc["profiles"][prof] = Object::const_get(new_clas).new
         rescue NameError => e
             puts "Unknown Profile class #{new_clas}!"
-            exit ZoomExit::UNKNOWN_PROFILE_CLASS
+            exit Exit::UNKNOWN_PROFILE_CLASS
         end
     end
 
