@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 usage() {
-    echo "Usage: ${0/*\//} [install_dir]"
+    echo "Usage: ${0/*\//} [install_dir] [name]"
     echo "Options:"
     echo "    -h"
     echo "        Display this help message"
@@ -9,20 +9,18 @@ usage() {
     exit $1
 }
 
-if [ $# -gt 1 ]; then
-    usage 1
-fi
+[ $# -gt 2 ] && usage 1
 
 INSTALL_DIR="$HOME/bin"
 case "$1" in
     "-h"|"--help") usage 0
         ;;
-    *)
-        if [ "$1" ]; then
-            INSTALL_DIR="$1"
-        fi
+    *) [ "$1" ] && INSTALL_DIR="$1"
         ;;
 esac
+
+NAME="z"
+[ $# -eq 2 ] && NAME="$2"
 
 echo -n "Installing zoom..."
 
@@ -33,11 +31,11 @@ cwd=$(pwd)
 mkdir -p $INSTALL_DIR && cd $INSTALL_DIR
 
 # Copy
-cp $cwd/zoom.rb z
-[ ! -e zc ] && ln -fs z zc
-[ ! -e zf ] && ln -fs z zf
-[ ! -e zg ] && ln -fs z zg
-[ ! -e zl ] && ln -fs z zl
-[ ! -e zr ] && ln -fs z zr
+cp $cwd/zoom.rb $NAME
+[ -e zc ] || ln -fs  $NAME zc
+[ -e zf ] || ln -fs  $NAME zf
+[ -e zg ] || ln -fs  $NAME zg
+[ -e zl ] || ln -fs  $NAME zl
+[ -e zr ] || ln -fs  $NAME zr
 
 echo "done!"
