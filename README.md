@@ -19,7 +19,7 @@ and jump to a tag in another terminal from any directory!
 Open a terminal and run the following:
 
 ```bash
-$ gem install zoom
+$ gem install ruby-zoom
 ```
 
 Or install from source:
