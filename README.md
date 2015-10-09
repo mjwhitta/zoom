@@ -19,21 +19,22 @@ and jump to a tag in another terminal from any directory!
 Open a terminal and run the following:
 
 ```bash
-$ git clone https://gitlab.com/mjwhitta/zoom.git
-$ cd zoom
-$ ./install.sh
+$ gem install zoom
 ```
 
-The default install directory is `~/bin`. You can change this by
-passing in the install directory of your choice like below:
+Or install from source:
 
 ```bash
-$ ./install.sh ~/scripts
+$ git clone https://gitlab.com/mjwhitta/zoom.git
+$ cd zoom
+$ rake install
 ```
 
-## Installation from Distro Packages
+### Installation from Distro Packages
 
-### User Packaged
+#### User Packaged
+
+Note: These are likely broken since Zoom 3.0!
 
 - ![logo](http://www.monitorix.org/imgs/archlinux.png "arch logo")
    Arch Linux: in the
@@ -87,25 +88,30 @@ You can use Zoom basically the same way you use ag/ack/grep.
 ## Shortcuts
 
 Zoom prefixes shortcut tags to ag/ack/grep's search results! If you
-use Zoom to search for "find_in_path" in the Zoom source directory,
-you would see something like the following:
+use Zoom to search for "ScoobyDoo" in the Zoom source directory, you
+would see something like the following:
 
 ```bash
-$ z find_in_path
-zoom.rb
-[1] 29:            op = find_in_path(operator)
-[2] 33:                self["operator"] = find_in_path("grep")
-[3] 61:    if (find_in_path("ag"))
-[4] 75:    if (find_in_path("ack"))
-[5] 77:    elsif (find_in_path("ack-grep"))
-[6] 128:    editor = find_in_path(ENV["EDITOR"])
-[7] 130:        editor = find_in_path("vim")
-[8] 133:        editor = find_in_path("vi")
-[9] 157:def find_in_path(cmd)
-[10] 456:    if (find_in_path("ag"))
-[11] 458:    elsif (find_in_path("ack"))
-[12] 460:    elsif (find_in_path("ack-grep"))
-[13] 487:    ed = find_in_path(options["editor"])
+$ z ScoobyDoo
+lib/zoom.rb
+[1] 25:        if (ScoobyDoo.where_are_you("ag"))
+[2] 27:        elsif (ScoobyDoo.where_are_you("ack"))
+[3] 29:        elsif (ScoobyDoo.where_are_you("ack-grep"))
+[4] 73:        e = ScoobyDoo.where_are_you(editor)
+[5] 107:        if (ScoobyDoo.where_are_you("ag"))
+[6] 117:            ScoobyDoo.where_are_you("ack") ||
+[7] 118:            ScoobyDoo.where_are_you("ack-grep")
+[8] 203:        op = ScoobyDoo.where_are_you(gets.chomp)
+[9] 303:        @editor = ScoobyDoo.where_are_you(@editor)
+[10] 304:        @editor = ScoobyDoo.where_are_you("vi") if (@editor.nil?)
+
+lib/zoom_profile.rb
+[11] 65:            op = ScoobyDoo.where_are_you(operator)
+[12] 69:                self["operator"] = ScoobyDoo.where_are_you("echo")
+
+lib/ack_profile.rb
+[13] 33:        if (ScoobyDoo.where_are_you("ack"))
+[14] 35:        elsif (ScoobyDoo.where_are_you("ack-grep"))
 ```
 
 Now you can jump to result 9 with the following command:
@@ -143,6 +149,45 @@ These profiles do not need to be limited to ag/ack/grep shortcuts.
 Note: The `default` profile is special and can't be deleted. You can
 however modify it.
 
+Note: The `zoom_find` profile is special and can't be deleted or
+modified.
+
+### Custom profile classes
+
+If you want to create your own custom profile classes, you can simply
+define your classes in `~/.zoom_profiles.rb`:
+
+```ruby
+require "zoom_profile"
+
+class LSProfile < ZoomProfile
+    def exe(args, pattern)
+        # You can redefine this method if you want, or leave it out to
+        # accept the default functionality.
+    end
+
+    def initialize(
+        operator = "ls",
+        flags = "--color -AFhl",
+        envprepend = "",
+        append = ""
+    )
+        super(operator, flags, envprepend, append)
+    end
+end
+
+class HelloProfile < ZoomProfile
+    def initialize(
+        operator = "echo",
+        flags = "",
+        envprepend = "",
+        append = "\"Hello, world!\""
+    )
+        super(operator, flags, envprepend, append)
+    end
+end
+```
+
 ## Convenient symlinks
 
 If you find it tedious to use Zoom with the flags, there are currently
@@ -166,8 +211,10 @@ $ ./test # same as 'z --use test'
 ## Penetration testing
 
 Zoom allows to you create profiles for commands other than
-ag/ack/grep. This may make Zoom a friendly tool for pentesters who are
-looking for a simple way to store exploits.
+ag/ack/grep. This may make Zoom a friendly tool for Penetration
+Testers or Security Researchers who are looking for a simple way to
+store exploits. I included a profile for searching for hard-coded
+passwords.
 
 ## Supported editors
 
@@ -200,7 +247,7 @@ For some simple zsh completion with Zoom, you can add the following to
 your `~/.zshrc`:
 
 ```bash
-fpath=(/path/to/zoom/repo $fpath)
+fpath=(/path/to/zoom/repo/completions $fpath)
 ```
 
 You may need to run the following command to update your completion
@@ -215,10 +262,9 @@ $ rm -f ~/.zcompdump; compinit
 - [Homepage](http://mjwhitta.github.io/zoom)
 - [Source](https://gitlab.com/mjwhitta/zoom)
 - [Mirror](https://github.com/mjwhitta/zoom)
+- [RubyGems](https://rubygems.org/gems/ruby-zoom)
 
 ## TODO
 
-- Convert to ruby gem
-- Need to test to see if any ag/ack/grep flags break functionality
-- Make comments/documentation more thorough
-- Add documentation for making custom classes for profiles
+- [ ] Need to test to see if any ag/ack/grep flags break functionality
+- [ ] Make comments/documentation more thorough
