@@ -268,7 +268,7 @@ begin
             options["pattern"]
         )
     end
-rescue ZoomError::Error => e
+rescue Zoom::Error => e
     puts e.message
     exit ZoomExit::EXCEPTION
 end

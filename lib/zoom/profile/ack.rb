@@ -1,7 +1,7 @@
 require "shellwords"
-require "zoom_profile"
+require "zoom/profile"
 
-class AckProfile < ZoomProfile
+class Zoom::Profile::Ack < Zoom::Profile
     def colors
         'ACK_COLOR_LINENO=white ACK_COLOR_MATCH="black on_white"'
     end
@@ -27,20 +27,8 @@ class AckProfile < ZoomProfile
         append = ""
     )
         # Special case because of debian
-        operator = nil
-        if (ScoobyDoo.where_are_you("ack"))
-            operator = "ack"
-        elsif (ScoobyDoo.where_are_you("ack-grep"))
-            operator = "ack-grep"
-        else
-            # Oops
-            operator = "echo"
-            if (operator == "echo")
-                flags = "#"
-                envprepend = ""
-                append = ""
-            end
-        end
+        operator = "ack"
+        operator = "ack-grep" if (ScoobyDoo.where_are_you("ack-grep"))
 
         super(operator, flags, envprepend, append)
         @taggable = true

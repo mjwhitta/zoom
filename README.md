@@ -158,13 +158,13 @@ If you want to create your own custom profile classes, you can simply
 define your classes in `~/.zoom_profiles.rb`:
 
 ```ruby
-require "zoom_profile"
+require "zoom"
 
-class LSProfile < ZoomProfile
-    def exe(args, pattern)
-        # You can redefine this method if you want, or leave it out to
-        # accept the default functionality.
-    end
+class ListProfile < Zoom::Profile
+    # You can redefine this method if you want, or leave it out to
+    # accept the default functionality.
+    # def exe(args, pattern)
+    # end
 
     def initialize(
         operator = "ls",
@@ -176,7 +176,7 @@ class LSProfile < ZoomProfile
     end
 end
 
-class HelloProfile < ZoomProfile
+class HelloProfile < Zoom::Profile
     def initialize(
         operator = "echo",
         flags = "",
@@ -213,7 +213,7 @@ $ ./test # same as 'z --use test'
 Zoom allows to you create profiles for commands other than
 ag/ack/grep. This may make Zoom a friendly tool for Penetration
 Testers or Security Researchers who are looking for a simple way to
-store exploits. I included a profile for searching for hard-coded
+store exploits. I've included a profile for searching for hard-coded
 passwords.
 
 ## Supported editors

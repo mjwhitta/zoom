@@ -1,7 +1,7 @@
 require "shellwords"
-require "zoom_profile"
+require "zoom/profile"
 
-class FindProfile < ZoomProfile
+class Zoom::Profile::Find < Zoom::Profile
     def exe(args, pattern)
         if (pattern.nil? || pattern.empty?)
             system(

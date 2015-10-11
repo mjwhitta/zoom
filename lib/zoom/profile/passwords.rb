@@ -1,10 +1,10 @@
-require "ag_profile"
-require "ack_profile"
-require "grep_profile"
 require "shellwords"
-require "zoom_profile"
+require "zoom/profile"
+require "zoom/profile/ag"
+require "zoom/profile/ack"
+require "zoom/profile/grep"
 
-class PasswordsProfile < ZoomProfile
+class Zoom::Profile::Passwords < Zoom::Profile
     def colors
         return @profile.colors
     end
@@ -32,19 +32,24 @@ class PasswordsProfile < ZoomProfile
         @passwd_regex = "\"pass(word|wd)?[^:=,>]? *[:=,>]\""
 
         if (ScoobyDoo.where_are_you("ag"))
-            @profile = AgProfile.new(nil, "-uS", "", @passwd_regex)
+            @profile = Zoom::Profile::Ag.new(
+                nil,
+                "-uS",
+                "",
+                @passwd_regex
+            )
         elsif (
             ScoobyDoo.where_are_you("ack") ||
             ScoobyDoo.where_are_you("ack-grep")
         )
-            @profile = AckProfile.new(
+            @profile = Zoom::Profile::Ack.new(
                 nil,
                 "--smart-case",
                 "",
                 @passwd_regex
             )
         else
-            @profile = GrepProfile.new(
+            @profile = Zoom::Profile::Grep.new(
                 nil,
                 "--color=always -EHinR",
                 "",

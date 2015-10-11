@@ -1,19 +1,11 @@
-require "ack_profile"
-require "ag_profile"
-require "find_profile"
-require "grep_profile"
 require "io/wait"
 require "json"
 require "pathname"
-require "passwords_profile"
 require "singleton"
 require "string"
-require "zoom_error"
-require "zoom_profile"
 
 class Zoom
     include Singleton
-    include ZoomError
 
     def add_profile(
         name,
@@ -24,14 +16,14 @@ class Zoom
         append = nil
     )
         if (@profiles.has_key?(name))
-            raise ZoomError::ProfileAlreadyExistsError.new(name)
+            raise Zoom::ProfileAlreadyExistsError.new(name)
         end
 
         default_class = nil
         begin
             default_class = Object::const_get(clas).new
         rescue NameError => e
-            raise ZoomError::ProfileClassUnknownError.new(clas)
+            raise Zoom::ProfileClassUnknownError.new(clas)
         end
 
         edit_profile(
@@ -51,7 +43,7 @@ class Zoom
     def configure_editor(editor)
         e = ScoobyDoo.where_are_you(editor)
         if (e.nil?)
-            raise ZoomError::ExecutableNotFoundError.new(editor)
+            raise Zoom::ExecutableNotFoundError.new(editor)
         end
 
         @rc["editor"] = e
@@ -82,8 +74,8 @@ class Zoom
 
         # Default ag profiles
         if (ScoobyDoo.where_are_you("ag"))
-            ag = AgProfile.new
-            all = AgProfile.new(nil, "-uS")
+            ag = Zoom::Profile::Ag.new
+            all = Zoom::Profile::Ag.new(nil, "-uS")
         else
             ag = nil
         end
@@ -93,15 +85,15 @@ class Zoom
             ScoobyDoo.where_are_you("ack") ||
             ScoobyDoo.where_are_you("ack-grep")
         )
-            ack = AckProfile.new
+            ack = Zoom::Profile::Ack.new
         else
             ack = nil
         end
 
         # Default grep profile (emulate ag/ack as much as possible)
-        grep = GrepProfile.new
+        grep = Zoom::Profile::Grep.new
         if (all.nil?)
-            all = GrepProfile.new
+            all = Zoom::ProfileGrep.new
             all.flags("--color=always -EHinR")
         end
 
@@ -115,7 +107,7 @@ class Zoom
         end
 
         # Create find profile
-        find = FindProfile.new
+        find = Zoom::Profile::Find.new
 
         # Put profiles into rc
         @profiles["ack"] = ack if (ack)
@@ -123,7 +115,7 @@ class Zoom
         @profiles["all"] = all if (all)
         @profiles["default"] = default
         @profiles["grep"] = grep
-        @profiles["passwords"] = PasswordsProfile.new
+        @profiles["passwords"] = Zoom::Profile::Passwords.new
         @profiles["zoom_find"] = find
 
         # Default editor (use $EDITOR)
@@ -135,15 +127,15 @@ class Zoom
 
     def delete_profile(name)
         if (name == "default")
-            raise ZoomError::ProfileCanNotBeModifiedError.new(name)
+            raise Zoom::ProfileCanNotBeModifiedError.new(name)
         end
 
         if (name == "zoom_find")
-            raise ZoomError::ProfileCanNotBeModifiedError.new(name)
+            raise Zoom::ProfileCanNotBeModifiedError.new(name)
         end
 
         if (!@profiles.has_key?(name))
-            raise ZoomError::ProfileDoesNotExistError.new(name)
+            raise Zoom::ProfileDoesNotExistError.new(name)
         end
 
         @profiles.delete(name)
@@ -164,13 +156,13 @@ class Zoom
         append = nil
     )
         if (name == "zoom_find")
-            raise ZoomError::ProfileCanNotBeModified.new(name)
+            raise Zoom::ProfileCanNotBeModifiedError.new(name)
         end
 
         profile = @profiles[name] if (profile.nil?)
 
         if (profile.nil?)
-            raise ZoomError::ProfileDoesNotExists.new(name)
+            raise Zoom::ProfileDoesNotExistsError.new(name)
         end
 
         profile.operator(operator) if (operator)
@@ -186,7 +178,7 @@ class Zoom
         name = @info["profile"] if (name.nil?)
 
         if (!@profiles.has_key?(name))
-            raise ZoomError::ProfileDoesNotExistError.new(name)
+            raise Zoom::ProfileDoesNotExistError.new(name)
         end
 
         @info["last_command"] = {
@@ -251,7 +243,7 @@ class Zoom
 
     def interactive_add_profile(name)
         if (@profiles.has_key?(name))
-            raise ZoomError::ProfileAlreadyExistsError.new(name)
+            raise Zoom::ProfileAlreadyExistsError.new(name)
         end
 
         default_op = "grep"
@@ -263,13 +255,17 @@ class Zoom
             default_op = "ack-grep"
         end
 
+        ack_class = Zoom::Profile::Ack.to_s
+        ag_class = Zoom::Profile::Ag.to_s
+        grep_class = Zoom::Profile::Grep.to_s
+
         case default_op
         when "ack", "ack-grep"
-            puts "Enter class (default AckProfile):"
+            puts "Enter class (default #{ack_class}):"
         when "ag"
-            puts "Enter class (default AgProfile):"
+            puts "Enter class (default #{ag_class}):"
         when "grep"
-            puts "Enter class (default GrepProfile):"
+            puts "Enter class (default #{grep_class}):"
         end
 
         clas = gets.chomp
@@ -277,11 +273,11 @@ class Zoom
 
         case default_op
         when "ack", "ack-grep"
-            clas = "AckProfile" if (clas.nil? || clas.empty?)
+            clas = ack_class if (clas.nil? || clas.empty?)
         when "ag"
-            clas = "AgProfile" if (clas.nil? || clas.empty?)
+            clas = ag_class if (clas.nil? || clas.empty?)
         when "grep"
-            clas = "GrepProfile" if (clas.nil? || clas.empty?)
+            clas = grep_class if (clas.nil? || clas.empty?)
         end
 
         add_profile(name, clas)
@@ -290,13 +286,13 @@ class Zoom
 
     def interactive_edit_profile(name, profile = nil)
         if (name == "zoom_find")
-            raise ZoomError::ProfileCanNotBeModifiedError.new(name)
+            raise Zoom::ProfileCanNotBeModifiedError.new(name)
         end
 
         profile = @profiles[name] if (profile.nil?)
 
         if (profile.nil?)
-            raise ZoomError::ProfileDoesNotExistError.new(name)
+            raise Zoom::ProfileDoesNotExistError.new(name)
         end
 
         # Get new operator
@@ -480,7 +476,7 @@ class Zoom
         @rc = JSON.parse(File.read(@rc_file))
         @profiles = Hash.new
         @rc["profiles"].each do |name, prof|
-            @profiles[name] = ZoomProfile.from_json(prof)
+            @profiles[name] = Zoom::Profile.from_json(prof)
         end
         @rc["profiles"] = @profiles
     end
@@ -490,15 +486,15 @@ class Zoom
         name = @info["profile"] if (name.nil?)
 
         if ((name == "default") || (name == "zoom_find"))
-            raise ZoomError::ProfileCanNotBeModifiedError.new(name)
+            raise Zoom::ProfileCanNotBeModifiedError.new(name)
         end
 
         if (!@profiles.has_key?(name))
-            raise ZoomError::ProfileDoesNotExistError.new(name)
+            raise Zoom::ProfileDoesNotExistError.new(name)
         end
 
         if (@profiles.has_key?(rename))
-            raise ZoomError::ProfileAlreadyExistsError.new(rename)
+            raise Zoom::ProfileAlreadyExistsError.new(rename)
         end
 
         @profiles[rename] = @profiles[name]
@@ -597,7 +593,7 @@ class Zoom
 
     def switch_profile(name)
         if (!@profiles.has_key?(name))
-            raise ZoomError::ProfileDoesNotExistError.new(name)
+            raise Zoom::ProfileDoesNotExistError.new(name)
         end
 
         @info["profile"] = name
@@ -619,3 +615,16 @@ class Zoom
     end
     private :write_zoomrc
 end
+
+require "zoom/error"
+require "zoom/executable_not_found_error"
+require "zoom/profile"
+require "zoom/profile_already_exists_error"
+require "zoom/profile_can_not_be_modified_error"
+require "zoom/profile_class_unknown_error"
+require "zoom/profile_does_not_exist_error"
+require "zoom/profile/ack"
+require "zoom/profile/ag"
+require "zoom/profile/find"
+require "zoom/profile/grep"
+require "zoom/profile/passwords"

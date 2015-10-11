@@ -1,7 +1,7 @@
 require "shellwords"
-require "zoom_profile"
+require "zoom/profile"
 
-class AgProfile < ZoomProfile
+class Zoom::Profile::Ag < Zoom::Profile
     def colors
         '--color-match "47;1;30" --color-line-number "0;37"'
     end

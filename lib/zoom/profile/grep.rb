@@ -1,7 +1,7 @@
 require "shellwords"
-require "zoom_profile"
+require "zoom/profile"
 
-class GrepProfile < ZoomProfile
+class Zoom::Profile::Grep < Zoom::Profile
     def colors
         [
             'GREP_COLORS="',

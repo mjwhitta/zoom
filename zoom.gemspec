@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
     s.name = "ruby-zoom"
-    s.version = "3.0.1"
+    s.version = "3.1.0"
     s.date = Time.new.strftime("%Y-%m-%d")
     s.summary =
         "Quickly open CLI search results in your favorite editor!"
@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
     s.executables = Dir.chdir("bin") do
         Dir["*"]
     end
-    s.files = Dir["lib/*.rb"]
+    s.files = Dir["lib/**/*.rb"]
     s.homepage = "http://mjwhitta.github.io/zoom"
     s.license = "GPL-3.0"
     s.add_development_dependency("minitest", "~> 5.8", ">= 5.8.1")

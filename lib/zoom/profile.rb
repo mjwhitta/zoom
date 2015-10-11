@@ -1,7 +1,8 @@
 require "scoobydoo"
 require "shellwords"
+require "zoom/profile_class_unknown_error"
 
-class ZoomProfile < Hash
+class Zoom::Profile < Hash
     attr_accessor :taggable
 
     def append(append = nil)
@@ -26,13 +27,13 @@ class ZoomProfile < Hash
     def self.from_json(json)
         begin
             return Object::const_get(json["class"]).new(
-                json["operator"].nil? ? "" : json["class"],
+                json["operator"].nil? ? "" : json["operator"],
                 json["flags"].nil? ? "" : json["flags"],
                 json["prepend"].nil? ? "" : json["prepend"],
                 json["append"].nil? ? "" : json["append"]
             )
         rescue NameError => e
-            raise ZoomError::ProfileClassUnknownError.new(
+            raise Zoom::ProfileClassUnknownError.new(
                 json["class"]
             )
         end
@@ -55,10 +56,10 @@ class ZoomProfile < Hash
         append = ""
     )
         self["class"] = self.class.to_s
-        self.operator(operator)
         self.flags(flags)
         self.prepend(envprepend)
         self.append(append)
+        self.operator(operator)
         @pager = "z --pager"
         @taggable = false
     end
@@ -70,6 +71,9 @@ class ZoomProfile < Hash
                 self["operator"] = op
             else
                 self["operator"] = ScoobyDoo.where_are_you("echo")
+                flags("")
+                prepend("")
+                append("#{operator} is not installed!")
             end
         end
         return self["operator"]
