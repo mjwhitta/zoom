@@ -93,7 +93,7 @@ class Zoom
         # Default grep profile (emulate ag/ack as much as possible)
         grep = Zoom::Profile::Grep.new
         if (all.nil?)
-            all = Zoom::ProfileGrep.new
+            all = Zoom::Profile::Grep.new
             all.flags("--color=always -EHinR")
         end
 
