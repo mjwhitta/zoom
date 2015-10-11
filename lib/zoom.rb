@@ -514,7 +514,7 @@ class Zoom
     def repeat
         return if (@info["last_command"].empty?)
 
-        exe_command(
+        exec_profile(
             @info["last_command"]["profile"],
             @info["last_command"]["subargs"],
             @info["last_command"]["pattern"]
