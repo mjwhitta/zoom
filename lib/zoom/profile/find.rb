@@ -23,6 +23,7 @@ class Zoom::Profile::Find < Zoom::Profile
         append = ""
     )
         super("find", flags, envprepend, append)
+        @immutable = true
         @taggable = true
     end
 end

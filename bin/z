@@ -250,7 +250,7 @@ begin
     when "repeat"
         Zoom.instance.repeat
     when "rc"
-        Zoom.instance.default
+        Zoom.default
     when "rename"
         Zoom.instance.rename_profile(
             options["rename"],
@@ -269,6 +269,9 @@ begin
         )
     end
 rescue Zoom::Error => e
+    puts e.message
+    exit ZoomExit::EXCEPTION
+rescue Exception => e
     puts e.message
     exit ZoomExit::EXCEPTION
 end

@@ -3,6 +3,7 @@ require "shellwords"
 require "zoom/profile_class_unknown_error"
 
 class Zoom::Profile < Hash
+    attr_accessor :immutable
     attr_accessor :taggable
 
     def append(append = nil)
@@ -60,6 +61,8 @@ class Zoom::Profile < Hash
         self.prepend(envprepend)
         self.append(append)
         self.operator(operator)
+
+        @immutable = false
         @pager = "z --pager"
         @taggable = false
     end

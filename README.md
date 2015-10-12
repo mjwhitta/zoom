@@ -83,7 +83,15 @@ Usage: z [OPTIONS] <pattern>
     -w, --which                      Display the current profile
 ```
 
-You can use Zoom basically the same way you use ag/ack/grep.
+You can use Zoom basically the same way you use ag/ack/grep. If you
+encounter any errors, most Zoom exceptions should be fixable by
+running:
+
+```bash
+$ z --rc
+```
+
+If you are still having issues, please create a GitLab issue.
 
 ## Shortcuts
 
@@ -214,7 +222,19 @@ Zoom allows to you create profiles for commands other than
 ag/ack/grep. This may make Zoom a friendly tool for Penetration
 Testers or Security Researchers who are looking for a simple way to
 store exploits. I've included a profile for searching for hard-coded
-passwords.
+passwords. The passwords profile is immutable so if you want to change
+the regex used, you can run the following command to change the code:
+
+```bash
+$ gem open ruby-zoom
+```
+
+Navigate to `lib/zoom/profile/passwords.rb` to make changes. If you
+want the revert your changes, run the following command:
+
+```bash
+$ gem pristine ruby-zoom
+```
 
 ## Supported editors
 

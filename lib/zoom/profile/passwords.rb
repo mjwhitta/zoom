@@ -1,4 +1,3 @@
-require "shellwords"
 require "zoom/profile"
 require "zoom/profile/ag"
 require "zoom/profile/ack"
@@ -63,6 +62,7 @@ class Zoom::Profile::Passwords < Zoom::Profile
             @profile.prepend,
             @profile.append
         )
+        @immutable = true
         @taggable = true
     end
 
