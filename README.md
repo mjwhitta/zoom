@@ -181,6 +181,7 @@ class ListProfile < Zoom::Profile
         append = ""
     )
         super(operator, flags, envprepend, append)
+        @taggable = false # Don't tag results
     end
 end
 
@@ -192,6 +193,7 @@ class HelloProfile < Zoom::Profile
         append = "\"Hello, world!\""
     )
         super(operator, flags, envprepend, append)
+        @immutable = true # Don't allow profile changes
     end
 end
 ```
