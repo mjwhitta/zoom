@@ -26,7 +26,7 @@ class Zoom
 
         default_class = nil
         begin
-            default_class = Object::const_get(clas).new
+            default_class = Zoom::Profile.profile_by_name(clas).new
         rescue NameError => e
             raise Zoom::ProfileClassUnknownError.new(clas)
         end

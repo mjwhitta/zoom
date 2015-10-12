@@ -27,7 +27,7 @@ class Zoom::Profile < Hash
 
     def self.from_json(json)
         begin
-            return Object::const_get(json["class"]).new(
+            return profile_by_name(json["class"]).new(
                 json["operator"].nil? ? "" : json["operator"],
                 json["flags"].nil? ? "" : json["flags"],
                 json["prepend"].nil? ? "" : json["prepend"],
@@ -85,6 +85,12 @@ class Zoom::Profile < Hash
     def prepend(envprepend = nil)
         self["prepend"] = envprepend if (envprepend)
         return self["prepend"]
+    end
+
+    def self.profile_by_name(clas)
+        clas.split("::").inject(Object) do |mod, class_name|
+            mod.const_get(class_name)
+        end
     end
 
     def to_s
