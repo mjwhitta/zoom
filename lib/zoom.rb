@@ -462,7 +462,7 @@ class Zoom
 
     def read_zoominfo
         if (!@@info_file.exist? && !@@info_file.symlink?)
-            default_zoominfo
+            Zoom.default_zoominfo
         end
 
         @info = JSON.parse(File.read(@@info_file))
@@ -470,7 +470,9 @@ class Zoom
     private :read_zoominfo
 
     def read_zoomrc
-        default_zoomrc if (!@@rc_file.exist? && !@@rc_file.symlink?)
+        if (!@@rc_file.exist? && !@@rc_file.symlink?)
+            Zoom.default_zoomrc
+        end
 
         @rc = JSON.parse(File.read(@@rc_file))
         @profiles = Hash.new
