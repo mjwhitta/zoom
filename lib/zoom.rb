@@ -21,14 +21,14 @@ class Zoom
         append = nil
     )
         if (@profiles.has_key?(name))
-            raise Zoom::ProfileAlreadyExistsError.new(name)
+            raise Zoom::Error::ProfileAlreadyExistsError.new(name)
         end
 
         default_class = nil
         begin
             default_class = Zoom::Profile.profile_by_name(clas).new
         rescue NameError => e
-            raise Zoom::ProfileClassUnknownError.new(clas)
+            raise Zoom::Error::ProfileClassUnknownError.new(clas)
         end
 
         edit_profile(
@@ -48,7 +48,7 @@ class Zoom
     def configure_editor(editor)
         e = ScoobyDoo.where_are_you(editor)
         if (e.nil?)
-            raise Zoom::ExecutableNotFoundError.new(editor)
+            raise Zoom::Error::ExecutableNotFoundError.new(editor)
         end
 
         @rc["editor"] = e
@@ -135,11 +135,11 @@ class Zoom
 
     def delete_profile(name)
         if (!@profiles.has_key?(name))
-            raise Zoom::ProfileDoesNotExistError.new(name)
+            raise Zoom::Error::ProfileDoesNotExistError.new(name)
         end
 
         if ((name == "default") || @profiles[name].immutable)
-            raise Zoom::ProfileCanNotBeModifiedError.new(name)
+            raise Zoom::Error::ProfileCanNotBeModifiedError.new(name)
         end
 
         @profiles.delete(name)
@@ -162,11 +162,11 @@ class Zoom
         profile = @profiles[name] if (profile.nil?)
 
         if (profile.nil?)
-            raise Zoom::ProfileDoesNotExistsError.new(name)
+            raise Zoom::Error::ProfileDoesNotExistsError.new(name)
         end
 
         if (profile.immutable)
-            raise Zoom::ProfileCanNotBeModifiedError.new(name)
+            raise Zoom::Error::ProfileCanNotBeModifiedError.new(name)
         end
 
         profile.operator(operator) if (operator)
@@ -182,7 +182,7 @@ class Zoom
         name = @info["profile"] if (name.nil?)
 
         if (!@profiles.has_key?(name))
-            raise Zoom::ProfileDoesNotExistError.new(name)
+            raise Zoom::Error::ProfileDoesNotExistError.new(name)
         end
 
         @info["last_command"] = {
@@ -242,7 +242,7 @@ class Zoom
 
     def interactive_add_profile(name)
         if (@profiles.has_key?(name))
-            raise Zoom::ProfileAlreadyExistsError.new(name)
+            raise Zoom::Error::ProfileAlreadyExistsError.new(name)
         end
 
         default_op = "grep"
@@ -287,11 +287,11 @@ class Zoom
         profile = @profiles[name] if (profile.nil?)
 
         if (profile.nil?)
-            raise Zoom::ProfileDoesNotExistError.new(name)
+            raise Zoom::Error::ProfileDoesNotExistError.new(name)
         end
 
         if (profile.immutable)
-            raise Zoom::ProfileCanNotBeModifiedError.new(name)
+            raise Zoom::Error::ProfileCanNotBeModifiedError.new(name)
         end
 
         # Get new operator
@@ -487,15 +487,15 @@ class Zoom
         name = @info["profile"] if (name.nil?)
 
         if ((name == "default") || (name == "zoom_find"))
-            raise Zoom::ProfileCanNotBeModifiedError.new(name)
+            raise Zoom::Error::ProfileCanNotBeModifiedError.new(name)
         end
 
         if (!@profiles.has_key?(name))
-            raise Zoom::ProfileDoesNotExistError.new(name)
+            raise Zoom::Error::ProfileDoesNotExistError.new(name)
         end
 
         if (@profiles.has_key?(rename))
-            raise Zoom::ProfileAlreadyExistsError.new(rename)
+            raise Zoom::Error::ProfileAlreadyExistsError.new(rename)
         end
 
         @profiles[rename] = @profiles[name]
@@ -594,7 +594,7 @@ class Zoom
 
     def switch_profile(name)
         if (!@profiles.has_key?(name))
-            raise Zoom::ProfileDoesNotExistError.new(name)
+            raise Zoom::Error::ProfileDoesNotExistError.new(name)
         end
 
         @info["profile"] = name
@@ -618,12 +618,7 @@ class Zoom
 end
 
 require "zoom/error"
-require "zoom/executable_not_found_error"
 require "zoom/profile"
-require "zoom/profile_already_exists_error"
-require "zoom/profile_can_not_be_modified_error"
-require "zoom/profile_class_unknown_error"
-require "zoom/profile_does_not_exist_error"
 require "zoom/profile/ack"
 require "zoom/profile/ag"
 require "zoom/profile/find"

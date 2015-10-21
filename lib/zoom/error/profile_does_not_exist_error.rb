@@ -1,6 +1,6 @@
 require "zoom/error"
 
-class Zoom::ProfileDoesNotExistError < Zoom::Error
+class Zoom::Error::ProfileDoesNotExistError < Zoom::Error
     def initialize(profile)
         super("Profile #{profile} does not exist!")
     end

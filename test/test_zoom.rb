@@ -17,7 +17,7 @@ class RPassTest < Minitest::Test
             system("mv -f #{file} #{file}.minitest") if (file.exist?)
         end
 
-        Zoom.instance.default
+        Zoom.default
     end
 
     def teardown
@@ -36,35 +36,35 @@ class RPassTest < Minitest::Test
     end
 
     def test_zoom_exceptions
-        assert_raises(Zoom::ExecutableNotFoundError) do
+        assert_raises(Zoom::Error::ExecutableNotFoundError) do
             Zoom.instance.configure_editor("asdf")
         end
 
-        assert_raises(Zoom::ProfileAlreadyExistsError) do
+        assert_raises(Zoom::Error::ProfileAlreadyExistsError) do
             Zoom.instance.add_profile("grep", "GrepProfile")
         end
 
-        assert_raises(Zoom::ProfileCanNotBeModifiedError) do
+        assert_raises(Zoom::Error::ProfileCanNotBeModifiedError) do
             Zoom.instance.delete_profile("default")
         end
 
-        assert_raises(Zoom::ProfileCanNotBeModifiedError) do
+        assert_raises(Zoom::Error::ProfileCanNotBeModifiedError) do
             Zoom.instance.delete_profile("zoom_find")
         end
 
-        assert_raises(Zoom::ProfileCanNotBeModifiedError) do
+        assert_raises(Zoom::Error::ProfileCanNotBeModifiedError) do
             Zoom.instance.rename_profile("asdf", "default")
         end
 
-        assert_raises(Zoom::ProfileCanNotBeModifiedError) do
+        assert_raises(Zoom::Error::ProfileCanNotBeModifiedError) do
             Zoom.instance.rename_profile("asdf", "zoom_find")
         end
 
-        assert_raises(Zoom::ProfileClassUnknownError) do
+        assert_raises(Zoom::Error::ProfileClassUnknownError) do
             Zoom.instance.add_profile("asdf", "AsdfProfile")
         end
 
-        assert_raises(Zoom::ProfileDoesNotExistError) do
+        assert_raises(Zoom::Error::ProfileDoesNotExistError) do
             Zoom.instance.delete_profile("asdf")
         end
     end

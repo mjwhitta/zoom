@@ -1,6 +1,6 @@
 require "scoobydoo"
 require "shellwords"
-require "zoom/profile_class_unknown_error"
+require "zoom/error/profile_class_unknown_error"
 
 class Zoom::Profile < Hash
     attr_accessor :immutable
@@ -34,7 +34,7 @@ class Zoom::Profile < Hash
                 json["append"].nil? ? "" : json["append"]
             )
         rescue NameError => e
-            raise Zoom::ProfileClassUnknownError.new(
+            raise Zoom::Error::ProfileClassUnknownError.new(
                 json["class"]
             )
         end
