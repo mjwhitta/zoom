@@ -50,6 +50,7 @@ If using the grep operator, you need to install
 using Zoom:
 
 ```bash
+$ brew tap homebrew/dupes
 $ brew install gnu-sed grep
 $ mkdir -p ~/bin
 $ cd ~/bin
