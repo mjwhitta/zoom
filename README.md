@@ -35,11 +35,10 @@ $ rake install
 #### User Packaged
 
 - ![logo](http://www.monitorix.org/imgs/archlinux.png "arch logo")
-   Arch Linux: via
-   [AUR](https://aur.archlinux.org/packages/ruby-zoom).
+  Arch Linux: via [AUR](https://aur.archlinux.org/packages/ruby-zoom)
 
-- Via Firef0x's Arch Linux Repository.
-   (**[Guide](http://firef0x.github.io/archrepo.html)**)
+- Via Firef0x's Arch Linux Repository
+  (**[Guide](http://firef0x.github.io/archrepo.html)**)
 
 ## Mac users
 
