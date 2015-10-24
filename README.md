@@ -34,14 +34,12 @@ $ rake install
 
 #### User Packaged
 
-Note: These are likely broken since Zoom 3.0!
-
 - ![logo](http://www.monitorix.org/imgs/archlinux.png "arch logo")
-   Arch Linux: in the
-   [AUR](https://aur.archlinux.org/packages/zoom-git)
+   Arch Linux: via
+   [AUR](https://aur.archlinux.org/packages/ruby-zoom).
 
-- [Firef0x's](http://firef0x.github.io/archrepo.html) Arch Linux
-   Repository
+- Via Firef0x's Arch Linux Repository.
+   (**[Guide](http://firef0x.github.io/archrepo.html)**)
 
 ## Mac users
 
