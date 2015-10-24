@@ -22,7 +22,7 @@ class Zoom::Profile::Ag < Zoom::Profile
 
     def initialize(
         operator = nil,
-        flags = "-S",
+        flags = "",
         envprepend = "",
         append = ""
     )

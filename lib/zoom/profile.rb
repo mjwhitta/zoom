@@ -102,3 +102,10 @@ class Zoom::Profile < Hash
         ].join(" ").strip
     end
 end
+
+require "zoom/profile/ack"
+require "zoom/profile/ag"
+require "zoom/profile/find"
+require "zoom/profile/grep"
+require "zoom/profile/passwords"
+require "zoom/profile/pt"

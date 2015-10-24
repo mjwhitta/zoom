@@ -77,13 +77,20 @@ class Zoom
         profiles = Hash.new
 
         all = nil
+        ag = nil
+        pt = nil
+        ack = nil
 
         # Default ag profiles
         if (ScoobyDoo.where_are_you("ag"))
             ag = Zoom::Profile::Ag.new
-            all = Zoom::Profile::Ag.new(nil, "-uS")
-        else
-            ag = nil
+            all = Zoom::Profile::Ag.new(nil, "-u")
+        end
+
+        # Default pt profiles
+        if (ScoobyDoo.where_are_you("pt"))
+            pt = Zoom::Profile::Pt.new
+            all ||= Zoom::Profile::Pt.new(nil, "--color -SeU")
         end
 
         # Default ack profile
@@ -92,20 +99,17 @@ class Zoom
             ScoobyDoo.where_are_you("ack-grep")
         )
             ack = Zoom::Profile::Ack.new
-        else
-            ack = nil
         end
 
         # Default grep profile (emulate ag/ack as much as possible)
         grep = Zoom::Profile::Grep.new
-        if (all.nil?)
-            all = Zoom::Profile::Grep.new
-            all.flags("--color=always -EHinR")
-        end
+        all ||= Zoom::Profile::Grep.new(nil, "--color=always -EHinR")
 
         # Create default profile
         if (ag)
             default = ag
+        elsif (pt)
+            default = pt
         elsif (ack)
             default = ack
         else
@@ -122,6 +126,7 @@ class Zoom
         profiles["default"] = default
         profiles["grep"] = grep
         profiles["passwords"] = Zoom::Profile::Passwords.new
+        profiles["pt"] = pt
         profiles["zoom_find"] = find
         rc["profiles"] = profiles
 
@@ -248,6 +253,8 @@ class Zoom
         default_op = "grep"
         if (ScoobyDoo.where_are_you("ag"))
             default_op = "ag"
+        elsif (ScoobyDoo.where_are_you("pt"))
+            default_op = "pt"
         elsif (ScoobyDoo.where_are_you("ack"))
             default_op = "ack"
         elsif (ScoobyDoo.where_are_you("ack-grep"))
@@ -257,6 +264,7 @@ class Zoom
         ack_class = Zoom::Profile::Ack.to_s
         ag_class = Zoom::Profile::Ag.to_s
         grep_class = Zoom::Profile::Grep.to_s
+        pt_class = Zoom::Profile::Pt.to_s
 
         case default_op
         when "ack", "ack-grep"
@@ -265,6 +273,8 @@ class Zoom
             puts "Enter class (default #{ag_class}):"
         when "grep"
             puts "Enter class (default #{grep_class}):"
+        when "pt"
+            puts "Enter class (default #{pt_class}):"
         end
 
         clas = gets.chomp
@@ -277,6 +287,8 @@ class Zoom
             clas = ag_class if (clas.nil? || clas.empty?)
         when "grep"
             clas = grep_class if (clas.nil? || clas.empty?)
+        when "pt"
+            clas = pt_class if (clas.nil? || clas.empty?)
         end
 
         add_profile(name, clas)
@@ -619,8 +631,3 @@ end
 
 require "zoom/error"
 require "zoom/profile"
-require "zoom/profile/ack"
-require "zoom/profile/ag"
-require "zoom/profile/find"
-require "zoom/profile/grep"
-require "zoom/profile/passwords"
