@@ -19,6 +19,11 @@ task :install => :gem do
     system("gem install ruby-zoom*.gem")
 end
 
+desc "Push gem to rubygems.org"
+task :push => [:clean, :gem] do
+    system("gem push ruby-zoom*.gem")
+end
+
 desc "Run tests"
 Rake::TestTask.new do |t|
     t.libs << "test"
