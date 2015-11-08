@@ -1,4 +1,4 @@
-# Redefine String class to allow for colorizing and rsplit
+# Redefine String class to allow for colorizing, rsplit, and word wrap
 class String
     def blue
         return colorize(36)
@@ -14,6 +14,12 @@ class String
 
     def red
         return colorize(31)
+    end
+
+    def rsplit(pattern)
+        ret = rpartition(pattern)
+        ret.delete_at(1)
+        return ret
     end
 
     def white
