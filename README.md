@@ -57,7 +57,7 @@ $ ln -s $(which ggrep) grep
 
 ## How to use
 
-```bash
+```
 $ z --help
 Usage: z [OPTIONS] <pattern>
     -a, --add=NAME                   Add a new profile with specified name
@@ -97,7 +97,7 @@ Zoom prefixes shortcut tags to ag/ack/grep's search results! If you
 use Zoom to search for "ScoobyDoo" in the Zoom source directory, you
 would see something like the following:
 
-```bash
+```
 $ z ScoobyDoo
 lib/zoom.rb
 [1] 25:        if (ScoobyDoo.where_are_you("ag"))
@@ -286,5 +286,5 @@ $ rm -f ~/.zcompdump; compinit
 
 ## TODO
 
-- [ ] Need to test to see if any ag/ack/grep flags break functionality
-- [ ] Make comments/documentation more thorough
+- Need to test to see if any ag/ack/grep flags break functionality
+- Make comments/documentation more thorough
