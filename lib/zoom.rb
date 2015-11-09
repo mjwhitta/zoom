@@ -126,7 +126,7 @@ class Zoom
         profiles["default"] = default
         profiles["grep"] = grep
         profiles["passwords"] = Zoom::Profile::Passwords.new
-        profiles["pt"] = pt
+        profiles["pt"] = pt if (pt)
         profiles["zoom_find"] = find
         rc["profiles"] = profiles
 
