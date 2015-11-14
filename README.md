@@ -279,7 +279,7 @@ $ rm -f ~/.zcompdump; compinit
 
 ## Links
 
-- [Homepage](http://mjwhitta.github.io/zoom)
+- [Homepage](https://mjwhitta.github.io/zoom)
 - [Source](https://gitlab.com/mjwhitta/zoom)
 - [Mirror](https://github.com/mjwhitta/zoom)
 - [RubyGems](https://rubygems.org/gems/ruby-zoom)
