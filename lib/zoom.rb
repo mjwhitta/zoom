@@ -456,6 +456,10 @@ class Zoom
 
     def parse_tags(results)
         tags = Array.new
+        if (results.nil? || results.empty?)
+            raise Zoom::Error::InvalidTagError.new
+        end
+
         results.split(",").each do |num|
             if (!num.scan(/^[0-9]+$/).empty?)
                 tags.push(num.to_i)
@@ -465,7 +469,7 @@ class Zoom
                     tags.push(i)
                 end
             else
-                puts "Tag #{num} not formatted properly. Ignoring."
+                raise Zoom::Error::InvalidTagError.new(num)
             end
         end
         return tags

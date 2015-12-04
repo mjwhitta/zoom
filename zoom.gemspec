@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
     s.name = "ruby-zoom"
-    s.version = "3.3.2"
+    s.version = "3.3.3"
     s.date = Time.new.strftime("%Y-%m-%d")
     s.summary =
         "Quickly open CLI search results in your favorite editor!"
