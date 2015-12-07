@@ -13,7 +13,7 @@ class String
     end
 
     def cyan
-        return colorise(36)
+        return colorize(36)
     end
 
     def green
