@@ -6,9 +6,16 @@ class Zoom::Profile < Hash
     attr_accessor :immutable
     attr_accessor :taggable
 
+    @@cache_file = "~/.zoom_cache"
+
     def append(append = nil)
         self["append"] = append if (append)
         return self["append"]
+    end
+
+    def self.cache_file(cache_file)
+        @@cache_file = cache_file
+        @@cache_file ||= "~/.zoom_cache"
     end
 
     def colors
@@ -63,7 +70,7 @@ class Zoom::Profile < Hash
         self.operator(operator)
 
         @immutable = false
-        @pager = "z --pager"
+        @pager = "z --pager --cache-file #{@@cache_file}"
         @taggable = false
     end
 

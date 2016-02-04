@@ -221,8 +221,10 @@ class Zoom
     end
     private :get_new_value
 
-    def initialize
-        @cache_file = Pathname.new("~/.zoom_cache").expand_path
+    def initialize(cache_file = nil)
+        cache_file ||= "~/.zoom_cache"
+        Zoom::Profile.cache_file(cache_file)
+        @cache_file = Pathname.new(cache_file).expand_path
         @info_file = Pathname.new("~/.zoominfo").expand_path
         @rc_file = Pathname.new("~/.zoomrc").expand_path
         @shortcut_file = Pathname.new("~/.zoom_shortcuts").expand_path

@@ -60,25 +60,26 @@ $ ln -s $(which ggrep) grep
 ```
 $ z --help
 Usage: z [OPTIONS] <pattern>
-    -a, --add=NAME                   Add a new profile with specified name
-    -c, --cache                      Show previous results
-    -d, --delete=NAME                Delete profile with specified name
-    -e, --edit=NAME                  Edit profile with specified name
-        --editor=EDITOR              Use the specified editor
-        --examples                   Show some examples
-        --find                       Use the zoom_find profile
-    -g, --go=NUM                     Open editor to search result NUM
-    -h, --help                       Display this help message
-    -l, --list                       List profiles
-        --list-profile-names         List profile names for completion functions
-        --list-tags                  List tags for completion functions
-        --pager                      Treat Zoom as a pager (internal use only)
-    -r, --repeat                     Repeat the last Zoom command
-        --rc                         Create default .zoomrc file
-        --rename=NAME                Rename the current profile
-    -s, --switch=NAME                Switch to profile with specified name
-    -u, --use=NAME                   Use specified profile one time only
-    -w, --which                      Display the current profile
+    -a, --add=NAME            Add a new profile with specified name
+    -c, --cache               Show previous results
+        --cache-file=FILE     Use the specified cache file
+    -d, --delete=NAME         Delete profile with specified name
+    -e, --edit=NAME           Edit profile with specified name
+        --editor=EDITOR       Use the specified editor
+        --examples            Show some examples
+        --find                Use the zoom_find profile
+    -g, --go=NUM              Open editor to search result NUM
+    -h, --help                Display this help message
+    -l, --list                List profiles
+        --list-profile-names  List profile names for completion functions
+        --list-tags           List tags for completion functions
+        --pager               Treat Zoom as a pager (internal use only)
+    -r, --repeat              Repeat the last Zoom command
+        --rc                  Create default .zoomrc file
+        --rename=NAME         Rename the current profile
+    -s, --switch=NAME         Switch to profile with specified name
+    -u, --use=NAME            Use specified profile one time only
+    -w, --which               Display the current profile
 ```
 
 You can use Zoom basically the same way you use ag/ack/grep. If you

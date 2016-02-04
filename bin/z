@@ -14,6 +14,7 @@ end
 def parse(args)
     options = Hash.new
     options["action"] = "exec"
+    options["cache_file"] = nil
     options["use"] = nil
 
     info = "Do you like to search through code using ag, ack, or " \
@@ -44,6 +45,13 @@ def parse(args)
 
         opts.on("-c", "--cache", "Show previous results") do
             options["action"] = "cache"
+        end
+
+        opts.on(
+            "--cache-file=FILE",
+            "Use the specified cache file"
+        ) do |file|
+            options["cache_file"] = file
         end
 
         opts.on(
@@ -200,7 +208,7 @@ end
 
 options = parse(ARGV)
 
-zoom = Zoom.new
+zoom = Zoom.new(options["cache_file"])
 begin
     case options["action"]
     when "add"
