@@ -1,17 +1,9 @@
 require "io/wait"
 require "json"
 require "pathname"
-require "singleton"
 require "string"
 
 class Zoom
-    include Singleton
-
-    @@cache_file = Pathname.new("~/.zoom_cache").expand_path
-    @@info_file = Pathname.new("~/.zoominfo").expand_path
-    @@rc_file = Pathname.new("~/.zoomrc").expand_path
-    @@shortcut_file = Pathname.new("~/.zoom_shortcuts").expand_path
-
     def add_profile(
         name,
         clas,
@@ -42,7 +34,7 @@ class Zoom
     end
 
     def clear_cache
-        @@cache_file.delete if (@@cache_file.exist?)
+        @cache_file.delete if (@cache_file.exist?)
     end
 
     def configure_editor(editor)
@@ -55,24 +47,24 @@ class Zoom
         write_zoomrc
     end
 
-    def self.default
+    def default
         default_zoominfo
         default_zoomrc
     end
 
-    def self.default_zoominfo
+    def default_zoominfo
         info = Hash.new
         info["profile"] = "default"
 
         # Reset last command to be empty
         info["last_command"] = Hash.new
 
-        File.open(@@info_file, "w") do |file|
+        File.open(@info_file, "w") do |file|
             file.write(JSON.pretty_generate(info))
         end
     end
 
-    def self.default_zoomrc
+    def default_zoomrc
         rc = Hash.new
         profiles = Hash.new
 
@@ -133,7 +125,7 @@ class Zoom
         # Default editor (use $EDITOR)
         rc["editor"] = ""
 
-        File.open(@@rc_file, "w") do |file|
+        File.open(@rc_file, "w") do |file|
             file.write(JSON.pretty_generate(rc))
         end
     end
@@ -209,7 +201,7 @@ class Zoom
 
     def get_location_of_result(result)
         count = 0
-        File.open(@@shortcut_file) do |file|
+        File.open(@shortcut_file) do |file|
             file.each do |line|
                 count += 1
                 if (count == result)
@@ -230,6 +222,11 @@ class Zoom
     private :get_new_value
 
     def initialize
+        @cache_file = Pathname.new("~/.zoom_cache").expand_path
+        @info_file = Pathname.new("~/.zoominfo").expand_path
+        @rc_file = Pathname.new("~/.zoomrc").expand_path
+        @shortcut_file = Pathname.new("~/.zoom_shortcuts").expand_path
+
         # Load custom profiles
         custom_profs = Pathname.new("~/.zoom_profiles.rb").expand_path
         require_relative custom_profs if (custom_profs.exist?)
@@ -243,6 +240,7 @@ class Zoom
         @editor = "vim" if (@editor.nil? || @editor.empty?)
         @editor = ScoobyDoo.where_are_you(@editor)
         @editor = ScoobyDoo.where_are_you("vi") if (@editor.nil?)
+
     end
 
     def interactive_add_profile(name)
@@ -359,13 +357,13 @@ class Zoom
     end
 
     def list_tags
-        return if (!@@cache_file.exist?)
+        return if (!@cache_file.exist?)
 
         # Open shortcut file for writing
-        shct = File.open(@@shortcut_file, "r")
+        shct = File.open(@shortcut_file, "r")
 
         # Read in cache
-        File.open(@@cache_file) do |cache|
+        File.open(@cache_file) do |cache|
             count = 1
 
             cache.each do |line|
@@ -442,7 +440,7 @@ class Zoom
     private :open_editor_to_result
 
     def pager
-        File.open(@@cache_file, "w") do |f|
+        File.open(@cache_file, "w") do |f|
             f.write("ZOOM_EXE_DIR=#{Dir.pwd}\n")
             begin
                 $stdin.each_line do |line|
@@ -477,20 +475,20 @@ class Zoom
     private :parse_tags
 
     def read_zoominfo
-        if (!@@info_file.exist? && !@@info_file.symlink?)
-            Zoom.default_zoominfo
+        if (!@info_file.exist? && !@info_file.symlink?)
+            default_zoominfo
         end
 
-        @info = JSON.parse(File.read(@@info_file))
+        @info = JSON.parse(File.read(@info_file))
     end
     private :read_zoominfo
 
     def read_zoomrc
-        if (!@@rc_file.exist? && !@@rc_file.symlink?)
-            Zoom.default_zoomrc
+        if (!@rc_file.exist? && !@rc_file.symlink?)
+            default_zoomrc
         end
 
-        @rc = JSON.parse(File.read(@@rc_file))
+        @rc = JSON.parse(File.read(@rc_file))
         @profiles = Hash.new
         @rc["profiles"].each do |name, prof|
             @profiles[name] = Zoom::Profile.from_json(prof)
@@ -540,7 +538,7 @@ class Zoom
     private :remove_colors
 
     def shortcut_cache(profile = nil)
-        return if (!@@cache_file.exist?)
+        return if (!@cache_file.exist?)
         return if (@info["last_command"].empty?)
 
         if (profile.nil?)
@@ -548,10 +546,10 @@ class Zoom
         end
 
         # Open shortcut file for writing
-        shct = File.open(@@shortcut_file, "w")
+        shct = File.open(@shortcut_file, "w")
 
         # Read in cache
-        File.open(@@cache_file) do |cache|
+        File.open(@cache_file) do |cache|
             start_dir = ""
             file = nil
             filename = ""
@@ -618,7 +616,7 @@ class Zoom
     end
 
     def write_zoominfo
-        File.open(@@info_file, "w") do |file|
+        File.open(@info_file, "w") do |file|
             file.write(JSON.pretty_generate(@info))
         end
     end
@@ -626,7 +624,7 @@ class Zoom
 
     def write_zoomrc
         @rc["profiles"] = @profiles
-        File.open(@@rc_file, "w") do |file|
+        File.open(@rc_file, "w") do |file|
             file.write(JSON.pretty_generate(@rc))
         end
     end

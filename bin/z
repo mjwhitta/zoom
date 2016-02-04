@@ -200,18 +200,19 @@ end
 
 options = parse(ARGV)
 
+zoom = Zoom.new
 begin
     case options["action"]
     when "add"
-        Zoom.instance.interactive_add_profile(options["use"])
+        zoom.interactive_add_profile(options["use"])
     when "cache"
-        Zoom.instance.shortcut_cache
+        zoom.shortcut_cache
     when "delete"
-        Zoom.instance.delete_profile(options["use"])
+        zoom.delete_profile(options["use"])
     when "edit"
-        Zoom.instance.interactive_edit_profile(options["use"])
+        zoom.interactive_edit_profile(options["use"])
     when "editor"
-        Zoom.instance.configure_editor(options["use"])
+        zoom.configure_editor(options["use"])
     when "examples"
         puts [
             "EXAMPLES:",
@@ -238,31 +239,31 @@ begin
             "    $ z --go 10,20,30-40"
         ].join("\n")
     when "go"
-        Zoom.instance.loop_through_results(options["use"])
+        zoom.loop_through_results(options["use"])
     when "list_profiles"
-        Zoom.instance.list_profiles
+        zoom.list_profiles
     when "list_profile_names"
-        Zoom.instance.list_profile_names
+        zoom.list_profile_names
     when "list_tags"
-        Zoom.instance.list_tags
+        zoom.list_tags
     when "pager"
-        Zoom.instance.pager
+        zoom.pager
     when "repeat"
-        Zoom.instance.repeat
+        zoom.repeat
     when "rc"
-        Zoom.default
+        zoom.default
     when "rename"
-        Zoom.instance.rename_profile(
+        zoom.rename_profile(
             options["rename"],
             options["use"]
         )
     when "switch"
-        Zoom.instance.switch_profile(options["use"])
+        zoom.switch_profile(options["use"])
     when "which"
-        Zoom.instance.show_current
+        zoom.show_current
     else
         # Search and save results
-        Zoom.instance.exec_profile(
+        zoom.exec_profile(
             options["use"],
             options["subargs"],
             options["pattern"]

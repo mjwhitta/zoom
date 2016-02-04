@@ -11,7 +11,7 @@ end
 desc "Build gem"
 task :gem do
     system("chmod -R u=rwX,go=rX bin lib")
-    system("gem build zoom.gemspec")
+    system("gem build -V zoom.gemspec")
 end
 
 desc "Build and install gem"
