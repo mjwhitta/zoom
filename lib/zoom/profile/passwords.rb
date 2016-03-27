@@ -1,72 +1,40 @@
-require "zoom/profile"
-require "zoom/profile/ag"
-require "zoom/profile/ack"
-require "zoom/profile/grep"
+require "zoom/profile_manager"
 
-class Zoom::Profile::Passwords < Zoom::Profile
-    def colors
-        return @profile.colors
+case Zoom::ProfileManager.default_profile
+when /^ack(-grep)?$/
+    class Zoom::Profile::Passwords < Zoom::Profile::Ack
     end
-
-    def exe(args, pattern)
-        @profile.exe(args, pattern)
+when "ag"
+    class Zoom::Profile::Passwords < Zoom::Profile::Ag
     end
-
-    def info
-        [
-            "Class   : #{self.class.to_s}",
-            "Prepend : #{@profile.prepend}",
-            "Operator: #{@profile.operator}",
-            "Flags   : #{@profile.flags}",
-            "Append  : #{@profile.append}"
-        ].join("\n").strip
+when "pt"
+    class Zoom::Profile::Passwords < Zoom::Profile::Pt
     end
+else
+    class Zoom::Profile::Passwords < Zoom::Profile::Grep
+    end
+end
 
-    def initialize(
-        operator = nil,
-        flags = "",
-        envprepend = "",
-        append = ""
-    )
-        @passwd_regex = "\"pass(word|wd)?[^:=,>]? *[:=,>]\""
+class Zoom::Profile::Passwords
+    def initialize(n, o = nil, f = "", b = "", a = "")
+        op = Zoom::ProfileManager.default_profile
 
-        if (ScoobyDoo.where_are_you("ag"))
-            @profile = Zoom::Profile::Ag.new(
-                nil,
-                "-uS",
-                "",
-                @passwd_regex
+        case op
+        when /^ack(-grep)?$/
+            super(
+                n,
+                op,
+                "--smart-case --ignore-dir=test --ignore-dir=tests"
             )
-        elsif (
-            ScoobyDoo.where_are_you("ack") ||
-            ScoobyDoo.where_are_you("ack-grep")
-        )
-            @profile = Zoom::Profile::Ack.new(
-                nil,
-                "--smart-case",
-                "",
-                @passwd_regex
-            )
+        when "ag"
+            super(n, op, "-Su --ignore=\"\/*test*\/\"")
+        when "pt"
+            super(n, op, "-SU --hidden --ignore=\"\/*test*\/\"")
         else
-            @profile = Zoom::Profile::Grep.new(
-                nil,
-                "--color=always -EHinR",
-                "",
-                @passwd_regex
-            )
+            super(n, op, "-ai --exclude-dir=test --exclude-dir=tests")
         end
 
-        super(
-            @profile.operator,
-            @profile.flags,
-            @profile.prepend,
-            @profile.append
-        )
-        @immutable = true
+        @pattern = "pass(word|wd)?[^:=,>]? *[:=,>]"
         @taggable = true
-    end
-
-    def to_s
-        return @porfile.to_s
     end
 end

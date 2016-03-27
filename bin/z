@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+require "djinni"
+require "fileutils"
+require "hilighter"
 require "optparse"
 require "zoom"
 
@@ -8,7 +11,9 @@ class ZoomExit
     INVALID_OPTION = 1
     INVALID_ARGUMENT = 2
     MISSING_ARGUMENT = 3
-    EXCEPTION = 4
+    EXTRA_ARGUMENTS = 4
+    EXCEPTION = 5
+    AMBIGUOUS_ARGUMENT = 6
 end
 
 def parse(args)
@@ -16,76 +21,50 @@ def parse(args)
     options["action"] = "exec"
     options["cache_file"] = nil
     options["use"] = nil
+    options["verbose"] = false
 
-    info = "Do you like to search through code using ag, ack, or " \
-        "grep? Good! This tool is for you! Zoom adds some " \
-        "convenience to ag/ack/grep by allowing you to quickly " \
-        "open your search results in your editor of choice. When " \
-        "looking at large code-bases, it can be a pain to have to " \
-        "scroll to find the filename of each result. Zoom prints a " \
-        "tag number in front of each result that ag/ack/grep " \
-        "outputs. Then you can quickly open that tag number with " \
-        "Zoom to jump straight to the source. Zoom is even " \
-        "persistent across all your sessions! You can search in " \
-        "one terminal and jump to a tag in another terminal from " \
-        "any directory!"
+    info = [
+        "Do you like to search through code using ag, ack, grep, or",
+        "pt? Good! This tool is for you! Zoom adds some convenience",
+        "to ag/ack/grep/pt by allowing you to quickly open your",
+        "search results in your editor of choice. When looking at",
+        "large code-bases, it can be a pain to have to scroll to",
+        "find the filename of each result. Zoom prints a tag number",
+        "in front of each result that ag/ack/grep/pt outputs. Then",
+        "you can quickly open that tag number with Zoom to jump",
+        "straight to the source. Zoom is even persistent across all",
+        "your sessions! You can search in one terminal and jump to a",
+        "tag in another terminal from any directory!"
+    ].join(" ")
 
     parser = OptionParser.new do |opts|
-        opts.banner =
-            "Usage: #{File.basename($0)} [OPTIONS] <pattern>"
+        opts.summary_width = 25
 
-        opts.on(
-            "-a",
-            "--add=NAME",
-            "Add a new profile with specified name"
-        ) do |name|
-            options["action"] = "add"
-            options["use"] = name
+        opts.banner =
+            "Usage: #{File.basename($0)} [OPTIONS] [pattern]"
+
+        opts.on("", "DESCRIPTION")
+
+        info.scan(/\S.{0,76}\S(?=\s|$)|\S+/).each do |line|
+            opts.on("    #{line}")
         end
+
+        opts.on("", "OPTIONS")
 
         opts.on("-c", "--cache", "Show previous results") do
             options["action"] = "cache"
         end
 
         opts.on(
+            "-o",
             "--cache-file=FILE",
-            "Use the specified cache file"
+            "Use alternate cache"
         ) do |file|
             options["cache_file"] = file
         end
 
-        opts.on(
-            "-d",
-            "--delete=NAME",
-            "Delete profile with specified name"
-        ) do |name|
-            options["action"] = "delete"
-            options["use"] = name
-        end
-
-        opts.on(
-            "-e",
-            "--edit=NAME",
-            "Edit profile with specified name"
-        ) do |name|
-            options["action"] = "edit"
-            options["use"] = name
-        end
-
-        opts.on(
-            "--editor=EDITOR",
-            "Use the specified editor"
-        ) do |editor|
-            options["action"] = "editor"
-            options["use"] = editor
-        end
-
-        opts.on("--examples", "Show some examples") do
-            options["action"] = "examples"
-        end
-
-        opts.on("--find", "Use the zoom_find profile") do
-            options["use"] = "zoom_find"
+        opts.on("--find", "Use built-in find profile") do
+            options["use"] = "find"
         end
 
         opts.on(
@@ -106,6 +85,33 @@ def parse(args)
             options["action"] = "list_profiles"
         end
 
+        opts.on("-r", "--repeat", "Repeat last Zoom command") do
+            options["action"] = "repeat"
+        end
+
+        opts.on("-u", "--use=NAME", "Run specified profile") do |name|
+            options["use"] = name
+        end
+
+        opts.on("-w", "--which", "Display current profile") do
+            options["action"] = "which"
+        end
+
+        opts.on("", "CONFIGURE_OPTIONS")
+
+        opts.on(
+            "--configure",
+            "Open prompt to edit profiles"
+        ) do
+            options["action"] = "configure"
+        end
+
+        opts.on("--rc", "Create default config file") do
+            options["action"] = "rc"
+        end
+
+        opts.on("", "MISC_OPTIONS")
+
         opts.on(
             "--list-profile-names",
             "List profile names for completion functions"
@@ -120,51 +126,37 @@ def parse(args)
             options["action"] = "list_tags"
         end
 
+        opts.on("--nocolor", "Disable colorized output") do
+            Hilighter.disable
+        end
+
         opts.on(
-            "--pager",
-            "Treat Zoom as a pager (internal use only)"
+            "-v",
+            "--verbose",
+            "Show backtrace when error occurs"
         ) do
-            options["action"] = "pager"
+            options["verbose"] = true
         end
 
-        opts.on("-r", "--repeat", "Repeat the last Zoom command") do
-            options["action"] = "repeat"
-        end
-
-        opts.on("--rc", "Create default .zoomrc file") do
-            options["action"] = "rc"
+        opts.on("--version", "Show version") do
+            options["action"] = "version"
         end
 
         opts.on(
-            "--rename=NAME",
-            "Rename the current profile"
-        ) do |name|
-            options["action"] = "rename"
-            options["rename"] = name
-        end
-
-        opts.on(
-            "-s",
-            "--switch=NAME",
-            "Switch to profile with specified name"
-        ) do |name|
-            options["action"] = "switch"
-            options["use"] = name
-        end
-
-        opts.on(
-            "-u",
-            "--use=NAME",
-            "Use specified profile one time only"
-        ) do |name|
-            options["use"] = name
-        end
-
-        opts.on("-w", "--which", "Display the current profile") do
-            options["action"] = "which"
-        end
-
-        opts.on("", info.word_wrap(80))
+            "",
+            "EXAMPLES",
+            "    Execute default profile:",
+            "    $ z PATTERN",
+            "",
+            "    Execute specified profile:",
+            "    $ z -u grep PATTERN",
+            "",
+            "    Pass additional flags to default profile:",
+            "    $ z -- -A 3 PATTERN",
+            "",
+            "    Open tags:",
+            "    $ zg 10,20,30-40"
+        )
     end
 
     begin
@@ -181,13 +173,17 @@ def parse(args)
         puts e.message
         puts parser
         exit ZoomExit::MISSING_ARGUMENT
+    rescue OptionParser::AmbiguousOption => e
+        puts e.message
+        puts parser
+        exit ZoomExit::AMBIGUOUS_ARGUMENT
     end
 
     case File.basename($0)
     when "zc"
         options["action"] = "cache"
     when "zf"
-        options["use"] = "zoom_find"
+        options["use"] = "find"
     when "zg"
         options["action"] = "go"
         options["use"] = args[0]
@@ -196,7 +192,7 @@ def parse(args)
     when "zr"
         options["action"] = "repeat"
     when "z"
-        # do nothing, this is the normal usage
+        # Do nothing, this is the normal usage
     else
         options["use"] = File.basename($0)
     end
@@ -208,80 +204,126 @@ end
 
 options = parse(ARGV)
 
-zoom = Zoom.new(options["cache_file"])
 begin
+    if (options["action"] == "rc")
+        FileUtils.rm_f(Pathname.new("~/.zoomrc").expand_path)
+    end
+
+    zoom = Zoom.new(options["cache_file"], nil, !Hilighter.disable?)
+
     case options["action"]
-    when "add"
-        zoom.interactive_add_profile(options["use"])
     when "cache"
-        zoom.shortcut_cache
-    when "delete"
-        zoom.delete_profile(options["use"])
-    when "edit"
-        zoom.interactive_edit_profile(options["use"])
-    when "editor"
-        zoom.configure_editor(options["use"])
-    when "examples"
-        puts [
-            "EXAMPLES:",
-            "",
-            "Add a profile named test:",
-            "    $ z --add test",
-            "",
-            "Edit a profile named test:",
-            "    $ z --edit test",
-            "",
-            "Execute the current profile:",
-            "    $ z PATTERN",
-            "",
-            "Repeat the previous Zoom command:",
-            "    $ z --repeat",
-            "",
-            "Pass additional flags to the choosen operator:",
-            "    $ z -- -A 3 PATTERN",
-            "",
-            "Open a tag:",
-            "    $ z --go 10",
-            "",
-            "Open multiple tags:",
-            "    $ z --go 10,20,30-40"
-        ].join("\n")
+        zoom.cache.shortcut(zoom.config)
+    when "configure"
+        Zoom.hilight(false)
+        djinni = Djinni.new
+        djinni.load_wishes(
+            "#{File.dirname(__FILE__)}/../lib/zoom/wish"
+        )
+        djinni.prompt(
+            {
+                "cache" => zoom.cache,
+                "config" => zoom.config,
+                "prompt_color" => "white",
+                "zoom" => zoom
+            },
+            "zoom(#{zoom.config.current_profile_name})> ".white
+        )
     when "go"
-        zoom.loop_through_results(options["use"])
+        if (options["use"])
+            results = zoom.cache.get_results(options["use"])
+            zoom.open(results)
+        end
     when "list_profiles"
-        zoom.list_profiles
+        profiles = zoom.config.get_profiles
+        profiles.keys.sort do |a, b|
+            a.downcase <=> b.downcase
+        end.each do |name|
+            if (name == zoom.config.current_profile_name)
+                print "*".red if (Zoom.hilight?)
+                print "*" if (!Zoom.hilight?)
+            end
+
+            lines = profiles[name].to_s.scan(
+                /\S.{0,76}\S(?=\s|$)|\S+/
+            )
+            puts lines.delete_at(0)
+            lines.each do |line|
+                puts "    #{line}"
+            end
+        end
     when "list_profile_names"
-        zoom.list_profile_names
+        puts zoom.config.get_profile_names
     when "list_tags"
-        zoom.list_tags
-    when "pager"
-        zoom.pager
+        puts zoom.cache.available_tags
     when "repeat"
         zoom.repeat
     when "rc"
-        zoom.default
-    when "rename"
-        zoom.rename_profile(
-            options["rename"],
-            options["use"]
-        )
-    when "switch"
-        zoom.switch_profile(options["use"])
+        zoom.config.default_config
+        zoom.cache.clear
+    when "version"
+        __FILE__.match(/ruby-zoom-(\d+\.\d+\.\d+)/) do |m|
+            puts m[1]
+        end
     when "which"
-        zoom.show_current
+        name = zoom.config.current_profile_name
+        profile = zoom.config.get_profiles[name]
+
+        print "*".red if (Zoom.hilight?)
+        print "*" if (!Zoom.hilight?)
+
+        lines = profile.to_s.scan(/\S.{0,76}\S(?=\s|$)|\S+/)
+        puts lines.delete_at(0)
+        lines.each do |line|
+            puts "    #{line}"
+        end
     else
-        # Search and save results
-        zoom.exec_profile(
+        # Search and cache results
+        zoom.run(
             options["use"],
             options["subargs"],
             options["pattern"]
         )
     end
+rescue SystemExit
+    # Quit from djinni
+    # Exit gracefully
 rescue Zoom::Error => e
-    puts e.message
+    $stderr.puts e.message
+    if (options["verbose"])
+        e.backtrace.each do |line|
+            $stderr.puts line.yellow
+        end
+    end
     exit ZoomExit::EXCEPTION
+rescue Interrupt
+    # ^C
+    # Exit gracefully
+rescue Errno::EPIPE
+    # Do nothing. This can happen if piping to another program such as
+    # less. Usually if less is closed before Zoom is done with STDOUT.
 rescue Exception => e
-    puts e.message
+    $stderr.puts
+    $stderr.puts "Oops! Looks like an error has occured! Try " \
+        "resetting your configs with the"
+    $stderr.puts "following comand:"
+    $stderr.puts
+    $stderr.puts "    z --rc"
+    $stderr.puts
+    $stderr.puts "If the error persists, file a bug at:"
+    $stderr.puts
+    $stderr.puts "    https://gitlab.com/mjwhitta/zoom/issues"
+    $stderr.puts
+    $stderr.puts "Maybe the message below will help. If not, you " \
+        "can use the --verbose flag to get"
+    $stderr.puts "a backtrace."
+
+    $stderr.puts e.message.white.on_red
+    if (options["verbose"])
+        e.backtrace.each do |line|
+            $stderr.puts line.yellow
+        end
+    end
     exit ZoomExit::EXCEPTION
 end
 exit ZoomExit::GOOD

@@ -1,41 +1,6 @@
-require "shellwords"
-require "zoom/profile"
-
 class Zoom::Profile::Ag < Zoom::Profile
-    def colors
-        '--color-match "47;1;30" --color-line-number "0;37"'
-    end
-
-    def exe(args, pattern)
-        if (pattern.nil? || pattern.empty?)
-            system(
-                "#{self.to_s} --pager \"#{@pager}\" #{args} " \
-                "#{self.append}"
-            )
-        else
-            system(
-                "#{self.to_s} --pager \"#{@pager}\" #{args} " \
-                "#{pattern.shellescape} #{self.append}"
-            )
-        end
-    end
-
-    def initialize(
-        operator = nil,
-        flags = "",
-        envprepend = "",
-        append = ""
-    )
-        super("ag", flags, envprepend, append)
+    def initialize(n, o = "ag", f = "-S", b = "", a = "")
+        super(n, o, f, b, a)
         @taggable = true
-    end
-
-    def to_s
-        [
-            self["prepend"],
-            self["operator"],
-            self.colors,
-            self["flags"]
-        ].join(" ").strip
     end
 end

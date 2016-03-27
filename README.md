@@ -4,15 +4,15 @@
 
 ### Quickly open CLI search results in your favorite editor!
 
-Do you like to search through code using ag, ack, or grep? Good! This
-tool is for you! Zoom adds some convenience to ag/ack/grep by allowing
-you to quickly open your search results in your editor of choice. When
-looking at large code-bases, it can be a pain to have to scroll to
-find the filename of each result. Zoom prints a tag number in front of
-each result that ag/ack/grep outputs. Then you can quickly open that
-tag number with Zoom to jump straight to the source. Zoom is even
-persistent across all your sessions! You can search in one terminal
-and jump to a tag in another terminal from any directory!
+Do you like to search through code using ag, ack, grep, or pt? Good!
+This tool is for you! Zoom adds some convenience to ag/ack/grep/pt by
+allowing you to quickly open your search results in your editor of
+choice. When looking at large code-bases, it can be a pain to have to
+scroll to find the filename of each result. Zoom prints a tag number
+in front of each result that ag/ack/grep/pt outputs. Then you can
+quickly open that tag number with Zoom to jump straight to the source.
+Zoom is even persistent across all your sessions! You can search in
+one terminal and jump to a tag in another terminal from any directory!
 
 ## How to install
 
@@ -27,7 +27,7 @@ Or install from source:
 ```bash
 $ git clone https://gitlab.com/mjwhitta/zoom.git
 $ cd zoom
-$ rake install
+$ bundle install && rake install
 ```
 
 ### Installation from Distro Packages
@@ -48,89 +48,75 @@ using Zoom:
 
 ```bash
 $ brew tap homebrew/dupes
-$ brew install gnu-sed grep
+$ brew install grep
 $ mkdir -p ~/bin
 $ cd ~/bin
-$ ln -s $(which gsed) sed
 $ ln -s $(which ggrep) grep
+$ echo "export PATH=~/bin:$PATH" >>~/.bashrc
 ```
 
 ## How to use
 
-```
+You can use Zoom basically the same way you use ag/ack/grep/pt. Try
+the following command for more info:
+
+```bash
 $ z --help
-Usage: z [OPTIONS] <pattern>
-    -a, --add=NAME            Add a new profile with specified name
-    -c, --cache               Show previous results
-        --cache-file=FILE     Use the specified cache file
-    -d, --delete=NAME         Delete profile with specified name
-    -e, --edit=NAME           Edit profile with specified name
-        --editor=EDITOR       Use the specified editor
-        --examples            Show some examples
-        --find                Use the zoom_find profile
-    -g, --go=NUM              Open editor to search result NUM
-    -h, --help                Display this help message
-    -l, --list                List profiles
-        --list-profile-names  List profile names for completion functions
-        --list-tags           List tags for completion functions
-        --pager               Treat Zoom as a pager (internal use only)
-    -r, --repeat              Repeat the last Zoom command
-        --rc                  Create default .zoomrc file
-        --rename=NAME         Rename the current profile
-    -s, --switch=NAME         Switch to profile with specified name
-    -u, --use=NAME            Use specified profile one time only
-    -w, --which               Display the current profile
 ```
 
-You can use Zoom basically the same way you use ag/ack/grep. If you
-encounter any errors, most Zoom exceptions should be fixable by
+If you encounter any errors, most Zoom exceptions should be fixable by
 running:
 
 ```bash
 $ z --rc
 ```
 
+`WARNING: This resets all your settings!`
+
 If you are still having issues, please create a GitLab issue.
 
 ## Shortcuts
 
-Zoom prefixes shortcut tags to ag/ack/grep's search results! If you
+Zoom prefixes shortcut tags to ag/ack/grep/pt's search results! If you
 use Zoom to search for "ScoobyDoo" in the Zoom source directory, you
 would see something like the following:
 
 ```
 $ z ScoobyDoo
-lib/zoom.rb
-[1] 25:        if (ScoobyDoo.where_are_you("ag"))
-[2] 27:        elsif (ScoobyDoo.where_are_you("ack"))
-[3] 29:        elsif (ScoobyDoo.where_are_you("ack-grep"))
-[4] 73:        e = ScoobyDoo.where_are_you(editor)
-[5] 107:        if (ScoobyDoo.where_are_you("ag"))
-[6] 117:            ScoobyDoo.where_are_you("ack") ||
-[7] 118:            ScoobyDoo.where_are_you("ack-grep")
-[8] 203:        op = ScoobyDoo.where_are_you(gets.chomp)
-[9] 303:        @editor = ScoobyDoo.where_are_you(@editor)
-[10] 304:        @editor = ScoobyDoo.where_are_you("vi") if (@editor.nil?)
+lib/zoom/profile/ack.rb
+[1] 4:        if ((o == "ack") && ScoobyDoo.where_are_you("ack-grep"))
 
-lib/zoom_profile.rb
-[11] 65:            op = ScoobyDoo.where_are_you(operator)
-[12] 69:                self["operator"] = ScoobyDoo.where_are_you("echo")
+lib/zoom/profile_manager.rb
+[2] 24:             return op if (ScoobyDoo.where_are_you(op))
+[3] 33:             if (ScoobyDoo.where_are_you(op))
 
-lib/ack_profile.rb
-[13] 33:        if (ScoobyDoo.where_are_you("ack"))
-[14] 35:        elsif (ScoobyDoo.where_are_you("ack-grep"))
+lib/zoom/profile.rb
+[4] 165:             op = ScoobyDoo.where_are_you(o)
+
+lib/zoom/wish/editor_wish.rb
+[5] 20:         if (ScoobyDoo.where_are_you(args))
+
+lib/zoom/config.rb
+[6] 60:             e = ScoobyDoo.where_are_you(ed)
+[7] 68:         e = ScoobyDoo.where_are_you(e)
+[8] 69:         e = ScoobyDoo.where_are_you("vi") if (e.nil?)
 ```
 
-Now you can jump to result 9 with the following command:
+Now you can jump to result 7 with the following commands:
 
 ```bash
-$ z --go 9
+$ z --go 7
 ```
+
+If you're using Vim as your editor, then you can use `<leader>z` to
+open the quickfix window, which will contain a list of the tags you
+specified. You can also use `zn` to go to the next tag and `zp` to go
+to the previous.
 
 ### Persistent shortcuts
 
 When you perform a search with Zoom, all results are cached. Using the
-following command will allow you to see the previous search results
+following commands will allow you to see the previous search results
 again:
 
 ```bash
@@ -151,21 +137,17 @@ following command to list your profiles:
 $ z --list
 ```
 
-These profiles do not need to be limited to ag/ack/grep shortcuts.
+These profiles do not need to be limited to ag/ack/grep/pt shortcuts.
 
-Note: The `default` profile is special and can't be deleted. You can
-however modify it.
-
-Note: The `zoom_find` profile is special and can't be deleted or
-modified.
+Note: The `find` profile is special and should return a list of files.
 
 ### Custom profile classes
 
 If you want to create your own custom profile classes, you can simply
-define your classes in `~/.zoom_profiles.rb`:
+define your classes in `~/.config/zoom/`:
 
 ```ruby
-require "zoom"
+# list_profile.rb
 
 class ListProfile < Zoom::Profile
     # You can redefine this method if you want, or leave it out to
@@ -174,25 +156,31 @@ class ListProfile < Zoom::Profile
     # end
 
     def initialize(
-        operator = "ls",
-        flags = "--color -AFhl",
-        envprepend = "",
-        append = ""
+        name,
+        operator = "",
+        flags = "",
+        before = "", # For use with env vars, such as PATH
+        after = "" # For use with follow up commands or redirection
     )
-        super(operator, flags, envprepend, append)
+        super(name, "ls", "--color -AFhl", before, "2>/dev/null")
         @taggable = false # Don't tag results
     end
 end
+```
+
+```ruby
+# hello_profile.rb
 
 class HelloProfile < Zoom::Profile
     def initialize(
-        operator = "echo",
+        name,
+        operator = "",
         flags = "",
-        envprepend = "",
-        append = "\"Hello, world!\""
+        before = "", # For use with env vars, such as PATH
+        after = "" # For use with follow up commands or redirection
     )
-        super(operator, flags, envprepend, append)
-        @immutable = true # Don't allow profile changes
+        super(name, "echo", flags, before, "Hello world!")
+        @taggable = false # Don't tag results
     end
 end
 ```
@@ -220,11 +208,12 @@ $ ./test # same as 'z --use test'
 ## Penetration testing
 
 Zoom allows to you create profiles for commands other than
-ag/ack/grep. This may make Zoom a friendly tool for Penetration
+ag/ack/grep/pt. This may make Zoom a friendly tool for Penetration
 Testers or Security Researchers who are looking for a simple way to
 store exploits. I've included a profile for searching for hard-coded
-passwords. The passwords profile is immutable so if you want to change
-the regex used, you can run the following command to change the code:
+passwords. The passwords profile has a hard-coded pattern so if you
+want to change the regex used, you can run the following command to
+change the code:
 
 ```bash
 $ gem open ruby-zoom
@@ -241,7 +230,7 @@ $ gem pristine ruby-zoom
 
 Zoom currently works with:
 
-- vim
+- vim (provides the best zoom experience)
 - emacs
 - nano
 - pico
@@ -256,6 +245,10 @@ ag is a faster version of ack!
 
 ack is the replacement for grep!
 
+## What is [pt](https://github.com/monochromegane/the_platinum_searcher)?
+
+pt is a code search tool similar to ack and ag!
+
 ## What is [grep](http://en.wikipedia.org/wiki/Grep)?
 
 If you don't know what grep is, this probably isn't the tool for you.
@@ -268,14 +261,7 @@ For some simple zsh completion with Zoom, you can add the following to
 your `~/.zshrc`:
 
 ```bash
-fpath=(/path/to/zoom/repo/completions $fpath)
-```
-
-You may need to run the following command to update your completion
-functions:
-
-```bash
-$ rm -f ~/.zcompdump; compinit
+compdef _gnu_generic z zc zf zg zl zr
 ```
 
 ## Links
@@ -288,4 +274,5 @@ $ rm -f ~/.zcompdump; compinit
 ## TODO
 
 - Need to test to see if any ag/ack/grep flags break functionality
-- Make comments/documentation more thorough
+    - In the meantime, Ag/Ack/Grep/Pt profiles have sane default flags
+- RDoc

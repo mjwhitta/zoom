@@ -1,36 +1,11 @@
-require "shellwords"
-require "zoom/profile"
-
 class Zoom::Profile::Ack < Zoom::Profile
-    def colors
-        'ACK_COLOR_LINENO=white ACK_COLOR_MATCH="black on_white"'
-    end
-
-    def exe(args, pattern)
-        if (pattern.nil? || pattern.empty?)
-            system(
-                "#{self.to_s} --pager \"#{@pager}\" #{args} " \
-                "#{self.append}"
-            )
-        else
-            system(
-                "#{self.to_s} --pager \"#{@pager}\" #{args} " \
-                "#{pattern.shellescape} #{self.append}"
-            )
-        end
-    end
-
-    def initialize(
-        operator = nil,
-        flags = "--smart-case",
-        envprepend = "",
-        append = ""
-    )
+    def initialize(n, o = "ack", f = "--smart-case", b = "", a = "")
         # Special case because of debian
-        operator = "ack"
-        operator = "ack-grep" if (ScoobyDoo.where_are_you("ack-grep"))
+        if ((o == "ack") && ScoobyDoo.where_are_you("ack-grep"))
+            o = "ack-grep"
+        end
 
-        super(operator, flags, envprepend, append)
+        super(n, o, f, b, a)
         @taggable = true
     end
 end
