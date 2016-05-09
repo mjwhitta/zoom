@@ -85,8 +85,8 @@ class Zoom::Editor
             "augroup END",
             "",
             "nnoremap <leader>z :copen<cr>",
-            "nnoremap zn :copen<cr>j:.cc<cr>:cclose<cr>",
-            "nnoremap zp :copen<cr>k:.cc<cr>:cclose<cr>",
+            "nnoremap zn :cn<cr>",
+            "nnoremap zp :cp<cr>",
             ""
         ].join("\n")
         zs.write(vimscript)
