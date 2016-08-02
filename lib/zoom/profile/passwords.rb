@@ -18,23 +18,20 @@ end
 class Zoom::Profile::Passwords
     def initialize(n, o = nil, f = "", b = "", a = "")
         op = Zoom::ProfileManager.default_profile
+        after = "| \\grep -v \"^[^:]*test[^:]*:[0-9]+:\""
 
         case op
         when /^ack(-grep)?$/
-            super(
-                n,
-                op,
-                "--smart-case --ignore-dir=test --ignore-dir=tests"
-            )
+            super(n, op, "--smart-case", "", after)
         when "ag"
-            super(n, op, "-Su --ignore=\"\/*test*\/\"")
+            super(n, op, "-Su", "", after)
         when "pt"
-            super(n, op, "-SU --hidden --ignore=\"\/*test*\/\"")
+            super(n, op, "-SU --hidden", "", after)
         else
-            super(n, op, "-ai --exclude-dir=test --exclude-dir=tests")
+            super(n, op, "-ai", "", after)
         end
 
-        @pattern = "pass(word|wd)?[^:=,>]? *[:=,>]"
+        @pattern = "(key|pass(word|wd)?)[^:=,>]? *[:=,>]"
         @taggable = true
     end
 end
