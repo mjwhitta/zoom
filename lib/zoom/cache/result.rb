@@ -6,7 +6,7 @@ class Zoom::Cache::Result
     attr_reader :tag
 
     def args
-        return @cache.zoom_args
+        return @cache.args
     end
 
     def grep_like?
@@ -35,15 +35,19 @@ class Zoom::Cache::Result
         end
     end
 
+    def paths
+        return @cache.paths
+    end
+
     def pattern
-        return @cache.zoom_pattern
+        return @cache.pattern
     end
 
     def profile_name
-        return @cache.zoom_profile_name
+        return @cache.profile_name
     end
 
     def pwd
-        return @cache.zoom_pwd
+        return @cache.pwd
     end
 end

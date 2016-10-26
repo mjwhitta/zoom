@@ -13,13 +13,10 @@ class Zoom
         return @@hilight
     end
 
-    def initialize(cache = nil, rc = nil, hilight = false)
-        @@hilight = hilight
+    def initialize(cache = nil, rc = nil)
         @cache = Zoom::Cache.new(cache)
         @config = Zoom::Config.new(rc)
-
-        # Prioritize false, so only reassign if true
-        @@hilight = @config.hilight if (hilight)
+        @@hilight = @config.hilight
     end
 
     def open(results)
@@ -32,38 +29,39 @@ class Zoom
 
     def repeat
         return if (@cache.empty?)
-
-        run(
-            @cache.profile_name,
-            @cache.args,
-            @cache.pattern
-        )
+        run(@cache.header)
     end
 
-    def run(prof_name, args, pattern)
-        prof_name = @config.current_profile_name if (prof_name.nil?)
+    def run(header)
+        profile_name = header["profile_name"]
+        args = header["args"]
+        pattern = header["pattern"]
+        paths = header["paths"]
 
-        if (!@config.has_profile?(prof_name))
-            raise Zoom::Error::ProfileDoesNotExist.new(prof_name)
+        if (profile_name.nil?)
+            profile_name = @config.current_profile_name
+            header["profile_name"] = profile_name
         end
 
-        profile = @config.get_profile(prof_name)
+        if (!@config.has_profile?(profile_name))
+            raise Zoom::Error::ProfileDoesNotExist.new(profile_name)
+        end
+
+        profile = @config.get_profile(profile_name)
+        if (pattern.nil? || !profile.pattern.empty?)
+            header["pattern"] = profile.pattern
+        end
+        header["pwd"] = Dir.pwd
+
         begin
+            # Clear cache
             @cache.clear
 
             # Store needed details
-            if (pattern && profile.pattern.empty?)
-                @cache.args(args)
-                @cache.pattern(pattern)
-            else
-                @cache.args("")
-                @cache.pattern(profile.pattern)
-            end
-            @cache.profile_name(prof_name)
-            @cache.pwd(Dir.pwd)
+            @cache.header(header)
 
             # Execute profile
-            @cache.write(profile.exe(args, pattern))
+            @cache.write(profile.exe(args, pattern, paths))
 
             # Display results from cache
             @cache.shortcut(@config)

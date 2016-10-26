@@ -40,8 +40,10 @@ def parse(args)
     parser = OptionParser.new do |opts|
         opts.summary_width = 25
 
-        opts.banner =
-            "Usage: #{File.basename($0)} [OPTIONS] [pattern]"
+        opts.banner = [
+            "Usage: #{File.basename($0)} [OPTIONS] [pattern]",
+            "[path1]...[pathN]"
+        ].join(" ")
 
         opts.on("", "DESCRIPTION")
 
@@ -193,12 +195,27 @@ def parse(args)
         options["action"] = "repeat"
     when "z"
         # Do nothing, this is the normal usage
+        # Add to this case if renaming
     else
         options["use"] = File.basename($0)
     end
 
-    options["pattern"] = args.delete_at(-1)
+    paths = Array.new
+    path = args.delete_at(-1)
+    while (path && Pathname.new(path).exist?)
+        paths.push(path)
+        path = args.delete_at(-1)
+    end
+
+    if (!paths.empty?)
+        options["paths"] = paths.reverse.join(" ")
+    else
+        options["paths"] = "."
+    end
+
+    options["pattern"] = path
     options["subargs"] = args.join(" ")
+
     return options
 end
 
@@ -209,7 +226,8 @@ begin
         FileUtils.rm_f(Pathname.new("~/.zoomrc").expand_path)
     end
 
-    zoom = Zoom.new(options["cache_file"], nil, !Hilighter.disable?)
+    zoom = Zoom.new(options["cache_file"])
+    Zoom.hilight(!Hilighter.disable?)
 
     case options["action"]
     when "cache"
@@ -279,11 +297,12 @@ begin
         end
     else
         # Search and cache results
-        zoom.run(
-            options["use"],
-            options["subargs"],
-            options["pattern"]
-        )
+        header = Hash.new
+        header["profile_name"] = options["use"]
+        header["args"] = options["subargs"]
+        header["pattern"] = options["pattern"]
+        header["paths"] = options["paths"]
+        zoom.run(header)
     end
 rescue SystemExit
     # Quit from djinni

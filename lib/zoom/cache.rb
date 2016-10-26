@@ -1,21 +1,13 @@
 require "io/wait"
+require "json"
 require "pathname"
 
 class Zoom::Cache
-    attr_reader :zoom_args
-    attr_reader :zoom_pattern
-    attr_reader :zoom_profile_name
-    attr_reader :zoom_pwd
+    attr_reader :header
 
-    def args(a = nil)
-        if (a.nil?)
-            return nil if (empty?)
-            return @zoom_args
-        end
-
-        File.open(@cache_file, "a") do |f|
-            f.write("ZOOM_ARGS=#{a}\n")
-        end
+    def args
+        return nil if (@header.nil?)
+        return @header["args"]
     end
 
     def available_tags
@@ -27,34 +19,16 @@ class Zoom::Cache
         @results = nil
         @thread.kill if (@thread)
         @thread = nil
-        @zoom_args = nil
-        @zoom_pattern = nil
-        @zoom_profile_name = nil
-        @zoom_pwd = nil
+        @header = nil
     end
 
     def empty?
         read if (@thread.nil?)
         return true if (@thread.nil?)
-
-        while (
-            @thread.alive? &&
-            (
-                @zoom_args.nil? ||
-                @zoom_pattern.nil? ||
-                @zoom_profile_name.nil? ||
-                @zoom_pwd.nil?
-            )
-        )
+        while (@thread.alive? && (@header.nil? || @header.empty?))
             sleep 0.1
         end
-
-        return (
-            @zoom_args.nil? ||
-            @zoom_pattern.nil? ||
-            @zoom_profile_name.nil? ||
-            @zoom_pwd.nil?
-        )
+        return @header.empty?
     end
 
     def get_results(tags = nil)
@@ -86,16 +60,22 @@ class Zoom::Cache
         return results
     end
 
+    def header(header = nil)
+        return nil if (header.nil? && empty?)
+        return @header if (header.nil?)
+
+        File.open(@cache_file, "a") do |f|
+            f.write("ZOOM_HEADER=#{JSON.generate(header)}\n")
+        end
+    end
+
     def initialize(file = nil)
         file = "~/.cache/zoom/cache" if (file.nil?)
 
         @cache_file = Pathname.new(file).expand_path
         @results = nil
         @thread = nil
-        @zoom_args = nil
-        @zoom_pattern = nil
-        @zoom_profile_name = nil
-        @zoom_pwd = nil
+        @header = Hash.new
 
         FileUtils.mkdir_p(@cache_file.dirname)
         read
@@ -122,37 +102,24 @@ class Zoom::Cache
     end
     private :parse_tags
 
-    def pattern(p = nil)
-        if (p.nil?)
-            return nil if (empty?)
-            return @zoom_pattern
-        end
-
-        File.open(@cache_file, "a") do |f|
-            f.write("ZOOM_PATTERN=#{p}\n")
-        end
+    def paths
+        return nil if (@header.nil?)
+        return @header["paths"]
     end
 
-    def profile_name(name = nil)
-        if (name.nil?)
-            return nil if (empty?)
-            return @zoom_profile_name
-        end
-
-        File.open(@cache_file, "a") do |f|
-            f.write("ZOOM_PROFILE_NAME=#{name}\n")
-        end
+    def pattern
+        return nil if (@header.nil?)
+        return @header["pattern"]
     end
 
-    def pwd(p = nil)
-        if (p.nil?)
-            return nil if (empty?)
-            return @zoom_pwd
-        end
+    def profile_name
+        return nil if (@header.nil?)
+        return @header["profile_name"]
+    end
 
-        File.open(@cache_file, "a") do |f|
-            f.write("ZOOM_PWD=#{p}\n")
-        end
+    def pwd
+        return nil if (@header.nil?)
+        return @header["pwd"]
     end
 
     def read
@@ -166,22 +133,11 @@ class Zoom::Cache
             File.open(@cache_file) do |cache|
                 cache.each do |line|
                     line.chomp!
-                    if (line.start_with?("ZOOM_ARGS="))
-                        @zoom_args = line.gsub("ZOOM_ARGS=", "")
-                    elsif (line.start_with?("ZOOM_PATTERN="))
-                        @zoom_pattern = line.gsub("ZOOM_PATTERN=", "")
-                    elsif (line.start_with?("ZOOM_PROFILE_NAME="))
-                        @zoom_profile_name = line.gsub(
-                            "ZOOM_PROFILE_NAME=",
-                            ""
+                    if (line.start_with?("ZOOM_HEADER="))
+                        @header = JSON.parse(
+                            line.gsub("ZOOM_HEADER=", "")
                         )
-                    elsif (line.start_with?("ZOOM_PWD="))
-                        @zoom_pwd = line.gsub("ZOOM_PWD=", "")
-                    elsif (
-                        (line == "-") ||
-                        (line == "--") ||
-                        line.empty?
-                    )
+                    elsif (line.match(/^-?-?$/))
                         # Ignore dividers when searching with context
                         # and empty lines
                     else
@@ -199,8 +155,11 @@ class Zoom::Cache
         return if (empty?)
 
         config.validate_colors
-        profile = config.get_profile(profile_name)
+        if (!config.has_profile?(profile_name))
+            raise Zoom::Error::ProfileDoesNotExists.new(profile_name)
+        end
 
+        profile = config.get_profile(profile_name)
         if (!profile.taggable)
             get_results.each do |result|
                 puts result.contents

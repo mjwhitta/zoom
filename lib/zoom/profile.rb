@@ -7,20 +7,20 @@ class Zoom::Profile < Hash
     attr_reader :taggable
 
     def after(a = nil)
-        self["after"] = a if (a)
-        return self["after"].strip
+        self["after"] = a.strip if (a)
+        return self["after"]
     end
 
     def before(b = nil)
-        self["before"] = b if (b)
-        return self["before"].strip
+        self["before"] = b.strip if (b)
+        return self["before"]
     end
 
     def class_name
         return self["class"]
     end
 
-    def exe(args, pattern)
+    def exe(args, pattern, paths)
         # Use hard-coded pattern if defined
         pattern = @pattern if (@pattern && !@pattern.empty?)
 
@@ -29,55 +29,88 @@ class Zoom::Profile < Hash
             return "" if (after.nil? || after.empty? || after == ".")
         end
 
+        # If paths are specified then remove "." for profiles like
+        # grep
+        after.gsub!(/^\.\s+/, "") if (!paths.empty?)
+
         # Emulate grep
         case operator.split("/")[-1]
         when "ack", "ack-grep"
-            str = [
+            cmd = [
                 before,
                 operator,
                 "-H --nobreak --nocolor --noheading -s",
-                flags
+                flags,
+                args,
+                pattern.shellescape,
+                paths,
+                after
             ].join(" ").strip
-            return %x(#{str} #{args} #{pattern.shellescape} #{after})
         when "ag"
-            str = [
+            cmd = [
                 before,
                 operator,
                 "--filename --nobreak --nocolor --noheading --silent",
-                flags
+                flags,
+                args,
+                pattern.shellescape,
+                paths,
+                after
             ].join(" ").strip
-            return %x(#{str} #{args} #{pattern.shellescape} #{after})
         when "find"
-            str = [before, operator, flags].join(" ").strip
-            return %x(#{str} #{args} \"#{pattern}\" #{after})
-        when "grep"
-            str = [
+            flags.gsub!(/^\.\s+/, "") if (!paths.empty?)
+            cmd = [
                 before,
                 operator,
-                "--color=never -EHnRs",
+                paths,
+                flags,
+                args,
+                "\"#{pattern}\"",
+                after
+            ].join(" ").strip
+        when "grep"
+            cmd = [
+                before,
+                operator,
+                "--color=never -EHInRs",
                 "--exclude-dir=.bzr",
                 "--exclude-dir=.git",
+                "--exclude-dir=.git-crypt",
                 "--exclude-dir=.svn",
-                flags
+                flags,
+                args,
+                pattern.shellescape,
+                paths,
+                after
             ].join(" ").strip
-            return %x(#{str} #{args} #{pattern.shellescape} #{after})
         when "pt"
-            str = [
+            cmd = [
                 before,
                 operator,
                 "-e --nocolor --nogroup",
-                flags
+                flags,
+                args,
+                pattern.shellescape,
+                paths,
+                after
             ].join(" ").strip
-            return %x(#{str} #{args} #{pattern.shellescape} #{after})
         else
-            str = [before, operator, flags].join(" ").strip
-            return %x(#{str} #{args} #{pattern} #{after})
+            cmd = [
+                before,
+                operator,
+                flags,
+                args,
+                pattern,
+                paths,
+                after
+            ].join(" ").strip
         end
+        return %x(#{cmd})
     end
 
     def flags(f = nil)
-        self["flags"] = f if (f)
-        return self["flags"].strip
+        self["flags"] = f.strip if (f)
+        return self["flags"]
     end
 
     def self.from_json(json)
@@ -146,7 +179,7 @@ class Zoom::Profile < Hash
         self["class"] = self.class.to_s
         after(a)
         before(b)
-        flags(f.split(" ").uniq.join(" "))
+        flags(f)
         name(n)
         operator(o)
 
@@ -155,17 +188,18 @@ class Zoom::Profile < Hash
     end
 
     def name(n = nil)
-        self["name"] = n if (n)
-        return self["name"].strip
+        self["name"] = n.strip if (n)
+        return self["name"]
     end
 
     def operator(o = nil)
         if (o)
+            o.strip!
             op = ScoobyDoo.where_are_you(o)
             raise Zoom::Error::ExecutableNotFound.new(o) if (op.nil?)
             self["operator"] = o
         end
-        return self["operator"].strip
+        return self["operator"]
     end
 
     def self.profile_by_name(clas)
