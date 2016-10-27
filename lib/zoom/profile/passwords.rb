@@ -20,13 +20,13 @@ class Zoom::Profile::Passwords
 
         case op
         when /^ack(-grep)?$/
-            super(n, op, "--smart-case #{f}", "", after)
+            super(n, op, "--smart-case", "", after)
         when "ag"
-            super(n, op, "-Su #{f}", "", after)
+            super(n, op, "-Su", "", after)
         when "pt"
-            super(n, op, "-SU --hidden #{f}", "", after)
+            super(n, op, "-SU --hidden", "", after)
         when "grep"
-            super(n, op, "-ai #{f}", "", after)
+            super(n, op, "-ai", "", after)
         else
             # Shouldn't happen
         end

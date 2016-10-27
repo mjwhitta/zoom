@@ -22,7 +22,10 @@ class Zoom::Profile < Hash
 
     def exe(args, pattern, paths)
         # Use hard-coded pattern if defined
-        pattern = @pattern if (@pattern && !@pattern.empty?)
+        if (@pattern && !@pattern.empty?)
+            args += " #{pattern}"
+            pattern = @pattern
+        end
 
         # If not pattern and no after, then return nothing
         if (pattern.nil? || pattern.empty?)
