@@ -11,7 +11,7 @@ class RPassTest < Minitest::Test
     end
 
     def teardown
-        system("rm -f /tmp/zoom_cache /tmp/zoomrc /tmp/zoominfo")
+        system("rm -f /tmp/zoom_cache /tmp/zoomrc")
     end
 
     def test_zoom_exceptions

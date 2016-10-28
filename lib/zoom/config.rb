@@ -3,6 +3,14 @@ require "json_config"
 require "scoobydoo"
 
 class Zoom::Config < JSONConfig
+    def add_security_profiles
+        profiles = get("profiles")
+        Zoom::ProfileManager::security_profiles.each do |profile|
+            profiles[profile.name] = profile
+        end
+        set("profiles", profiles)
+    end
+
     def color(key, value)
         if (value)
             validate_color(value)

@@ -112,6 +112,13 @@ def parse(args)
             options["action"] = "rc"
         end
 
+        opts.on(
+            "--secprofs",
+            "Create some security related profiles"
+        ) do
+            options["action"] = "secprofs"
+        end
+
         opts.on("", "MISC_OPTIONS")
 
         opts.on(
@@ -279,6 +286,8 @@ begin
     when "rc"
         zoom.config.default_config
         zoom.cache.clear
+    when "secprofs"
+        zoom.config.add_security_profiles
     when "version"
         __FILE__.match(/ruby-zoom-(\d+\.\d+\.\d+)/) do |m|
             puts m[1]

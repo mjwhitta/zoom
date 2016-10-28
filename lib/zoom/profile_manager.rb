@@ -40,10 +40,17 @@ class Zoom::ProfileManager
             end
         end
 
-        profiles["passwords"] = Zoom::Profile::Passwords.new(
-            "passwords"
-        )
-
         return profiles
+    end
+
+    def self.security_profiles
+        return [
+            Zoom::Profile::Passwords.new("passwords"),
+            Zoom::Profile::UnsafeC.new("unsafe_c"),
+            Zoom::Profile::UnsafeJava.new("unsafe_java"),
+            Zoom::Profile::UnsafeJs.new("unsafe_js"),
+            Zoom::Profile::UnsafePhp.new("unsafe_php"),
+            Zoom::Profile::UnsafePython.new("unsafe_python")
+        ]
     end
 end

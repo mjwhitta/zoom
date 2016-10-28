@@ -73,7 +73,9 @@ $ z --rc
 
 `WARNING: This resets all your settings!`
 
-If you are still having issues, please create a GitLab issue.
+If you are still having issues, please create a [GitLab issue].
+
+[GitLab issue]: https://gitlab.com/mjwhitta/zoom/issues
 
 ## Shortcuts
 
@@ -91,15 +93,15 @@ lib/zoom/profile_manager.rb
 [3] 33:             if (ScoobyDoo.where_are_you(op))
 
 lib/zoom/profile.rb
-[4] 165:             op = ScoobyDoo.where_are_you(o)
+[4] 196:             op = ScoobyDoo.where_are_you(o)
 
 lib/zoom/wish/editor_wish.rb
 [5] 20:         if (ScoobyDoo.where_are_you(args))
 
 lib/zoom/config.rb
-[6] 60:             e = ScoobyDoo.where_are_you(ed)
-[7] 68:         e = ScoobyDoo.where_are_you(e)
-[8] 69:         e = ScoobyDoo.where_are_you("vi") if (e.nil?)
+[6] 68:             e = ScoobyDoo.where_are_you(ed)
+[7] 76:         e = ScoobyDoo.where_are_you(e)
+[8] 77:         e = ScoobyDoo.where_are_you("vi") if (e.nil?)
 ```
 
 Now you can jump to result 7 with the following commands:
@@ -139,7 +141,8 @@ $ z --list
 
 These profiles do not need to be limited to ag/ack/grep/pt shortcuts.
 
-Note: The `find` profile is special and should return a list of files.
+Note: The `find` profile is "special" and should return a list of
+files.
 
 ### Custom profile classes
 
@@ -205,22 +208,26 @@ $ ln -s z test
 $ ./test # same as 'z --use test'
 ```
 
-## Penetration testing
+## Interested in security?
 
 Zoom allows to you create profiles for commands other than
 ag/ack/grep/pt. This may make Zoom a friendly tool for Penetration
 Testers or Security Researchers who are looking for a simple way to
-store exploits. I've included a profile for searching for hard-coded
-passwords. The passwords profile has a hard-coded pattern so if you
-want to change the regex used, you can run the following command to
-change the code:
+store exploits. I've included some example profiles for searching for
+hard-coded passwords or unsafe C/Java/Javascript/PHP/Python code.
+These profiles are not created by default with `z --rc`. To create
+them run `z --secprofs`.
+
+These profiles have a hard-coded pattern so if you want to change the
+regex used, you can run the following command to change the code:
 
 ```bash
 $ gem open ruby-zoom
 ```
 
-Navigate to `lib/zoom/profile/passwords.rb` to make changes. If you
-want the revert your changes, run the following command:
+Navigate to `lib/zoom/profile` directory and select a profile to make
+changes. If you want the revert your changes, run the following
+command:
 
 ```bash
 $ gem pristine ruby-zoom

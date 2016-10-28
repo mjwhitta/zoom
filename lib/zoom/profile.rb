@@ -22,19 +22,15 @@ class Zoom::Profile < Hash
 
     def exe(args, pattern, paths)
         # Use hard-coded pattern if defined
-        if (@pattern && !@pattern.empty?)
+        if (@pattern && !@pattern.empty? && (pattern != @pattern))
             args += " #{pattern}"
             pattern = @pattern
         end
 
         # If not pattern and no after, then return nothing
         if (pattern.nil? || pattern.empty?)
-            return "" if (after.nil? || after.empty? || after == ".")
+            return "" if (after.nil? || after.empty?)
         end
-
-        # If paths are specified then remove "." for profiles like
-        # grep
-        after.gsub!(/^\.\s+/, "") if (!paths.empty?)
 
         # Emulate grep
         case operator.split("/")[-1]
@@ -61,7 +57,6 @@ class Zoom::Profile < Hash
                 after
             ].join(" ").strip
         when "find"
-            flags.gsub!(/^\.\s+/, "") if (!paths.empty?)
             cmd = [
                 before,
                 operator,
@@ -76,12 +71,12 @@ class Zoom::Profile < Hash
                 before,
                 operator,
                 "--color=never -EHInRs",
+                flags,
+                args,
                 "--exclude-dir=.bzr",
                 "--exclude-dir=.git",
                 "--exclude-dir=.git-crypt",
                 "--exclude-dir=.svn",
-                flags,
-                args,
                 pattern.shellescape,
                 paths,
                 after
@@ -249,3 +244,8 @@ require "zoom/profile/find"
 require "zoom/profile/grep"
 require "zoom/profile/passwords"
 require "zoom/profile/pt"
+require "zoom/profile/unsafe_c"
+require "zoom/profile/unsafe_java"
+require "zoom/profile/unsafe_js"
+require "zoom/profile/unsafe_php"
+require "zoom/profile/unsafe_python"

@@ -2,7 +2,7 @@ require "zoom/profile_manager"
 
 clas = Zoom::ProfileManager.default_profile.capitalize
 superclass = Zoom::Profile.profile_by_name("Zoom::Profile::#{clas}")
-class Zoom::Profile::Passwords < superclass
+class Zoom::Profile::UnsafeJs < superclass
     def initialize(n, o = nil, f = "", b = "", a = "")
         # I don't care about test code
         after = "| \\grep -v \"^[^:]*test[^:]*:[0-9]+:\""
@@ -11,17 +11,17 @@ class Zoom::Profile::Passwords < superclass
         op = Zoom::ProfileManager.default_profile
         case op
         when /^ack(-grep)?$/
-            flags = "--smart-case"
+            flags = "--smart-case --js"
         when "ag"
-            flags = "-Su"
+            flags = "-S -G \"\\.js$\""
         when "pt"
-            flags = "-SU --hidden"
+            flags = "-S -G \"\\.js$\""
         when "grep"
-            flags = "-ai"
+            flags = "-i --include=\"*.js\""
         end
 
         super(n, op, flags, "", after)
-        @pattern = "(key|pass(word|wd)?)[^:=,>]? *[:=,>]"
+        @pattern = "\\.((eval|html)\\(|innerHTML)"
         @taggable = true
     end
 end
