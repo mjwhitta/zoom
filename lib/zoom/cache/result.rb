@@ -5,10 +5,6 @@ class Zoom::Cache::Result
     attr_reader :match
     attr_reader :tag
 
-    def args
-        return @cache.args
-    end
-
     def grep_like?
         return @grep_like
     end
@@ -33,14 +29,6 @@ class Zoom::Cache::Result
             @lineno = m[2]
             @match = m[3]
         end
-    end
-
-    def paths
-        return @cache.paths
-    end
-
-    def pattern
-        return @cache.pattern
     end
 
     def profile_name

@@ -84,24 +84,34 @@ use Zoom to search for "ScoobyDoo" in the Zoom source directory, you
 would see something like the following:
 
 ```
-$ z ScoobyDoo
+$ z scoobydoo
+Gemfile
+[1] 8: gem "scoobydoo"
+
 lib/zoom/profile/ack.rb
-[1] 4:        if ((o == "ack") && ScoobyDoo.where_are_you("ack-grep"))
+[2] 4:        if ((o == "ack") && ScoobyDoo.where_are_you("ack-grep"))
 
 lib/zoom/profile_manager.rb
-[2] 24:             return op if (ScoobyDoo.where_are_you(op))
-[3] 33:             if (ScoobyDoo.where_are_you(op))
+[3] 2: require "scoobydoo"
+[4] 24:             return op if (ScoobyDoo.where_are_you(op))
+[5] 33:             if (ScoobyDoo.where_are_you(op))
 
 lib/zoom/profile.rb
-[4] 196:             op = ScoobyDoo.where_are_you(o)
+[6] 2: require "scoobydoo"
+[7] 143:             op = ScoobyDoo.where_are_you(o)
 
 lib/zoom/wish/editor_wish.rb
-[5] 20:         if (ScoobyDoo.where_are_you(args))
+[8] 2: require "scoobydoo"
+[9] 20:         if (ScoobyDoo.where_are_you(args))
 
 lib/zoom/config.rb
-[6] 68:             e = ScoobyDoo.where_are_you(ed)
-[7] 76:         e = ScoobyDoo.where_are_you(e)
-[8] 77:         e = ScoobyDoo.where_are_you("vi") if (e.nil?)
+[10] 3: require "scoobydoo"
+[11] 68:             e = ScoobyDoo.where_are_you(ed)
+[12] 76:         e = ScoobyDoo.where_are_you(e)
+[13] 77:         e = ScoobyDoo.where_are_you("vi") if (e.nil?)
+
+zoom.gemspec
+[14] 33:   s.add_runtime_dependency("scoobydoo", "~> 0.1", ">= 0.1.4")
 ```
 
 Now you can jump to result 7 with the following commands:

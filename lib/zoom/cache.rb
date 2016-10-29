@@ -82,7 +82,9 @@ class Zoom::Cache
     end
 
     def parse_tags(input)
-        raise Zoom::Error::InvalidTag.new if (input.nil? || input.empty?)
+        if (input.nil? || input.empty?)
+            raise Zoom::Error::InvalidTag.new
+        end
 
         tags = Array.new
         input.split(",").each do |num|

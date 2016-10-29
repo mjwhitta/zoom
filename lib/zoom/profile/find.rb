@@ -1,5 +1,5 @@
 class Zoom::Profile::Find < Zoom::Profile
-    def initialize(n, o = "find", f = "-name", b = "", a = "")
+    def initialize(n, o = "find", f = "", b = "", a = "")
         super(n, o, f, b, a)
         @taggable = true
     end

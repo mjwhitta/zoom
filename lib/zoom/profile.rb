@@ -3,16 +3,19 @@ require "scoobydoo"
 require "shellwords"
 
 class Zoom::Profile < Hash
+    attr_reader :format_flags
     attr_reader :pattern
     attr_reader :taggable
 
     def after(a = nil)
         self["after"] = a.strip if (a)
+        self["after"] ||= ""
         return self["after"]
     end
 
     def before(b = nil)
         self["before"] = b.strip if (b)
+        self["before"] ||= ""
         return self["before"]
     end
 
@@ -20,86 +23,28 @@ class Zoom::Profile < Hash
         return self["class"]
     end
 
-    def exe(args, pattern, paths)
-        # Use hard-coded pattern if defined
-        if (@pattern && !@pattern.empty? && (pattern != @pattern))
-            args += " #{pattern}"
-            pattern = @pattern
-        end
-
-        # If not pattern and no after, then return nothing
-        if (pattern.nil? || pattern.empty?)
-            return "" if (after.nil? || after.empty?)
-        end
-
+    def exe(header)
         # Emulate grep
         case operator.split("/")[-1]
-        when "ack", "ack-grep"
-            cmd = [
-                before,
-                operator,
-                "-H --nobreak --nocolor --noheading -s",
-                flags,
-                args,
-                pattern.shellescape,
-                paths,
-                after
-            ].join(" ").strip
-        when "ag"
-            cmd = [
-                before,
-                operator,
-                "--filename --nobreak --nocolor --noheading --silent",
-                flags,
-                args,
-                pattern.shellescape,
-                paths,
-                after
-            ].join(" ").strip
         when "find"
             cmd = [
                 before,
                 operator,
-                paths,
+                header["paths"],
                 flags,
-                args,
-                "\"#{pattern}\"",
-                after
-            ].join(" ").strip
-        when "grep"
-            cmd = [
-                before,
-                operator,
-                "--color=never -EHInRs",
-                flags,
-                args,
-                "--exclude-dir=.bzr",
-                "--exclude-dir=.git",
-                "--exclude-dir=.git-crypt",
-                "--exclude-dir=.svn",
-                pattern.shellescape,
-                paths,
-                after
-            ].join(" ").strip
-        when "pt"
-            cmd = [
-                before,
-                operator,
-                "-e --nocolor --nogroup",
-                flags,
-                args,
-                pattern.shellescape,
-                paths,
+                header["args"],
+                header["pattern"],
                 after
             ].join(" ").strip
         else
             cmd = [
                 before,
                 operator,
+                @format_flags,
                 flags,
-                args,
-                pattern,
-                paths,
+                header["args"],
+                header["pattern"],
+                header["paths"],
                 after
             ].join(" ").strip
         end
@@ -108,6 +53,7 @@ class Zoom::Profile < Hash
 
     def flags(f = nil)
         self["flags"] = f.strip if (f)
+        self["flags"] ||= ""
         return self["flags"]
     end
 
@@ -187,6 +133,7 @@ class Zoom::Profile < Hash
 
     def name(n = nil)
         self["name"] = n.strip if (n)
+        self["name"] ||= ""
         return self["name"]
     end
 
@@ -198,6 +145,38 @@ class Zoom::Profile < Hash
             self["operator"] = o
         end
         return self["operator"]
+    end
+
+    def preprocess(header)
+        # Use hard-coded pattern if defined
+        pattern = header["pattern"]
+        if (@pattern && !@pattern.empty? && (pattern != @pattern))
+            header["args"] += " #{pattern}"
+            header["pattern"] = @pattern
+        end
+
+        case operator.split("/")[-1]
+        when /^ack(-grep)?$/, "ag", "grep", "pt"
+            header["pattern"] = header["pattern"].shellescape
+        when "find"
+            # If additional args are passed, then assume pattern is
+            # actually and arg
+            if (header["args"] && !header["args"].empty?)
+                header["args"] += " #{header["pattern"]}"
+                header["pattern"] = ""
+            end
+
+            # If pattern was provided then assume it's an iname search
+            if (header["pattern"] && !header["pattern"].empty?)
+                header["pattern"] = "-iname \"#{header["pattern"]}\""
+            end
+        end
+
+        # Translate any needed flags
+        header["args"] += " #{translate(header["translate"])}"
+        header["args"].strip!
+
+        return header
     end
 
     def self.profile_by_name(clas)
@@ -235,6 +214,10 @@ class Zoom::Profile < Hash
         end
         ret.push(hilight_after(after)) if (!after.empty?)
         return ret.join(" ").strip
+    end
+
+    def translate(from)
+        return ""
     end
 end
 

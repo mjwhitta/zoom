@@ -4,10 +4,7 @@ clas = Zoom::ProfileManager.default_profile.capitalize
 superclass = Zoom::Profile.profile_by_name("Zoom::Profile::#{clas}")
 class Zoom::Profile::Passwords < superclass
     def initialize(n, o = nil, f = "", b = "", a = "")
-        # I don't care about test code
-        after = "| \\grep -v \"^[^:]*test[^:]*:[0-9]+:\""
         flags = ""
-
         op = Zoom::ProfileManager.default_profile
         case op
         when /^ack(-grep)?$/
@@ -20,8 +17,8 @@ class Zoom::Profile::Passwords < superclass
             flags = "-ai"
         end
 
-        super(n, op, flags, "", after)
-        @pattern = "(key|pass(word|wd)?)[^:=,>]? *[:=,>]"
+        super(n, op, flags)
+        @pattern = "(key|pass(wd|word)?)[^:=,>]? *[:=,>]"
         @taggable = true
     end
 end

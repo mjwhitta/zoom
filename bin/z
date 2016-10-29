@@ -20,6 +20,7 @@ def parse(args)
     options = Hash.new
     options["action"] = "exec"
     options["cache_file"] = nil
+    options["translate_flags"] = Hash.new
     options["use"] = nil
     options["verbose"] = false
 
@@ -83,6 +84,14 @@ def parse(args)
             exit ZoomExit::GOOD
         end
 
+        opts.on(
+            "-i",
+            "--ignore=PATTERN",
+            "Ignore files/directories matching PATTERN"
+        ) do |pattern|
+            options["translate_flags"]["ignore"] = pattern
+        end
+
         opts.on("-l", "--list", "List profiles") do
             options["action"] = "list_profiles"
         end
@@ -95,7 +104,11 @@ def parse(args)
             options["use"] = name
         end
 
-        opts.on("-w", "--which", "Display current profile") do
+        opts.on("-w", "--word-regexp", "Only match whole words") do
+            options["translate_flags"]["word-regexp"] = ""
+        end
+
+        opts.on("--which", "Display current profile") do
             options["action"] = "which"
         end
 
@@ -221,7 +234,7 @@ def parse(args)
     end
 
     options["pattern"] = path
-    options["subargs"] = args.join(" ")
+    options["pass_args"] = args.join(" ")
 
     return options
 end
@@ -307,10 +320,11 @@ begin
     else
         # Search and cache results
         header = Hash.new
-        header["profile_name"] = options["use"]
-        header["args"] = options["subargs"]
-        header["pattern"] = options["pattern"]
+        header["args"] = options["pass_args"]
         header["paths"] = options["paths"]
+        header["pattern"] = options["pattern"]
+        header["profile_name"] = options["use"]
+        header["translate"] = options["translate_flags"]
         zoom.run(header)
     end
 rescue SystemExit

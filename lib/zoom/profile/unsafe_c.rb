@@ -4,10 +4,7 @@ clas = Zoom::ProfileManager.default_profile.capitalize
 superclass = Zoom::Profile.profile_by_name("Zoom::Profile::#{clas}")
 class Zoom::Profile::UnsafeC < superclass
     def initialize(n, o = nil, f = "", b = "", a = "")
-        # I don't care about test code
-        after = "| \\grep -v \"^[^:]*test[^:]*:[0-9]+:\""
         flags = ""
-
         op = Zoom::ProfileManager.default_profile
         case op
         when /^ack(-grep)?$/
@@ -20,7 +17,7 @@ class Zoom::Profile::UnsafeC < superclass
             flags = "-i --include=\"*.[ch]\" --include=\"*.[ch]pp\""
         end
 
-        super(n, op, flags, "", after)
+        super(n, op, flags)
         @pattern = [
             "(",
             [

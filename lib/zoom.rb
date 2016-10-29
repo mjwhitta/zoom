@@ -27,18 +27,21 @@ class Zoom
         profile.go(@config.editor, results)
     end
 
-    def repeat
+    def repeat(shortcut = true)
         return if (@cache.empty?)
-        run(@cache.header)
+        run(@cache.header, shortcut)
     end
 
-    def run(header)
-        profile_name = header["profile_name"]
-        args = header["args"]
-        pattern = header["pattern"]
-        paths = header["paths"]
+    def run(header, shortcut = true)
+        # Ensure header has no nil
+        ["args", "paths", "pattern", "profile_name"].each do |key|
+            header[key] ||= ""
+        end
+        header["pwd"] = Dir.pwd
+        header["translate"] ||= Array.new
 
-        if (profile_name.nil?)
+        profile_name = header["profile_name"]
+        if (profile_name.empty?)
             profile_name = @config.current_profile_name
             header["profile_name"] = profile_name
         end
@@ -48,10 +51,9 @@ class Zoom
         end
 
         profile = @config.get_profile(profile_name)
-        if (pattern.nil? || !profile.pattern.empty?)
+        if (!profile.pattern.empty?)
             header["pattern"] = profile.pattern
         end
-        header["pwd"] = Dir.pwd
 
         begin
             # Clear cache
@@ -60,11 +62,15 @@ class Zoom
             # Store needed details
             @cache.header(header)
 
+            # This will translate and/or append args such that the
+            # output will be something Zoom can process
+            header = profile.preprocess(header)
+
             # Execute profile
-            @cache.write(profile.exe(args, pattern, paths))
+            @cache.write(profile.exe(header))
 
             # Display results from cache
-            @cache.shortcut(@config)
+            @cache.shortcut(@config) if (shortcut)
         rescue Interrupt
             # ^C
         end
