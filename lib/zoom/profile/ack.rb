@@ -22,7 +22,7 @@ class Zoom::Profile::Ack < Zoom::Profile
         from.each do |flag, value|
             case flag
             when "ignore"
-                to.push("--type-set=zoom:match:/#{value}/ --zoom")
+                to.push("--ignore-file=\"match:/#{value}/\"")
             when "word-regexp"
                 to.push("-w")
             end
