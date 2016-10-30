@@ -21,7 +21,7 @@ class Zoom::Profile::UnsafeJava < superclass
             ].join(" ")
         end
 
-        super(n, op, flags)
+        super(n, op, flags, b, a)
         @pattern = "(sun\\.misc\\.)?Unsafe|readObject\\("
         @taggable = true
     end

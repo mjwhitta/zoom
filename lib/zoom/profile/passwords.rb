@@ -17,7 +17,7 @@ class Zoom::Profile::Passwords < superclass
             flags = "-ai"
         end
 
-        super(n, op, flags)
+        super(n, op, flags, b, a)
         @pattern = "(key|pass(wd|word)?)[^:=,>]? *[:=,>]"
         @taggable = true
     end

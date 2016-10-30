@@ -22,7 +22,7 @@ class Zoom::Profile::UnsafePhp < superclass
             ].join(" ")
         end
 
-        super(n, op, flags)
+        super(n, op, flags, b, a)
         # From here: https://www.eukhost.com/blog/webhosting/dangerous-php-functions-must-be-disabled/
         # OMG is anything safe?!
         @pattern = [

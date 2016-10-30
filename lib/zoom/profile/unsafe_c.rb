@@ -17,7 +17,7 @@ class Zoom::Profile::UnsafeC < superclass
             flags = "-i --include=\"*.[ch]\" --include=\"*.[ch]pp\""
         end
 
-        super(n, op, flags)
+        super(n, op, flags, b, a)
         @pattern = [
             "(",
             [

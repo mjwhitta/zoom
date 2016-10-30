@@ -3,8 +3,6 @@ require "json"
 require "pathname"
 
 class Zoom::Cache
-    attr_reader :header
-
     def args
         return nil if (@header.nil?)
         return @header["args"]

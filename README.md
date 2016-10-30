@@ -198,6 +198,39 @@ class HelloProfile < Zoom::Profile
 end
 ```
 
+```ruby
+# search_profile.rb
+
+class SearchProfile < Zoom::Profile
+    def initialize(
+        name,
+        operator = "some_search_tool",
+        flags = "--case-insensitive",
+        before = "", # For use with env vars, such as PATH
+        after = "" # For use with follow up commands or redirection
+    )
+        super(name, operator, flags, before, after)
+        @format_flags = "--color=never -EHInRs" # Mirror grep output
+        @taggable = true
+    end
+
+    def translate(from)
+        to = Array.new
+        from.each do |flag, value|
+            case flag
+                when "ignore"
+                    # Translate to ignore flag for this operator
+                    to.push("--ignore=#{value}")
+                when "word-regexp"
+                    # Translate to word-regexp flag for this operator
+                    to.push("-w")
+            end
+        end
+        return to.join(" ")
+    end
+end
+```
+
 ## Convenient symlinks
 
 If you find it tedious to use Zoom with the flags, there are currently

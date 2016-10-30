@@ -17,7 +17,7 @@ class Zoom::Profile::UnsafePython < superclass
             flags = "-i --include=\"*.py\""
         end
 
-        super(n, op, flags)
+        super(n, op, flags, b, a)
         @pattern = [
             "(",
             [

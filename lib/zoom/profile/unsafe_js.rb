@@ -17,7 +17,7 @@ class Zoom::Profile::UnsafeJs < superclass
             flags = "-i --include=\"*.js\""
         end
 
-        super(n, op, flags)
+        super(n, op, flags, b, a)
         @pattern = "\\.((append|eval|html)\\(|innerHTML)"
         @taggable = true
     end
