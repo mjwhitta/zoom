@@ -13,7 +13,9 @@ class ZoomTest < Minitest::Test
     end
 
     def test_ack
-        return if (!@zoom.config.has_profile?("ack"))
+        if (!@zoom.config.has_profile?("ack"))
+            skip "Ack profile not found"
+        end
 
         header = Hash.new
         header["paths"] = "test/test_src"
@@ -35,7 +37,9 @@ class ZoomTest < Minitest::Test
     end
 
     def test_ag
-        return if (!@zoom.config.has_profile?("ag"))
+        if (!@zoom.config.has_profile?("ag"))
+            skip "Ag profile not found"
+        end
 
         header = Hash.new
         header["paths"] = "test/test_src"
@@ -57,7 +61,9 @@ class ZoomTest < Minitest::Test
     end
 
     def test_find
-        return if (!@zoom.config.has_profile?("find"))
+        if (!@zoom.config.has_profile?("find"))
+            skip "Find profile not found"
+        end
 
         header = Hash.new
         header["paths"] = "test/test_src"
@@ -79,7 +85,9 @@ class ZoomTest < Minitest::Test
     end
 
     def test_grep
-        return if (!@zoom.config.has_profile?("grep"))
+        if (!@zoom.config.has_profile?("grep"))
+            skip "Grep profile not found"
+        end
 
         header = Hash.new
         header["paths"] = "test/test_src"
@@ -114,7 +122,9 @@ class ZoomTest < Minitest::Test
     end
 
     def test_pt
-        return if (!@zoom.config.has_profile?("pt"))
+        if (!@zoom.config.has_profile?("pt"))
+            skip "Pt profile not found"
+        end
 
         header = Hash.new
         header["paths"] = "test/test_src"
@@ -201,7 +211,9 @@ class ZoomTest < Minitest::Test
     end
 
     def test_word_regexp
-        return if (!@zoom.config.has_profile?("grep"))
+        if (!@zoom.config.has_profile?("grep"))
+            skip "Grep profile not found"
+        end
 
         header = Hash.new
         header["paths"] = "test/test_src"
