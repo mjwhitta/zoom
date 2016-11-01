@@ -30,7 +30,7 @@ class ZoomTest < Minitest::Test
         assert_equal(8, results.length)
 
         header["translate"] = Hash.new
-        header["translate"]["ignore"] = ".*php.*"
+        header["translate"]["ignore"] = [".*php.*"]
         @zoom.run(header, false)
         results = @zoom.cache.get_results
         assert_equal(3, results.length)
@@ -54,7 +54,7 @@ class ZoomTest < Minitest::Test
         assert_equal(8, results.length)
 
         header["translate"] = Hash.new
-        header["translate"]["ignore"] = "*php*"
+        header["translate"]["ignore"] = ["*php*"]
         @zoom.run(header, false)
         results = @zoom.cache.get_results
         assert_equal(3, results.length)
@@ -102,7 +102,7 @@ class ZoomTest < Minitest::Test
         assert_equal(8, results.length)
 
         header["translate"] = Hash.new
-        header["translate"]["ignore"] = "*php*"
+        header["translate"]["ignore"] = ["*php*"]
         @zoom.run(header, false)
         results = @zoom.cache.get_results
         assert_equal(3, results.length)
@@ -139,7 +139,7 @@ class ZoomTest < Minitest::Test
         assert_equal(8, results.length)
 
         header["translate"] = Hash.new
-        header["translate"]["ignore"] = "*php*"
+        header["translate"]["ignore"] = ["*php*"]
         @zoom.run(header, false)
         results = @zoom.cache.get_results
         assert_equal(3, results.length)

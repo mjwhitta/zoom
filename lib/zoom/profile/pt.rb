@@ -1,7 +1,7 @@
 class Zoom::Profile::Pt < Zoom::Profile
     def initialize(n, o = "pt", f = "-S", b = "", a = "")
         super(n, o, f, b, a)
-        @format_flags = "-e --nocolor --nogroup"
+        @format_flags = "-e -f --nocolor --nogroup"
         @taggable = true
     end
 
@@ -10,7 +10,9 @@ class Zoom::Profile::Pt < Zoom::Profile
         from.each do |flag, value|
             case flag
             when "ignore"
-                to.push("--ignore=#{value}")
+                value.each do |v|
+                    to.push("--ignore=#{v}")
+                end
             when "word-regexp"
                 to.push("-w")
             end

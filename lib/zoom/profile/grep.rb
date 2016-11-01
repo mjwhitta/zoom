@@ -17,7 +17,9 @@ class Zoom::Profile::Grep < Zoom::Profile
         from.each do |flag, value|
             case flag
             when "ignore"
-                to.push("--exclude=#{value}")
+                value.each do |v|
+                    to.push("--exclude=#{v} --exclude-dir=#{v}")
+                end
             when "word-regexp"
                 to.push("-w")
             end

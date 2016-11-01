@@ -89,7 +89,8 @@ def parse(args)
             "--ignore=PATTERN",
             "Ignore files/directories matching PATTERN"
         ) do |pattern|
-            options["translate_flags"]["ignore"] = pattern
+            options["translate_flags"]["ignore"] ||= Array.new
+            options["translate_flags"]["ignore"].push(pattern)
         end
 
         opts.on("-l", "--list", "List profiles") do

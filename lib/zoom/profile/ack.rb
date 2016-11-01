@@ -7,8 +7,8 @@ class Zoom::Profile::Ack < Zoom::Profile
 
         super(n, o, f, b, a)
         @format_flags = [
-            "-H",
             "--follow",
+            "-H",
             "--nobreak",
             "--nocolor",
             "--noheading",
@@ -22,7 +22,10 @@ class Zoom::Profile::Ack < Zoom::Profile
         from.each do |flag, value|
             case flag
             when "ignore"
-                to.push("--ignore-file=\"match:/#{value}/\"")
+                value.each do |v|
+                    to.push("--ignore-dir=\"#{v}\"")
+                    to.push("--ignore-file=\"match:/#{v}/\"")
+                end
             when "word-regexp"
                 to.push("-w")
             end
