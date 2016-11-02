@@ -164,11 +164,11 @@ class ZoomTest < Minitest::Test
         header["profile_name"] = "unsafe_java"
         @zoom.run(header, false)
         results = @zoom.cache.get_results
-        assert_equal(6, results.length)
+        assert_equal(10, results.length)
 
         @zoom.repeat(false)
         results = @zoom.cache.get_results
-        assert_equal(6, results.length)
+        assert_equal(10, results.length)
     end
 
     def test_unsafe_js
