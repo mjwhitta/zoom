@@ -19,6 +19,16 @@ class Zoom::Profile < Hash
         return self["before"]
     end
 
+    def camel_case_to_underscore(clas)
+        # Convert camelcase class to unscore separated string
+        name = clas.to_s.split("::")[-1]
+        name.gsub!(/([A-Z]+)([A-Z][a-z])/, "\\1_\\2")
+        name.gsub!(/([a-z0-9])([A-Z])/, "\\1_\\2")
+        name.tr!("-", "_")
+        return name.downcase
+    end
+    private :camel_case_to_underscore
+
     def class_name
         return self["class"]
     end
@@ -119,7 +129,13 @@ class Zoom::Profile < Hash
     end
     private :hilight_pattern
 
-    def initialize(n, o = "echo", f = "#", b = "", a = "")
+    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
+        a ||= ""
+        b ||= ""
+        f ||= ""
+        n ||= camel_case_to_underscore(self.class.to_s)
+        o ||= "echo"
+
         self["class"] = self.class.to_s
         after(a)
         before(b)

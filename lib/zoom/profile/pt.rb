@@ -1,5 +1,7 @@
 class Zoom::Profile::Pt < Zoom::Profile
-    def initialize(n, o = "pt", f = "-S", b = "", a = "")
+    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
+        f ||= "-S"
+        o ||= "pt"
         super(n, o, f, b, a)
         @format_flags = "-e -f --nocolor --nogroup"
         @taggable = true

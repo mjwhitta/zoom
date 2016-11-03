@@ -1,10 +1,12 @@
 class Zoom::Profile::Ack < Zoom::Profile
-    def initialize(n, o = "ack", f = "--smart-case", b = "", a = "")
+    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
         # Special case because of debian
+        o ||= "ack"
         if ((o == "ack") && ScoobyDoo.where_are_you("ack-grep"))
             o = "ack-grep"
         end
 
+        f ||= "--smart-case"
         super(n, o, f, b, a)
         @format_flags = [
             "--follow",

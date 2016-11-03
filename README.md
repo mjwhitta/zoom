@@ -169,14 +169,17 @@ class ListProfile < Zoom::Profile
     # end
 
     def initialize(
-        name,
-        operator = "",
-        flags = "",
-        before = "", # For use with env vars, such as PATH
-        after = "" # For use with follow up commands or redirection
+        name = nil,
+        operator = nil,
+        flags = nil,
+        before = nil, # Env vars, such as PATH
+        after = nil # Follow up commands or redirection
     )
-        super(name, "ls", "--color -AFhl", before, "2>/dev/null")
-        @taggable = false # Don't tag results
+        after ||= "2>/dev/null"
+        flags ||= "--color -AFhl"
+        operator ||= "ls"
+        super(name, operator, flags, before, after)
+        @taggable = false # Don't tag results (defaults to false)
     end
 end
 ```
@@ -186,14 +189,16 @@ end
 
 class HelloProfile < Zoom::Profile
     def initialize(
-        name,
-        operator = "",
-        flags = "",
-        before = "", # For use with env vars, such as PATH
-        after = "" # For use with follow up commands or redirection
+        name = nil,
+        operator = nil,
+        flags = nil,
+        before = nil, # Env vars, such as PATH
+        after = nil # Follow up commands or redirection
     )
-        super(name, "echo", flags, before, "Hello world!")
-        @taggable = false # Don't tag results
+        after ||= "Hello world!"
+        operator ||= "echo"
+        super(name, operator, flags, before, after)
+        @taggable = false # Don't tag results (defaults to false)
     end
 end
 ```
@@ -203,12 +208,14 @@ end
 
 class SearchProfile < Zoom::Profile
     def initialize(
-        name,
-        operator = "some_search_tool",
-        flags = "--case-insensitive",
-        before = "", # For use with env vars, such as PATH
-        after = "" # For use with follow up commands or redirection
+        name = nil,
+        operator = nil,
+        flags = nil,
+        before = nil, # Env vars, such as PATH
+        after = nil # Follow up commands or redirection
     )
+        flags ||= "--case-insensitive"
+        operator ||= "some_search_tool"
         super(name, operator, flags, before, after)
         @format_flags = "--color=never -EHInRs" # Mirror grep output
         @taggable = true
@@ -236,22 +243,23 @@ end
 
 class SecProfile < Zoom::SecurityProfile
     def initialize(
-        name,
+        name = nil,
         operator = nil,
-        flags = "",
-        before = "", # For use with env vars, such as PATH
-        after = "" # For use with follow up commands or redirection
+        flags = nil,
+        before = nil, # Env vars, such as PATH
+        after = nil # Follow up commands or redirection
     )
-        flags = ""
+        # Only need the case statement if you don't want the default
+        # flags
         case Zoom::ProfileManager.default_profile
             when /^ack(-grep)?$/
-                flags = "ack_flags_here"
+                flags ||= "ack_flags_here"
             when "ag"
-                flags = "ag_flags_here"
+                flags ||= "ag_flags_here"
             when "grep"
-                flags = "grep_flags_here"
+                flags ||= "grep_flags_here"
             when "pt"
-                flags = "pt_flags_here"
+                flags ||= "pt_flags_here"
         end
         super(name, nil, flags, before, after)
         @taggable = true

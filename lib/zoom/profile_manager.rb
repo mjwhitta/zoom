@@ -39,12 +39,7 @@ class Zoom::ProfileManager
     def self.security_profiles
         profs = Array.new
         Zoom::SecurityProfile.subclasses.each do |clas|
-            # Convert camelcase class to unscore separated string
-            name = clas.to_s.split("::")[-1]
-            name.gsub!(/([A-Z]+)([A-Z][a-z])/, "\\1_\\2")
-            name.gsub!(/([a-z0-9])([A-Z])/, "\\1_\\2")
-            name.tr!("-", "_")
-            profs.push(clas.new(name.downcase))
+            profs.push(clas.new)
         end
         return profs
     end

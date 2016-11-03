@@ -1,18 +1,17 @@
 class Zoom::SecurityProfile::UnsafePython < Zoom::SecurityProfile
-    def initialize(n, o = nil, f = "", b = "", a = "")
-        flags = ""
+    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
-            flags = "--smart-case --python"
+            f ||= "--smart-case --python"
         when "ag"
-            flags = "-S -G \"\\.py$\""
+            f ||= "-S -G \"\\.py$\""
         when "grep"
-            flags = "-i --include=\"*.py\""
+            f ||= "-i --include=\"*.py\""
         when "pt"
-            flags = "-S -G \"\\.py$\""
+            f ||= "-S -G \"\\.py$\""
         end
 
-        super(n, nil, flags, b, a)
+        super(n, nil, f, b, a)
         @pattern = [
             "(",
             [

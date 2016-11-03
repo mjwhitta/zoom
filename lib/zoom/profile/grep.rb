@@ -1,5 +1,7 @@
 class Zoom::Profile::Grep < Zoom::Profile
-    def initialize(n, o = "grep", f = "-i", b = "", a = "")
+    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
+        f ||= "-i"
+        o ||= "grep"
         super(n, o, f, b, a)
         @format_flags = [
             "--color=never",

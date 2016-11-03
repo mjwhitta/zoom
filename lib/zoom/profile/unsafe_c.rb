@@ -1,18 +1,17 @@
 class Zoom::SecurityProfile::UnsafeC < Zoom::SecurityProfile
-    def initialize(n, o = nil, f = "", b = "", a = "")
-        flags = ""
+    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
-            flags = "--smart-case --cc --cpp"
+            f ||= "--smart-case --cc --cpp"
         when "ag"
-            flags = "-S -G \"\\.(c|h)(pp)?$\""
+            f ||= "-S -G \"\\.(c|h)(pp)?$\""
         when "grep"
-            flags = "-i --include=\"*.[ch]\" --include=\"*.[ch]pp\""
+            f ||= "-i --include=\"*.[ch]\" --include=\"*.[ch]pp\""
         when "pt"
-            flags = "-S -G \"\\.(c|h)(pp)?$\""
+            f ||= "-S -G \"\\.(c|h)(pp)?$\""
         end
 
-        super(n, nil, flags, b, a)
+        super(n, nil, f, b, a)
         @pattern = [
             "(",
             [

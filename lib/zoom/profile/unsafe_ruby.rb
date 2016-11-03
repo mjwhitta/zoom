@@ -1,16 +1,15 @@
 class Zoom::SecurityProfile::UnsafeRuby < Zoom::SecurityProfile
-    def initialize(n, o = nil, f = "", b = "", a = "")
-        flags = ""
+    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
-            flags = "--smart-case --ruby"
+            f ||= "--smart-case --ruby"
         when "ag"
-            flags = [
+            f ||= [
                 "-S",
                 "-G \"\\.(erb|r(ake|b|html|js|xml)|spec)$|Rakefile\""
             ].join(" ")
         when "grep"
-            flags = [
+            f ||= [
                 "-i",
                 "--include=\"*.erb\"",
                 "--include=\"*.rake\"",
@@ -22,13 +21,13 @@ class Zoom::SecurityProfile::UnsafeRuby < Zoom::SecurityProfile
                 "--include=\"Rakefile\""
             ].join(" ")
         when "pt"
-            flags = [
+            f ||= [
                 "-S",
                 "-G \"\\.(erb|r(ake|b|html|js|xml)|spec)$|Rakefile\""
             ].join(" ")
         end
 
-        super(n, nil, flags, b, a)
+        super(n, nil, f, b, a)
         @pattern = [
             "%x\\(",
             "\\.constantize",

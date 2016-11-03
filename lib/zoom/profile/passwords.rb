@@ -1,18 +1,17 @@
 class Zoom::SecurityProfile::Passwords < Zoom::SecurityProfile
-    def initialize(n, o = nil, f = "", b = "", a = "")
-        flags = ""
+    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
-            flags = "--smart-case"
+            f ||= "--smart-case"
         when "ag"
-            flags = "-Su"
+            f ||= "-Su"
         when "grep"
-            flags = "-ai"
+            f ||= "-ai"
         when "pt"
-            flags = "-SU --hidden"
+            f ||= "-SU --hidden"
         end
 
-        super(n, nil, flags, b, a)
+        super(n, nil, f, b, a)
         @pattern = "(key|pass(wd|word)?)[^:=,>]? *[:=,>]"
         @taggable = true
     end

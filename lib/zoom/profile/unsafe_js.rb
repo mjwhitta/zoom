@@ -1,18 +1,17 @@
 class Zoom::SecurityProfile::UnsafeJs < Zoom::SecurityProfile
-    def initialize(n, o = nil, f = "", b = "", a = "")
-        flags = ""
+    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
-            flags = "--smart-case --js"
+            f ||= "--smart-case --js"
         when "ag"
-            flags = "-S -G \"\\.js$\""
+            f ||= "-S -G \"\\.js$\""
         when "grep"
-            flags = "-i --include=\"*.js\""
+            f ||= "-i --include=\"*.js\""
         when "pt"
-            flags = "-S -G \"\\.js$\""
+            f ||= "-S -G \"\\.js$\""
         end
 
-        super(n, nil, flags, b, a)
+        super(n, nil, f, b, a)
         @pattern = "\\.((append|eval|html)\\(|innerHTML)"
         @taggable = true
     end
