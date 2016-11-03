@@ -231,6 +231,34 @@ class SearchProfile < Zoom::Profile
 end
 ```
 
+```ruby
+# sec_profile.rb
+
+class SecProfile < Zoom::SecurityProfile
+    def initialize(
+        name,
+        operator = nil,
+        flags = "",
+        before = "", # For use with env vars, such as PATH
+        after = "" # For use with follow up commands or redirection
+    )
+        flags = ""
+        case Zoom::ProfileManager.default_profile
+            when /^ack(-grep)?$/
+                flags = "ack_flags_here"
+            when "ag"
+                flags = "ag_flags_here"
+            when "grep"
+                flags = "grep_flags_here"
+            when "pt"
+                flags = "pt_flags_here"
+        end
+        super(name, nil, flags, before, after)
+        @taggable = true
+    end
+end
+```
+
 ## Convenient symlinks
 
 If you find it tedious to use Zoom with the flags, there are currently

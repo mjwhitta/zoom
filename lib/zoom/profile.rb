@@ -220,15 +220,3 @@ class Zoom::Profile < Hash
         return ""
     end
 end
-
-require "zoom/profile/ack"
-require "zoom/profile/ag"
-require "zoom/profile/find"
-require "zoom/profile/grep"
-require "zoom/profile/passwords"
-require "zoom/profile/pt"
-require "zoom/profile/unsafe_c"
-require "zoom/profile/unsafe_java"
-require "zoom/profile/unsafe_js"
-require "zoom/profile/unsafe_php"
-require "zoom/profile/unsafe_python"

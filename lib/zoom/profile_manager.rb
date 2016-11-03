@@ -1,13 +1,6 @@
+require "fagin"
 require "pathname"
 require "scoobydoo"
-
-# Load custom profiles
-config_dir = Pathname.new("~/.config/zoom").expand_path
-if (config_dir.exist?)
-    Dir["#{config_dir}/*.rb"].each do |file|
-        require_relative file
-    end
-end
 
 class Zoom::ProfileManager
     @@ranking = [
@@ -44,13 +37,15 @@ class Zoom::ProfileManager
     end
 
     def self.security_profiles
-        return [
-            Zoom::Profile::Passwords.new("passwords"),
-            Zoom::Profile::UnsafeC.new("unsafe_c"),
-            Zoom::Profile::UnsafeJava.new("unsafe_java"),
-            Zoom::Profile::UnsafeJs.new("unsafe_js"),
-            Zoom::Profile::UnsafePhp.new("unsafe_php"),
-            Zoom::Profile::UnsafePython.new("unsafe_python")
-        ]
+        profs = Array.new
+        Zoom::SecurityProfile.subclasses.each do |clas|
+            # Convert camelcase class to unscore separated string
+            name = clas.to_s.split("::")[-1]
+            name.gsub!(/([A-Z]+)([A-Z][a-z])/, "\\1_\\2")
+            name.gsub!(/([a-z0-9])([A-Z])/, "\\1_\\2")
+            name.tr!("-", "_")
+            profs.push(clas.new(name.downcase))
+        end
+        return profs
     end
 end

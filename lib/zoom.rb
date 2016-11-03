@@ -1,3 +1,4 @@
+require "fagin"
 require "pathname"
 
 class Zoom
@@ -82,4 +83,17 @@ require "zoom/config"
 require "zoom/editor"
 require "zoom/error"
 require "zoom/profile"
+Fagin.find_children(
+    "Zoom::Profile",
+    "#{File.dirname(__FILE__)}/zoom/profile"
+)
 require "zoom/profile_manager"
+require "zoom/security_profile"
+Fagin.find_children(
+    "Zoom::SecurityProfile",
+    "#{File.dirname(__FILE__)}/zoom/profile"
+)
+
+# Load custom profiles
+Fagin.find_children("Zoom::Profile", "~/.config/zoom")
+Fagin.find_children("Zoom::SecurityProfile", "~/.config/zoom")

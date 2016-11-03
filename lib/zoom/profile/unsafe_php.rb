@@ -1,17 +1,10 @@
-require "zoom/profile_manager"
-
-clas = Zoom::ProfileManager.default_profile.capitalize
-superclass = Zoom::Profile.profile_by_name("Zoom::Profile::#{clas}")
-class Zoom::Profile::UnsafePhp < superclass
+class Zoom::SecurityProfile::UnsafePhp < Zoom::SecurityProfile
     def initialize(n, o = nil, f = "", b = "", a = "")
         flags = ""
-        op = Zoom::ProfileManager.default_profile
-        case op
+        case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             flags = "--smart-case --php"
         when "ag"
-            flags = "-S -G \"\\.ph(p[345t]?|tml)$\""
-        when "pt"
             flags = "-S -G \"\\.ph(p[345t]?|tml)$\""
         when "grep"
             flags = [
@@ -20,9 +13,11 @@ class Zoom::Profile::UnsafePhp < superclass
                 "--include=\"*.php[345t]\"",
                 "--include=\"*.phtml\""
             ].join(" ")
+        when "pt"
+            flags = "-S -G \"\\.ph(p[345t]?|tml)$\""
         end
 
-        super(n, op, flags, b, a)
+        super(n, nil, flags, b, a)
         # From here: https://www.eukhost.com/blog/webhosting/dangerous-php-functions-must-be-disabled/
         # OMG is anything safe?!
         @pattern = [

@@ -1,23 +1,18 @@
-require "zoom/profile_manager"
-
-clas = Zoom::ProfileManager.default_profile.capitalize
-superclass = Zoom::Profile.profile_by_name("Zoom::Profile::#{clas}")
-class Zoom::Profile::UnsafeJs < superclass
+class Zoom::SecurityProfile::UnsafeJs < Zoom::SecurityProfile
     def initialize(n, o = nil, f = "", b = "", a = "")
         flags = ""
-        op = Zoom::ProfileManager.default_profile
-        case op
+        case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             flags = "--smart-case --js"
         when "ag"
             flags = "-S -G \"\\.js$\""
-        when "pt"
-            flags = "-S -G \"\\.js$\""
         when "grep"
             flags = "-i --include=\"*.js\""
+        when "pt"
+            flags = "-S -G \"\\.js$\""
         end
 
-        super(n, op, flags, b, a)
+        super(n, nil, flags, b, a)
         @pattern = "\\.((append|eval|html)\\(|innerHTML)"
         @taggable = true
     end

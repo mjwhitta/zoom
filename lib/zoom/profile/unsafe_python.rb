@@ -1,23 +1,18 @@
-require "zoom/profile_manager"
-
-clas = Zoom::ProfileManager.default_profile.capitalize
-superclass = Zoom::Profile.profile_by_name("Zoom::Profile::#{clas}")
-class Zoom::Profile::UnsafePython < superclass
+class Zoom::SecurityProfile::UnsafePython < Zoom::SecurityProfile
     def initialize(n, o = nil, f = "", b = "", a = "")
         flags = ""
-        op = Zoom::ProfileManager.default_profile
-        case op
+        case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             flags = "--smart-case --python"
         when "ag"
             flags = "-S -G \"\\.py$\""
-        when "pt"
-            flags = "-S -G \"\\.py$\""
         when "grep"
             flags = "-i --include=\"*.py\""
+        when "pt"
+            flags = "-S -G \"\\.py$\""
         end
 
-        super(n, op, flags, b, a)
+        super(n, nil, flags, b, a)
         @pattern = [
             "(",
             [

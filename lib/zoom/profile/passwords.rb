@@ -1,23 +1,18 @@
-require "zoom/profile_manager"
-
-clas = Zoom::ProfileManager.default_profile.capitalize
-superclass = Zoom::Profile.profile_by_name("Zoom::Profile::#{clas}")
-class Zoom::Profile::Passwords < superclass
+class Zoom::SecurityProfile::Passwords < Zoom::SecurityProfile
     def initialize(n, o = nil, f = "", b = "", a = "")
         flags = ""
-        op = Zoom::ProfileManager.default_profile
-        case op
+        case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             flags = "--smart-case"
         when "ag"
             flags = "-Su"
-        when "pt"
-            flags = "-SU --hidden"
         when "grep"
             flags = "-ai"
+        when "pt"
+            flags = "-SU --hidden"
         end
 
-        super(n, op, flags, b, a)
+        super(n, nil, flags, b, a)
         @pattern = "(key|pass(wd|word)?)[^:=,>]? *[:=,>]"
         @taggable = true
     end
