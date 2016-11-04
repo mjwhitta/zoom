@@ -3,12 +3,10 @@ class Zoom::SecurityProfile::UnsafeJs < Zoom::SecurityProfile
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             f ||= "--smart-case --js"
-        when "ag"
+        when "ag", "pt"
             f ||= "-S -G \"\\.js$\""
         when "grep"
             f ||= "-i --include=\"*.js\""
-        when "pt"
-            f ||= "-S -G \"\\.js$\""
         end
 
         super(n, nil, f, b, a)

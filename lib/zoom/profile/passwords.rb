@@ -3,12 +3,10 @@ class Zoom::SecurityProfile::Passwords < Zoom::SecurityProfile
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             f ||= "--smart-case"
-        when "ag"
-            f ||= "-Su"
+        when "ag", "pt"
+            f ||= "-SU --hidden"
         when "grep"
             f ||= "-ai"
-        when "pt"
-            f ||= "-SU --hidden"
         end
 
         super(n, nil, f, b, a)

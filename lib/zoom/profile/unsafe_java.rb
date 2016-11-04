@@ -3,7 +3,7 @@ class Zoom::SecurityProfile::UnsafeJava < Zoom::SecurityProfile
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             f ||= "--smart-case --java"
-        when "ag"
+        when "ag", "pt"
             f ||= "-S -G \"\\.(java|properties)$\""
         when "grep"
             f ||= [
@@ -11,8 +11,6 @@ class Zoom::SecurityProfile::UnsafeJava < Zoom::SecurityProfile
                 "--include=\"*.java\"",
                 "--include=\"*.properties\""
             ].join(" ")
-        when "pt"
-            f ||= "-S -G \"\\.(java|properties)$\""
         end
 
         super(n, nil, f, b, a)

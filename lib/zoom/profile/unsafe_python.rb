@@ -3,12 +3,10 @@ class Zoom::SecurityProfile::UnsafePython < Zoom::SecurityProfile
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             f ||= "--smart-case --python"
-        when "ag"
+        when "ag", "pt"
             f ||= "-S -G \"\\.py$\""
         when "grep"
             f ||= "-i --include=\"*.py\""
-        when "pt"
-            f ||= "-S -G \"\\.py$\""
         end
 
         super(n, nil, f, b, a)

@@ -3,7 +3,7 @@ class Zoom::SecurityProfile::UnsafeRuby < Zoom::SecurityProfile
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             f ||= "--smart-case --ruby"
-        when "ag"
+        when "ag", "pt"
             f ||= [
                 "-S",
                 "-G \"\\.(erb|r(ake|b|html|js|xml)|spec)$|Rakefile\""
@@ -19,11 +19,6 @@ class Zoom::SecurityProfile::UnsafeRuby < Zoom::SecurityProfile
                 "--include=\"*.rxml\"",
                 "--include=\"*.spec\"",
                 "--include=\"Rakefile\""
-            ].join(" ")
-        when "pt"
-            f ||= [
-                "-S",
-                "-G \"\\.(erb|r(ake|b|html|js|xml)|spec)$|Rakefile\""
             ].join(" ")
         end
 

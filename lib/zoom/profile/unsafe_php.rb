@@ -3,7 +3,7 @@ class Zoom::SecurityProfile::UnsafePhp < Zoom::SecurityProfile
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             f ||= "--smart-case --php"
-        when "ag"
+        when "ag", "pt"
             f ||= "-S -G \"\\.ph(p[345t]?|tml)$\""
         when "grep"
             f ||= [
@@ -12,8 +12,6 @@ class Zoom::SecurityProfile::UnsafePhp < Zoom::SecurityProfile
                 "--include=\"*.php[345t]\"",
                 "--include=\"*.phtml\""
             ].join(" ")
-        when "pt"
-            f ||= "-S -G \"\\.ph(p[345t]?|tml)$\""
         end
 
         super(n, nil, f, b, a)

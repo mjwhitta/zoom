@@ -3,12 +3,10 @@ class Zoom::SecurityProfile::UnsafeC < Zoom::SecurityProfile
         case Zoom::ProfileManager.default_profile
         when /^ack(-grep)?$/
             f ||= "--smart-case --cc --cpp"
-        when "ag"
+        when "ag", "pt"
             f ||= "-S -G \"\\.(c|h)(pp)?$\""
         when "grep"
             f ||= "-i --include=\"*.[ch]\" --include=\"*.[ch]pp\""
-        when "pt"
-            f ||= "-S -G \"\\.(c|h)(pp)?$\""
         end
 
         super(n, nil, f, b, a)
