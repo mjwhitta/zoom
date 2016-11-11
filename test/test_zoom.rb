@@ -138,11 +138,11 @@ class ZoomTest < Minitest::Test
         header["profile_name"] = "passwords"
         @zoom.run(header, false)
         results = @zoom.cache.get_results
-        assert_equal(16, results.length)
+        assert_equal(36, results.length)
 
         @zoom.repeat(false)
         results = @zoom.cache.get_results
-        assert_equal(16, results.length)
+        assert_equal(36, results.length)
     end
 
     def test_pt

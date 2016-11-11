@@ -10,7 +10,7 @@ class Zoom::SecurityProfile::Passwords < Zoom::SecurityProfile
         end
 
         super(n, nil, f, b, a)
-        @pattern = "(key|pass(wd|word)?)[^:=,>]? *[:=,>]"
+        @pattern = "(key|pa?ss(w(o?r)?d)?)[^:=,>]? *[:=,>]"
         @taggable = true
     end
 end
