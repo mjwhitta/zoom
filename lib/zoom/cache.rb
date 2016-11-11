@@ -156,7 +156,7 @@ class Zoom::Cache
 
         config.validate_colors
         if (!config.has_profile?(profile_name))
-            raise Zoom::Error::ProfileDoesNotExists.new(profile_name)
+            raise Zoom::Error::ProfileDoesNotExist.new(profile_name)
         end
 
         profile = config.get_profile(profile_name)
