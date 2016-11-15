@@ -10,7 +10,15 @@ class Zoom::SecurityProfile::UnsafeJs < Zoom::SecurityProfile
         end
 
         super(n, nil, f, b, a)
-        @pattern = "\\.((append|eval|html)\\(|innerHTML)"
+        @pattern = [
+            "\\.",
+            "(",
+            [
+                "(append|eval|html)\\(",
+                "innerHTML"
+            ].join("|"),
+            ")"
+        ].join
         @taggable = true
     end
 end

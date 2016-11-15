@@ -11,6 +11,7 @@ class Zoom::SecurityProfile::UnsafePython < Zoom::SecurityProfile
 
         super(n, nil, f, b, a)
         @pattern = [
+            "(^|[^\\nA-Za-z_])",
             "(",
             [
                 "c?[Pp]ickle\\.loads?",
@@ -20,7 +21,8 @@ class Zoom::SecurityProfile::UnsafePython < Zoom::SecurityProfile
                 "subprocess\\.call",
                 "yaml\\.load"
             ].join("|"),
-            ")\\("
+            ")",
+            "\\("
         ].join
         @taggable = true
     end

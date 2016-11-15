@@ -18,13 +18,7 @@ class ZoomTest < Minitest::Test
         end
 
         header = Hash.new
-        header["paths"] = [
-            "test/test_src/unsafe_c",
-            "test/test_src/unsafe_java",
-            "test/test_src/unsafe_js",
-            "test/test_src/unsafe_php",
-            "test/test_src/unsafe_python",
-        ].join(" ")
+        header["paths"] = "test/test_src/ack_ag_find_grep_pt"
         header["pattern"] = "eval"
         header["profile_name"] = "ack"
         @zoom.run(header, false)
@@ -48,13 +42,7 @@ class ZoomTest < Minitest::Test
         end
 
         header = Hash.new
-        header["paths"] = [
-            "test/test_src/unsafe_c",
-            "test/test_src/unsafe_java",
-            "test/test_src/unsafe_js",
-            "test/test_src/unsafe_php",
-            "test/test_src/unsafe_python",
-        ].join(" ")
+        header["paths"] = "test/test_src/ack_ag_find_grep_pt"
         header["pattern"] = "eval"
         header["profile_name"] = "ag"
         @zoom.run(header, false)
@@ -78,22 +66,16 @@ class ZoomTest < Minitest::Test
         end
 
         header = Hash.new
-        header["paths"] = [
-            "test/test_src/unsafe_c",
-            "test/test_src/unsafe_java",
-            "test/test_src/unsafe_js",
-            "test/test_src/unsafe_php",
-            "test/test_src/unsafe_python",
-        ].join(" ")
+        header["paths"] = "test/test_src/ack_ag_find_grep_pt"
         header["pattern"] = "*php*"
         header["profile_name"] = "find"
         @zoom.run(header, false)
         results = @zoom.cache.get_results
-        assert_equal(6, results.length)
+        assert_equal(5, results.length)
 
         @zoom.repeat(false)
         results = @zoom.cache.get_results
-        assert_equal(6, results.length)
+        assert_equal(5, results.length)
 
         header["args"] = "-type f"
         header["pattern"] = ""
@@ -108,13 +90,7 @@ class ZoomTest < Minitest::Test
         end
 
         header = Hash.new
-        header["paths"] = [
-            "test/test_src/unsafe_c",
-            "test/test_src/unsafe_java",
-            "test/test_src/unsafe_js",
-            "test/test_src/unsafe_php",
-            "test/test_src/unsafe_python",
-        ].join(" ")
+        header["paths"] = "test/test_src/ack_ag_find_grep_pt"
         header["pattern"] = "eval"
         header["profile_name"] = "grep"
         @zoom.run(header, false)
@@ -129,7 +105,7 @@ class ZoomTest < Minitest::Test
         header["translate"]["ignore"] = ["*php*"]
         @zoom.run(header, false)
         results = @zoom.cache.get_results
-        assert_equal(2, results.length)
+        assert_equal(3, results.length)
     end
 
     def test_passwords
@@ -151,13 +127,7 @@ class ZoomTest < Minitest::Test
         end
 
         header = Hash.new
-        header["paths"] = [
-            "test/test_src/unsafe_c",
-            "test/test_src/unsafe_java",
-            "test/test_src/unsafe_js",
-            "test/test_src/unsafe_php",
-            "test/test_src/unsafe_python",
-        ].join(" ")
+        header["paths"] = "test/test_src/ack_ag_find_grep_pt"
         header["pattern"] = "eval"
         header["profile_name"] = "pt"
         @zoom.run(header, false)
@@ -264,7 +234,7 @@ class ZoomTest < Minitest::Test
         header["profile_name"] = "grep"
         @zoom.run(header, false)
         results = @zoom.cache.get_results
-        assert_equal(12, results.length)
+        assert_equal(24, results.length)
 
         header["translate"] = Hash.new
         header["translate"]["word-regexp"] = ""

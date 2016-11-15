@@ -25,11 +25,18 @@ class Zoom::SecurityProfile::UnsafeRuby < Zoom::SecurityProfile
         super(n, nil, f, b, a)
         @pattern = [
             "%x\\(",
+            "|",
             "\\.constantize",
-            "instance_eval",
-            "(public_)?send",
-            "system"
-        ].join("|")
+            "|",
+            "(^|[^\\nA-Za-z_])",
+            "(",
+            [
+                "instance_eval",
+                "(public_)?send",
+                "system",
+            ].join("|"),
+            ")"
+        ].join
         @taggable = true
     end
 end

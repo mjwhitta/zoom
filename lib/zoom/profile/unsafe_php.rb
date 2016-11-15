@@ -18,9 +18,14 @@ class Zoom::SecurityProfile::UnsafePhp < Zoom::SecurityProfile
         # From here: https://www.eukhost.com/blog/webhosting/dangerous-php-functions-must-be-disabled/
         # OMG is anything safe?!
         @pattern = [
-            "\\`|",
-            "\\$_GET\\[|",
-            "(include|require)(_once)?|",
+            "\\`",
+            "|",
+            "\\$_GET\\[",
+            "|",
+            "(^|[^\\nA-Za-z_])",
+            "(",
+            "(include|require)(_once)?",
+            "|",
             "(",
             [
                 "apache_(child_terminate|setenv)",
@@ -48,7 +53,9 @@ class Zoom::SecurityProfile::UnsafePhp < Zoom::SecurityProfile
                 "sys(log|tem)",
                 "xmlrpc_entity_decode"
             ].join("|"),
-            ")\\("
+            ")",
+            "\\(",
+            ")"
         ].join
         @taggable = true
     end

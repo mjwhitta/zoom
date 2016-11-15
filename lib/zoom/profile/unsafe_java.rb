@@ -16,8 +16,16 @@ class Zoom::SecurityProfile::UnsafeJava < Zoom::SecurityProfile
         super(n, nil, f, b, a)
         @pattern = [
             "(sun\\.misc\\.)?Unsafe",
-            "(\\.getRuntime|readObject|Runtime)\\("
-        ].join("|")
+            "|",
+            "(",
+            [
+                "\\.getRuntime",
+                "readObject",
+                "Runtime"
+            ].join("|"),
+            ")",
+            "\\("
+        ].join
         @taggable = true
     end
 end

@@ -11,6 +11,7 @@ class Zoom::SecurityProfile::UnsafeC < Zoom::SecurityProfile
 
         super(n, nil, f, b, a)
         @pattern = [
+            "(^|[^\\nA-Za-z_])",
             "(",
             [
                 "_splitpath",
