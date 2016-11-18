@@ -53,7 +53,7 @@ class Zoom::Profile < Hash
                 @format_flags,
                 flags,
                 header["args"],
-                header["pattern"],
+                header["pattern"].shellescape,
                 header["paths"],
                 after
             ].join(" ").strip
@@ -165,18 +165,29 @@ class Zoom::Profile < Hash
 
     def preprocess(header)
         # Use hard-coded pattern if defined
-        pattern = header["pattern"]
-        if (@pattern && !@pattern.empty? && (pattern != @pattern))
-            header["args"] += " #{pattern}"
+        if (
+            @pattern &&
+            !@pattern.empty? &&
+            (header["pattern"] != @pattern)
+        )
+            header["args"] += " #{header["pattern"]}"
             header["pattern"] = @pattern
         end
 
         case operator.split("/")[-1]
         when /^ack(-grep)?$/, "ag", "grep", "pt"
-            header["pattern"] = header["pattern"].shellescape
+            paths = header["paths"].split(" ")
+            if (header["pattern"].empty? && !paths.empty?)
+                header["pattern"] = paths.delete_at(0)
+                header["paths"] = paths.join(" ").strip
+                header["paths"] = "." if (header["paths"].empty?)
+            end
+
+            # This isn't done here anymore as it'll break hilighting
+            # header["pattern"] = header["pattern"].shellescape
         when "find"
             # If additional args are passed, then assume pattern is
-            # actually and arg
+            # actually an arg
             if (header["args"] && !header["args"].empty?)
                 header["args"] += " #{header["pattern"]}"
                 header["pattern"] = ""

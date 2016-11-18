@@ -62,6 +62,10 @@ class Zoom::Cache
         return nil if (header.nil? && empty?)
         return @header if (header.nil?)
 
+        # This causes the cache to be "empty" so don't do it! Leaving
+        # this here so I don't forget.
+        # @header = header
+
         File.open(@cache_file, "a") do |f|
             f.write("ZOOM_HEADER=#{JSON.generate(header)}\n")
         end

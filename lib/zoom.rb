@@ -30,14 +30,15 @@ class Zoom
 
     def repeat(shortcut = true)
         return if (@cache.empty?)
-        run(@cache.header, shortcut)
+        run(@cache.header, shortcut, true)
     end
 
-    def run(header, shortcut = true)
+    def run(header, shortcut = true, repeat = false)
         # Ensure header has no nil
-        ["args", "paths", "pattern", "profile_name"].each do |key|
+        ["args", "pattern", "profile_name"].each do |key|
             header[key] ||= ""
         end
+        header["paths"] ||= "."
         header["pwd"] = Dir.pwd
         header["translate"] ||= Array.new
 
@@ -52,20 +53,16 @@ class Zoom
         end
 
         profile = @config.get_profile(profile_name)
-        if (!profile.pattern.empty?)
-            header["pattern"] = profile.pattern
-        end
-
         begin
+            # This will translate and/or append args such that the
+            # output will be something Zoom can process
+            header = profile.preprocess(header) if (!repeat)
+
             # Clear cache
             @cache.clear
 
             # Store needed details
             @cache.header(header)
-
-            # This will translate and/or append args such that the
-            # output will be something Zoom can process
-            header = profile.preprocess(header)
 
             # Execute profile
             @cache.write(profile.exe(header))

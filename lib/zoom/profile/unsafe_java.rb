@@ -19,6 +19,7 @@ class Zoom::SecurityProfile::UnsafeJava < Zoom::SecurityProfile
             "|",
             "(",
             [
+                "\\.exec",
                 "\\.getRuntime",
                 "readObject",
                 "Runtime"
