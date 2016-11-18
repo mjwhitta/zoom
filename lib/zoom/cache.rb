@@ -196,7 +196,7 @@ class Zoom::Cache
         end
     end
 
-    def write(str)
+    def write(str, pattern = nil)
         return if (str.nil?)
 
         if (!str.valid_encoding?)
@@ -208,7 +208,22 @@ class Zoom::Cache
         end
 
         File.open(@cache_file, "a") do |f|
-            f.write(str.gsub(/\r/, "^M"))
+            str.gsub(/\r/, "^M").split("\n").each do |line|
+                if (pattern && line.match(/^[^:]+:[0-9]+:.+$/))
+                    line.match(/^([^:]+:[0-9]+:)(.+)$/) do |m|
+                        prev_ln = nil
+                        m[2].scan(
+                            /(.{0,128}#{pattern}.{0,128})/
+                        ) do |n|
+                            curr_ln = "#{m[1]}#{n[0]}\n"
+                            f.write(curr_ln) if (curr_ln != prev_ln)
+                            prev_ln = curr_ln
+                        end
+                    end
+                else
+                    f.write("#{line}\n")
+                end
+            end
         end
     end
 end

@@ -65,7 +65,7 @@ class Zoom
             @cache.header(header)
 
             # Execute profile
-            @cache.write(profile.exe(header))
+            @cache.write(profile.exe(header), header["pattern"])
 
             # Display results from cache
             @cache.shortcut(@config) if (shortcut)

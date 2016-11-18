@@ -108,6 +108,24 @@ class ZoomTest < Minitest::Test
         assert_equal(3, results.length)
     end
 
+    def test_multiple_matches
+        if (!@zoom.config.has_profile?("grep"))
+            skip "Grep profile not found"
+        end
+
+        header = Hash.new
+        header["paths"] = "test/test_src/multiple_matches"
+        header["pattern"] = "(as)(df)"
+        header["profile_name"] = "grep"
+        @zoom.run(header, false)
+        results = @zoom.cache.get_results
+        assert_equal(3, results.length)
+
+        @zoom.repeat(false)
+        results = @zoom.cache.get_results
+        assert_equal(3, results.length)
+    end
+
     def test_passwords
         header = Hash.new
         header["paths"] = "test/test_src/passwords"
