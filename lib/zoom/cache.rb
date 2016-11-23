@@ -211,13 +211,10 @@ class Zoom::Cache
             str.gsub(/\r/, "^M").split("\n").each do |line|
                 if (pattern && line.match(/^[^:]+:[0-9]+:.+$/))
                     line.match(/^([^:]+:[0-9]+:)(.+)$/) do |m|
-                        prev_ln = nil
                         m[2].scan(
-                            /(.{0,128}#{pattern}.{0,128})/
+                            /(.{0,128}#{pattern}.{0,128})/i
                         ) do |n|
-                            curr_ln = "#{m[1]}#{n[0]}\n"
-                            f.write(curr_ln) if (curr_ln != prev_ln)
-                            prev_ln = curr_ln
+                            f.write("#{m[1]}#{n[0]}\n")
                         end
                     end
                 else
