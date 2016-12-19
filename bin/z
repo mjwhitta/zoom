@@ -298,7 +298,7 @@ begin
     when "repeat"
         zoom.repeat
     when "rc"
-        zoom.config.default_config
+        # zoom.config.default_config # Redundant
         zoom.cache.clear
     when "secprofs"
         zoom.config.add_security_profiles

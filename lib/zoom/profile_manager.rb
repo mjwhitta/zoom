@@ -1,4 +1,3 @@
-require "fagin"
 require "pathname"
 require "scoobydoo"
 
@@ -33,14 +32,27 @@ class Zoom::ProfileManager
             end
         end
 
+        Zoom::Profile.subclasses.each do |clas|
+            case clas.to_s
+            when /^Zoom::SecurityProfile.*/
+                # Ignore these
+            when /^Zoom::Profile::(Ag|Ack|Find|Grep|Pt)/
+                # Ignore these
+            else
+                # Custom classes
+                c = clas.new
+                profiles[c.name] = c
+            end
+        end
+
         return profiles
     end
 
     def self.security_profiles
-        profs = Array.new
+        profiles = Array.new
         Zoom::SecurityProfile.subclasses.each do |clas|
-            profs.push(clas.new)
+            profiles.push(clas.new)
         end
-        return profs
+        return profiles
     end
 end
