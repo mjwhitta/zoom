@@ -113,7 +113,7 @@ class Zoom::Editor
         zq.close
         zs.close
 
-        system("#{@editor} -S #{source} #{files.join(" ")}")
+        system("#{@editor} -S #{source} \"#{files.join("\" \"")}\"")
 
         FileUtils.rm_f(quickfix)
         FileUtils.rm_f(source)
