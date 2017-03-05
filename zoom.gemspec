@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
     s.name = "ruby-zoom"
-    s.version = "4.6.5"
+    s.version = "4.6.6"
     s.date = Time.new.strftime("%Y-%m-%d")
     s.summary =
         "Quickly open CLI search results in your favorite editor!"
@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
     s.add_development_dependency("rake", "~> 12.0", ">= 12.0.0")
     s.add_runtime_dependency("djinni", "~> 2.0", ">= 2.0.2")
     s.add_runtime_dependency("fagin", "~> 1.0", ">= 1.0.0")
-    s.add_runtime_dependency("hilighter", "~> 1.0", ">= 1.0.0")
+    s.add_runtime_dependency("hilighter", "~> 1.1", ">= 1.1.0")
     s.add_runtime_dependency("json_config", "~> 0.1", ">= 0.1.2")
     s.add_runtime_dependency("scoobydoo", "~> 0.1", ">= 0.1.4")
 end

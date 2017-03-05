@@ -141,14 +141,9 @@ class Zoom::Config < JSONConfig
     end
 
     def validate_color(clr)
+        @valid ||= String.colors.keys.concat(String.modes.keys)
         clr.split(".").each do |c|
-            if (
-                String.colors.keys.include?(c.gsub(/^on_/, "")) ||
-                String.modes.keys.include?(c)
-            )
-                next
-            end
-
+            next if (@valid.include?(c.gsub(/^on_/, "")))
             raise Zoom::Error::InvalidColor.new(clr)
         end
     end
