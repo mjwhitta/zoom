@@ -4,9 +4,14 @@ class Zoom::SecurityProfile::UnsafeC < Zoom::SecurityProfile
         when /^ack(-grep)?$/
             f ||= "--smart-case --cc --cpp"
         when "ag", "pt"
-            f ||= "-S -G \"\\.(c|h)(pp)?$\""
+            f ||= "-S -G \"\\.(c(c|pp)?|h(pp)?)$\""
         when "grep"
-            f ||= "-i --include=\"*.[ch]\" --include=\"*.[ch]pp\""
+            f ||= [
+                "-i",
+                "--include=\"*.[ch]\"",
+                "--include=\"*.[ch]pp\"",
+                "--include=\"*.cc\""
+            ].join(" ")
         end
 
         super(n, nil, f, b, a)
