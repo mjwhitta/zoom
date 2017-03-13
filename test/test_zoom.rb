@@ -169,11 +169,11 @@ class ZoomTest < Minitest::Test
         header["profile_name"] = "unsafe_c"
         @zoom.run(header, false)
         results = @zoom.cache.get_results
-        assert_equal(56, results.length)
+        assert_equal(70, results.length)
 
         @zoom.repeat(false)
         results = @zoom.cache.get_results
-        assert_equal(56, results.length)
+        assert_equal(70, results.length)
     end
 
     def test_unsafe_java
@@ -252,7 +252,7 @@ class ZoomTest < Minitest::Test
         header["profile_name"] = "grep"
         @zoom.run(header, false)
         results = @zoom.cache.get_results
-        assert_equal(24, results.length)
+        assert_equal(30, results.length)
 
         header["translate"] = Hash.new
         header["translate"]["word-regexp"] = ""
