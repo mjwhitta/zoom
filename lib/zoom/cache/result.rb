@@ -11,23 +11,32 @@ class Zoom::Cache::Result
 
     def initialize(tag, contents, cache)
         @cache = cache
-        @contents = contents
+        @contents = contents.unpack("C*").pack("U*").gsub(
+            /([\u0080-\u00ff]+)/,
+            "\\1".dump[1..-2]
+        )
         @filename = nil
         @grep_like = false
         @lineno = nil
         @match = nil
         @tag = tag
 
-        @contents.unpack("C*").pack("U*").gsub(
-            /([\u0080-\u00ff]+)/,
-            "\\1".dump[1..-2]
-        ).match(/^([^:]+):(\d+)[:-](.*)/) do |m|
-            next if (m.nil?)
+        case @contents
+        when /^Binary file (.+) matches\.$/
+            @contents.match(/^Binary file (.+) matches\.$/) do |m|
+                next if (m.nil?)
+                @filename = "Binary file"
+                @contents = m[1]
+            end
+        when /^([^:]+):(\d+)[:-](.*)$/
+            @contents.match(/^([^:]+):(\d+)[:-](.*)$/) do |m|
+                next if (m.nil?)
 
-            @grep_like = true
-            @filename = m[1]
-            @lineno = m[2]
-            @match = m[3]
+                @grep_like = true
+                @filename = m[1]
+                @lineno = m[2]
+                @match = m[3]
+            end
         end
     end
 

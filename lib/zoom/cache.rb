@@ -189,6 +189,14 @@ class Zoom::Cache
                     )
                 ].join(" ")
             else
+                if (result.filename)
+                    if (result.filename != curr_filename)
+                        puts if (curr_filename)
+                        puts config.hilight_filename(result.filename)
+                        curr_filename = result.filename
+                    end
+                end
+
                 tag = result.tag
                 line = result.contents
                 puts [config.hilight_tag("[#{tag}]"), line].join(" ")
