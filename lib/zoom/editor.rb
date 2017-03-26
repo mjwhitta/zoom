@@ -105,7 +105,7 @@ class Zoom::Editor
             end
 
             if (result.grep_like?)
-                zq.write("#{pwd}/#{filename}|#{lineno}| #{match}\n")
+                zq.write("#{pwd}/#{filename}:#{lineno}: #{match}\n")
             end
         end
         zs.write("silent cfile #{quickfix}\n")
