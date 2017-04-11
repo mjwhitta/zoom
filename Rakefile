@@ -1,21 +1,22 @@
-require "hilighter"
+require "fileutils"
 require "rake/testtask"
+
+# These are no longer symlinks
+symlinks = ["bin/zc", "bin/zf", "bin/zg", "bin/zl", "bin/zr"]
 
 task :default => :gem
 
 desc "Clean up"
 task :clean do
-    system("rm -f *.gem Gemfile.lock")
+    system("rm -f *.gem Gemfile.lock #{symlinks.join(" ")}")
     system("chmod -R go-rwx bin lib")
-end
-
-desc "Show colors from hilighter"
-task :colors do
-    Hilighter.sample
 end
 
 desc "Build gem"
 task :gem do
+    symlinks.each do |symlink|
+        FileUtils.cp("bin/z", symlink)
+    end
     system("chmod -R u=rwX,go=rX bin lib")
     system("gem build -V *.gemspec")
 end
