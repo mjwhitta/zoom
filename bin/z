@@ -99,7 +99,7 @@ def parse(args)
 
         opts.on(
             "--pattern-file=FILE",
-            "Read patterns from a file. One per line. Treated as OR."
+            "Read patterns from file. One per line. Treated as OR."
         ) do |file|
             patterns = File.open(file).read.split(/[\n\r]+/)
             options["pattern"] = "(#{patterns.join(")|(")})"
