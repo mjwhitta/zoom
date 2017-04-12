@@ -97,6 +97,14 @@ def parse(args)
             options["action"] = "list_profiles"
         end
 
+        opts.on(
+            "--pattern-file=FILE",
+            "Read patterns from a file. One per line. Treated as OR."
+        ) do |file|
+            patterns = File.open(file).read.split(/[\n\r]+/)
+            options["pattern"] = "(#{patterns.join(")|(")})"
+        end
+
         opts.on("-r", "--repeat", "Repeat last Zoom command") do
             options["action"] = "repeat"
         end
@@ -234,7 +242,11 @@ def parse(args)
         options["paths"] = "."
     end
 
-    options["pattern"] = path
+    if (options["pattern"])
+        args.insert(0, path)
+    else
+        options["pattern"] = path
+    end
     options["pass_args"] = args.join(" ")
 
     return options
