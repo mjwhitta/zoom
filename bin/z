@@ -42,8 +42,8 @@ def parse(args)
         opts.summary_width = 25
 
         opts.banner = [
-            "Usage: #{File.basename($0)} [OPTIONS] [pattern]",
-            "[path1]...[pathN]"
+            "Usage: #{File.basename($0)} [OPTIONS]",
+            "[passthru options] [pattern] [path1]...[pathN]"
         ].join(" ")
 
         opts.on("", "DESCRIPTION")
@@ -230,10 +230,10 @@ def parse(args)
     end
 
     paths = Array.new
-    path = args.delete_at(-1)
-    while (path && Pathname.new(path).exist?)
-        paths.push(path)
-        path = args.delete_at(-1)
+    pattern = args.delete_at(-1)
+    while (pattern && Pathname.new(pattern).exist?)
+        paths.push(pattern)
+        pattern = args.delete_at(-1)
     end
 
     if (!paths.empty?)
@@ -243,9 +243,9 @@ def parse(args)
     end
 
     if (options["pattern"])
-        args.insert(0, path)
+        args.push(pattern)
     else
-        options["pattern"] = path
+        options["pattern"] = pattern
     end
     options["pass_args"] = args.join(" ")
 
