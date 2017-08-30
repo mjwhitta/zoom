@@ -3,9 +3,11 @@ require "scoobydoo"
 require "shellwords"
 
 class Zoom::Profile < Hash
-    attr_reader :format_flags
-    attr_reader :pattern
-    attr_reader :taggable
+    attr_accessor :exts
+    attr_accessor :files
+    attr_accessor :format_flags
+    attr_accessor :regex
+    attr_accessor :taggable
 
     def after(a = nil)
         self["after"] = a.strip if (a)
@@ -35,30 +37,26 @@ class Zoom::Profile < Hash
 
     def exe(header)
         # Emulate grep
-        case operator.split("/")[-1]
-        when "find"
-            cmd = [
-                before,
-                operator,
-                header["paths"],
-                flags,
-                header["args"],
-                header["pattern"],
-                after
-            ].join(" ").strip
+        cmd = [
+            before,
+            tool,
+            @format_flags,
+            flags,
+            only_exts_and_files,
+            header["translated"],
+            header["args"],
+            "--",
+            header["regex"].shellescape,
+            header["paths"],
+            after
+        ].join(" ").strip
+
+        if (header.has_key?("debug") && header["debug"])
+            puts cmd
+            return ""
         else
-            cmd = [
-                before,
-                operator,
-                @format_flags,
-                flags,
-                header["args"],
-                header["pattern"].shellescape,
-                header["paths"],
-                after
-            ].join(" ").strip
+            return %x(#{cmd})
         end
-        return %x(#{cmd})
     end
 
     def flags(f = nil)
@@ -71,7 +69,7 @@ class Zoom::Profile < Hash
         begin
             return profile_by_name(json["class"]).new(
                 json["name"],
-                json["operator"].nil? ? "" : json["operator"],
+                json["tool"].nil? ? "" : json["tool"],
                 json["flags"].nil? ? "" : json["flags"],
                 json["before"].nil? ? "" : json["before"],
                 json["after"].nil? ? "" : json["after"]
@@ -83,8 +81,9 @@ class Zoom::Profile < Hash
         end
     end
 
-    def go(editor, results)
-        Zoom::Editor.new(editor).open(results)
+    def grep_like_format_flags(all = false)
+        @format_flags = "" # Set this to mirror basic grep
+        @taggable = false # Should results be tagged like grep
     end
 
     def hilight_after(str)
@@ -117,34 +116,41 @@ class Zoom::Profile < Hash
     end
     private :hilight_name
 
-    def hilight_operator(str)
-        return str if (!Zoom.hilight?)
-        return str.green
-    end
-    private :hilight_operator
-
-    def hilight_pattern(str)
+    def hilight_regex(str)
         return str if (!Zoom.hilight?)
         return str
     end
-    private :hilight_pattern
+    private :hilight_regex
 
-    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
+    def hilight_tool(str)
+        return str if (!Zoom.hilight?)
+        return str.green
+    end
+    private :hilight_tool
+
+    def initialize(n = nil, t = nil, f = nil, b = nil, a = nil)
         a ||= ""
         b ||= ""
         f ||= ""
         n ||= camel_case_to_underscore(self.class.to_s)
-        o ||= "echo"
+        t ||= "echo"
 
         self["class"] = self.class.to_s
         after(a)
         before(b)
         flags(f)
         name(n)
-        operator(o)
+        tool(t)
 
-        @pattern = "" # Setting this will override user input
+        @exts = Array.new # Set this to only search specified exts
+        @files = Array.new # Set this to noly search specified files
+        @regex = "" # Setting this will override user input
+
+        # In case someone overrides grep_like_format_flags
+        @format_flags = ""
         @taggable = false
+
+        grep_like_format_flags
     end
 
     def name(n = nil)
@@ -153,56 +159,12 @@ class Zoom::Profile < Hash
         return self["name"]
     end
 
-    def operator(o = nil)
-        if (o)
-            o.strip!
-            op = ScoobyDoo.where_are_you(o)
-            raise Zoom::Error::ExecutableNotFound.new(o) if (op.nil?)
-            self["operator"] = o
-        end
-        return self["operator"]
+    def only_exts_and_files
+        # Do nothing
+        return ""
     end
 
     def preprocess(header)
-        # Use hard-coded pattern if defined
-        if (
-            @pattern &&
-            !@pattern.empty? &&
-            (header["pattern"] != @pattern)
-        )
-            header["args"] += " #{header["pattern"]}"
-            header["pattern"] = @pattern
-        end
-
-        case operator.split("/")[-1]
-        when /^ack(-grep)?$/, "ag", "grep", "pt"
-            paths = header["paths"].split(" ")
-            if (header["pattern"].empty? && !paths.empty?)
-                header["pattern"] = paths.delete_at(0)
-                header["paths"] = paths.join(" ").strip
-                header["paths"] = "." if (header["paths"].empty?)
-            end
-
-            # This isn't done here anymore as it'll break hilighting
-            # header["pattern"] = header["pattern"].shellescape
-        when "find"
-            # If additional args are passed, then assume pattern is
-            # actually an arg
-            if (header["args"] && !header["args"].empty?)
-                header["args"] += " #{header["pattern"]}"
-                header["pattern"] = ""
-            end
-
-            # If pattern was provided then assume it's an iname search
-            if (header["pattern"] && !header["pattern"].empty?)
-                header["pattern"] = "-iname \"#{header["pattern"]}\""
-            end
-        end
-
-        # Translate any needed flags
-        header["args"] += " #{translate(header["translate"])}"
-        header["args"].strip!
-
         return header
     end
 
@@ -216,7 +178,7 @@ class Zoom::Profile < Hash
         ObjectSpace.each_object(Class).select do |clas|
             if (clas < self)
                 begin
-                    clas.new(clas.to_s)
+                    clas.new
                     true
                 rescue Zoom::Error::ExecutableNotFound
                     false
@@ -232,15 +194,25 @@ class Zoom::Profile < Hash
         ret.push(hilight_name)
         ret.push("#{hilight_class}\n")
         ret.push(hilight_before(before)) if (!before.empty?)
-        ret.push(hilight_operator(operator)) if (!operator.empty?)
+        ret.push(hilight_tool(tool)) if (!tool.empty?)
         ret.push(hilight_flags(flags)) if (!flags.empty?)
-        if (@pattern.nil? || @pattern.empty?)
-            ret.push(hilight_pattern("PATTERN"))
+        if (@regex.nil? || @regex.empty?)
+            ret.push(hilight_regex("REGEX"))
         else
-            ret.push(hilight_pattern("\"#{@pattern}\""))
+            ret.push(hilight_regex("\"#{@regex}\""))
         end
         ret.push(hilight_after(after)) if (!after.empty?)
         return ret.join(" ").strip
+    end
+
+    def tool(t = nil)
+        if (t)
+            t.strip!
+            tl = ScoobyDoo.where_are_you(t)
+            raise Zoom::Error::ExecutableNotFound.new(t) if (tl.nil?)
+            self["tool"] = t
+        end
+        return self["tool"]
     end
 
     def translate(from)

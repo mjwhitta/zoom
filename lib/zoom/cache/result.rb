@@ -28,12 +28,12 @@ class Zoom::Cache::Result
                 @filename = "Binary file"
                 @contents = m[1]
             end
-        when /^([^:]+):(\d+)[:-](.*)$/
-            @contents.match(/^([^:]+):(\d+)[:-](.*)$/) do |m|
+        when /^([^:]+)[:-](\d+)[:-](.*)$/
+            @contents.match(/^([^:]+)[:-](\d+)[:-](.*)$/) do |m|
                 next if (m.nil?)
 
                 @grep_like = true
-                @filename = m[1]
+                @filename = m[1].gsub(/^\.\//, "")
                 @lineno = m[2]
                 @match = m[3]
             end

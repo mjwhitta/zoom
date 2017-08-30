@@ -26,7 +26,7 @@ class EditWish < Djinni::Wish
         f, found, v = args.partition(" ")
 
         case f
-        when "class", "operator"
+        when "class", "tool"
             if (found.empty?)
                 usage
                 return
@@ -51,8 +51,8 @@ class EditWish < Djinni::Wish
             profiles[n] = profile
         when "flags"
             profile.flags(v)
-        when "operator"
-            profile.operator(v)
+        when "tool"
+            profile.tool(v)
         else
             usage
             return
@@ -71,7 +71,7 @@ class EditWish < Djinni::Wish
             "before" => "Prepend any ENV vars",
             "class" => "Modify the class",
             "flags" => "Specify any additional flags",
-            "operator" => "Specify an alternative operator"
+            "tool" => "Specify an alternative tool"
         }
     end
 

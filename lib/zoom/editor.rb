@@ -42,7 +42,7 @@ class Zoom::Editor
     private :default
 
     def initialize(editor)
-        @editor = editor
+        @editor, _, @flags = editor.partition(" ")
     end
 
     def open(results)
@@ -61,11 +61,13 @@ class Zoom::Editor
             filename = result.filename
             lineno = result.lineno
             pwd = result.pwd
-            system("#{@editor} +#{lineno} '#{pwd}/#{filename}'")
+            system(
+                "#{@editor} #{@flags} +#{lineno} '#{pwd}/#{filename}'"
+            )
         else
             filename = result.contents
             pwd = result.pwd
-            system("#{@editor} '#{pwd}/#{filename}'")
+            system("#{@editor} #{@flags} '#{pwd}/#{filename}'")
         end
     end
     private :open_result
@@ -113,7 +115,9 @@ class Zoom::Editor
         zq.close
         zs.close
 
-        system("#{@editor} -S #{source} '#{files.join("' '")}'")
+        system(
+            "#{@editor} #{@flags} -S #{source} '#{files.join("' '")}'"
+        )
 
         FileUtils.rm_f(quickfix)
         FileUtils.rm_f(source)

@@ -1,29 +1,21 @@
 class Zoom::SecurityProfile::UnsafePython < Zoom::SecurityProfile
-    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
-        case Zoom::ProfileManager.default_profile
-        when /^ack(-grep)?$/
-            f ||= "--smart-case --python"
-        when "ag", "pt"
-            f ||= "-S -G \"\\.py$\""
-        when "grep"
-            f ||= "-i --include=\"*.py\""
-        end
+    def initialize(n = nil, t = nil, f = nil, b = nil, a = nil)
+        t = Zoom::ProfileManager.default_tool
 
-        super(n, nil, f, b, a)
-        @pattern = [
-            "(^|[^\\nA-Za-z_])",
-            "(",
-            [
-                "c?[Pp]ickle\\.loads?",
-                "eval",
-                "exec",
-                "os\\.(popen|system)",
-                "subprocess\\.call",
-                "yaml\\.load"
-            ].join("|"),
-            ")",
-            "\\("
+        super(n, t, f, b, a)
+        @exts = ["py"]
+        functions = [
+            "c?[Pp]ickle\\.loads?",
+            "eval",
+            "exec",
+            "os\\.(popen|system)",
+            "subprocess\\.call",
+            "yaml\\.load"
+        ]
+        start_or_not_variable = "(^|[^\\nA-Za-z_])"
+        @regex = [
+            start_or_not_variable,
+            "(#{functions.join("|")})\\(",
         ].join
-        @taggable = true
     end
 end

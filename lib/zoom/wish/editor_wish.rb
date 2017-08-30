@@ -1,5 +1,4 @@
 require "djinni"
-require "scoobydoo"
 
 class EditorWish < Djinni::Wish
     def aliases
@@ -11,17 +10,12 @@ class EditorWish < Djinni::Wish
     end
 
     def execute(args, djinni_env = {})
-        if (args.include?(" "))
+        if (args.empty?)
             usage
             return
         end
 
-        config = djinni_env["config"]
-        if (ScoobyDoo.where_are_you(args))
-            config.editor(args)
-        else
-            puts "Editor not found: #{args}"
-        end
+        djinni_env["config"].editor(args)
     end
 
     def usage

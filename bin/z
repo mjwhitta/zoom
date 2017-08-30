@@ -20,39 +20,69 @@ def parse(args)
     options = Hash.new
     options["action"] = "exec"
     options["cache_file"] = nil
+    options["debug"] = false
+    options["passthru"] = ""
+    options["tool"] = nil
     options["translate_flags"] = Hash.new
     options["use"] = nil
     options["verbose"] = false
 
     info = [
-        "Do you like to search through code using ag, ack, grep, or",
-        "pt? Good! This tool is for you! Zoom adds some convenience",
-        "to ag/ack/grep/pt by allowing you to quickly open your",
-        "search results in your editor of choice. When looking at",
-        "large code-bases, it can be a pain to have to scroll to",
-        "find the filename of each result. Zoom prints a tag number",
-        "in front of each result that ag/ack/grep/pt outputs. Then",
-        "you can quickly open that tag number with Zoom to jump",
+        "Do you like to search through code using ag, ack, grep, pt,",
+        "or rg? Good! This tool is for you! Zoom adds some",
+        "convenience to grep-like search tools by allowing you to",
+        "quickly open your search results in your editor of choice.",
+        "When looking at large code-bases, it can be a pain to have",
+        "to scroll to find the filename of each result. Zoom prints",
+        "a tag number in front of each result that grep outputs.",
+        "Then you can quickly open that tag number with Zoom to jump",
         "straight to the source. Zoom is even persistent across all",
         "your sessions! You can search in one terminal and jump to a",
         "tag in another terminal from any directory!"
     ].join(" ")
 
+    passthru = Array.new
+
     parser = OptionParser.new do |opts|
         opts.summary_width = 25
 
         opts.banner = [
-            "Usage: #{File.basename($0)} [OPTIONS]",
-            "[passthru options] [pattern] [path1]...[pathN]"
+            "Usage: #{File.basename($0)} [OPTIONS] --",
+            "[passthru options] [regex] [path1]...[pathN]"
         ].join(" ")
 
         opts.on("", "DESCRIPTION")
 
-        info.scan(/\S.{0,76}\S(?=\s|$)|\S+/).each do |line|
+        info.scan(/\S.{0,66}\S(?=\s|$)|\S+/).each do |line|
             opts.on("    #{line}")
         end
 
         opts.on("", "OPTIONS")
+
+        opts.on(
+            "-A",
+            "--after-context=NUM",
+            "Show NUM lines after each match"
+        ) do |num|
+            passthru.push("-A #{num}")
+        end
+
+        opts.on(
+            "-a",
+            "--all",
+            "Search all files (including binaries and VCS",
+            "ignored files)"
+        ) do
+            options["translate_flags"]["all"] = ""
+        end
+
+        opts.on(
+            "-B",
+            "--before-context=NUM",
+            "Show NUM lines before each match"
+        ) do |num|
+            passthru.push("-B #{num}")
+        end
 
         opts.on("-c", "--cache", "Show previous results") do
             options["action"] = "cache"
@@ -66,8 +96,36 @@ def parse(args)
             options["cache_file"] = file
         end
 
+        opts.on(
+            "-C",
+            "--context=NUM",
+            "Show NUM lines before and after each match"
+        ) do |num|
+            passthru.push("-C #{num}")
+        end
+
+        opts.on(
+            "-d",
+            "--debug",
+            "Show command that would be run (but don't run)"
+        ) do
+            options["debug"] = true
+        end
+
+        opts.on("-f", "--follow", "Follow symlinks") do
+            options["translate_flags"]["follow"] = ""
+        end
+
         opts.on("--find", "Use built-in find profile") do
             options["use"] = "find"
+        end
+
+        opts.on(
+            "--force-tool=TOOL",
+            "Use the specified tool (with applicable",
+            "profiles)"
+        ) do |tool|
+            options["tool"] = tool
         end
 
         opts.on(
@@ -86,11 +144,11 @@ def parse(args)
 
         opts.on(
             "-i",
-            "--ignore=PATTERN",
-            "Ignore files/directories matching PATTERN"
-        ) do |pattern|
+            "--ignore=GLOB",
+            "Ignore files/directories matching GLOB"
+        ) do |regex|
             options["translate_flags"]["ignore"] ||= Array.new
-            options["translate_flags"]["ignore"].push(pattern)
+            options["translate_flags"]["ignore"].push(regex)
         end
 
         opts.on("-l", "--list", "List profiles") do
@@ -98,11 +156,12 @@ def parse(args)
         end
 
         opts.on(
-            "--pattern-file=FILE",
-            "Read patterns from file. One per line. Treated as OR."
+            "--regex-file=FILE",
+            "Read regexes from lines of file (treated as",
+            "OR)"
         ) do |file|
-            patterns = File.open(file).read.split(/[\n\r]+/)
-            options["pattern"] = "(#{patterns.join(")|(")})"
+            regexes = File.open(file).read.split(/[\n\r]+/)
+            options["regex"] = "(#{regexes.join(")|(")})"
         end
 
         opts.on("-r", "--repeat", "Repeat last Zoom command") do
@@ -170,23 +229,29 @@ def parse(args)
         end
 
         opts.on("--version", "Show version") do
-            options["action"] = "version"
+            __FILE__.match(/ruby-zoom-(\d+\.\d+\.\d+)/) do |m|
+                puts m[1]
+            end
+            exit ZoomExit::GOOD
         end
 
         opts.on(
             "",
             "EXAMPLES",
             "    Execute default profile:",
-            "    $ z PATTERN",
+            "    $ z REGEX",
             "",
             "    Execute specified profile:",
-            "    $ z -u grep PATTERN",
+            "    $ z -u grep REGEX",
             "",
-            "    Pass additional flags to default profile:",
-            "    $ z -- -A 3 PATTERN",
+            "    Pass additional flags to grep profile:",
+            "    $ z -u grep -- --line-regexp REGEX",
             "",
-            "    Open tags:",
-            "    $ zg 10,20,30-40"
+            "    Ignore .class files and test related files",
+            "    $ z -i \"*.class\" -i \"*test*\" REGEX",
+            "",
+            "    Open specified tags:",
+            "    $ z --go 10,20,30-40"
         )
     end
 
@@ -230,24 +295,23 @@ def parse(args)
     end
 
     paths = Array.new
-    pattern = args.delete_at(-1)
-    while (pattern && Pathname.new(pattern).exist?)
-        paths.push(pattern)
-        pattern = args.delete_at(-1)
+    regex = args.delete_at(-1)
+    while (regex && Pathname.new(regex).exist?)
+        paths.push(regex)
+        regex = args.delete_at(-1)
     end
 
-    if (!paths.empty?)
-        options["paths"] = paths.reverse.join(" ")
+    if (options["regex"])
+        args.push(regex) if (regex)
     else
-        options["paths"] = "."
+        regex ||= paths.delete_at(-1)
+        options["regex"] = regex
     end
 
-    if (options["pattern"])
-        args.push(pattern)
-    else
-        options["pattern"] = pattern
-    end
-    options["pass_args"] = args.join(" ")
+    options["paths"] = "."
+    options["paths"] = paths.reverse.join(" ") if (!paths.empty?)
+
+    options["passthru"] = "#{passthru.join(" ")} #{args.join(" ")}"
 
     return options
 end
@@ -259,6 +323,7 @@ begin
         FileUtils.rm_f(Pathname.new("~/.zoomrc").expand_path)
     end
 
+    Zoom::ProfileManager.force_tool(options["tool"])
     zoom = Zoom.new(options["cache_file"])
     Zoom.hilight(!Hilighter.disable?)
 
@@ -291,8 +356,7 @@ begin
             a.downcase <=> b.downcase
         end.each do |name|
             if (name == zoom.config.current_profile_name)
-                print "*".red if (Zoom.hilight?)
-                print "*" if (!Zoom.hilight?)
+                print "*".red
             end
 
             lines = profiles[name].to_s.scan(
@@ -314,16 +378,9 @@ begin
         zoom.cache.clear
     when "secprofs"
         zoom.config.add_security_profiles
-    when "version"
-        __FILE__.match(/ruby-zoom-(\d+\.\d+\.\d+)/) do |m|
-            puts m[1]
-        end
     when "which"
         name = zoom.config.current_profile_name
         profile = zoom.config.get_profiles[name]
-
-        print "*".red if (Zoom.hilight?)
-        print "*" if (!Zoom.hilight?)
 
         lines = profile.to_s.scan(/\S.{0,76}\S(?=\s|$)|\S+/)
         puts lines.delete_at(0)
@@ -333,10 +390,11 @@ begin
     else
         # Search and cache results
         header = Hash.new
-        header["args"] = options["pass_args"]
+        header["args"] = options["passthru"]
+        header["debug"] = options["debug"]
         header["paths"] = options["paths"]
-        header["pattern"] = options["pattern"]
         header["profile_name"] = options["use"]
+        header["regex"] = options["regex"]
         header["translate"] = options["translate_flags"]
         zoom.run(header)
     end

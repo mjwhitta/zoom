@@ -49,7 +49,7 @@ class Zoom::Config < JSONConfig
     end
 
     def default_config
-        default = Zoom::ProfileManager.default_profile
+        default = Zoom::ProfileManager.default_tool
         profiles = Zoom::ProfileManager.default_profiles
 
         clear
@@ -64,20 +64,29 @@ class Zoom::Config < JSONConfig
     end
 
     def editor(ed = nil)
-        if (ed)
-            e = ScoobyDoo.where_are_you(ed)
-            raise Zoom::Error::ExecutableNotFound.new(ed) if (e.nil?)
+        if (ed && !ed.empty?)
+            e = ed.split(" ")[0]
+            if (ScoobyDoo.where_are_you(e).nil?)
+                raise Zoom::Error::ExecutableNotFound.new(e)
+            end
             set("editor", ed)
         end
 
         e = get("editor")
         e = ENV["EDITOR"] if (e.nil? || e.empty?)
         e = "vim" if (e.nil? || e.empty?)
+
+        e, _, f = e.partition(" ")
         e = ScoobyDoo.where_are_you(e)
-        e = ScoobyDoo.where_are_you("vi") if (e.nil?)
+
+        if (e.nil?)
+            e = ScoobyDoo.where_are_you("vi")
+            f = ""
+        end
+
         raise Zoom::Error::ExecutableNotFound.new("vi") if (e.nil?)
 
-        return e
+        return "#{e} #{f}".strip
     end
 
     def has_profile?(name)

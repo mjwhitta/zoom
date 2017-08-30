@@ -1,35 +1,37 @@
 class Zoom::SecurityProfile::UnsafeC < Zoom::SecurityProfile
-    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
-        case Zoom::ProfileManager.default_profile
-        when /^ack(-grep)?$/
-            f ||= "--smart-case --cc --cpp"
-        when "ag", "pt"
-            f ||= "-S -G \"\\.(c(c|pp)?|h(pp)?)$\""
-        when "grep"
-            f ||= [
-                "-i",
-                "--include=\"*.[ch]\"",
-                "--include=\"*.[ch]pp\"",
-                "--include=\"*.cc\""
-            ].join(" ")
-        end
+    def initialize(n = nil, t = nil, f = nil, b = nil, a = nil)
+        t = Zoom::ProfileManager.default_tool
 
-        super(n, nil, f, b, a)
-        @pattern = [
-            "(^|[^\\nA-Za-z_])",
-            "(",
-            [
-                "_splitpath",
-                "ato[fil]",
-                "gets",
-                "makepath",
-                "(sn?)?scanf",
-                "str(cat|cpy|len)",
-                "v?sprintf"
-            ].join("|"),
-            ")",
-            "\\("
+        super(n, t, f, b, a)
+        @exts = [
+            "C",
+            "c",
+            "cc",
+            "cpp",
+            "cxx",
+            "H",
+            "h",
+            "hh",
+            "hpp",
+            "hxx",
+            "m",
+            "tpp",
+            "xs"
+        ]
+        functions = [
+            "_splitpath",
+            "ato[fil]",
+            "gets",
+            "makepath",
+            "popen",
+            "(sn?)?scanf",
+            "str(cat|cpy|len)",
+            "v?sprintf"
+        ]
+        start_or_not_variable = "(^|[^\\nA-Za-z_])"
+        @regex = [
+            start_or_not_variable,
+            "(#{functions.join("|")})\\(",
         ].join
-        @taggable = true
     end
 end

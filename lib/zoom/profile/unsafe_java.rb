@@ -1,32 +1,19 @@
 class Zoom::SecurityProfile::UnsafeJava < Zoom::SecurityProfile
-    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
-        case Zoom::ProfileManager.default_profile
-        when /^ack(-grep)?$/
-            f ||= "--smart-case --java"
-        when "ag", "pt"
-            f ||= "-S -G \"\\.(java|properties)$\""
-        when "grep"
-            f ||= [
-                "-i",
-                "--include=\"*.java\"",
-                "--include=\"*.properties\""
-            ].join(" ")
-        end
+    def initialize(n = nil, t = nil, f = nil, b = nil, a = nil)
+        t = Zoom::ProfileManager.default_tool
 
-        super(n, nil, f, b, a)
-        @pattern = [
-            "(sun\\.misc\\.)?Unsafe",
-            "|",
-            "(",
-            [
-                "\\.exec",
-                "\\.getRuntime",
-                "readObject",
-                "Runtime"
-            ].join("|"),
-            ")",
-            "\\("
-        ].join
-        @taggable = true
+        super(n, t, f, b, a)
+        @exts = ["java", "properties"]
+        functions = [
+            "\\.exec",
+            "\\.getRuntime",
+            "readObject",
+            "Runtime"
+        ]
+        imports = "(sun\\.misc\\.)?Unsafe"
+        @regex = [
+            imports,
+            "(#{functions.join("|")})\\(",
+        ].join("|")
     end
 end

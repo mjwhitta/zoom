@@ -1,22 +1,33 @@
-class Zoom::Profile::Pt < Zoom::Profile
+class Zoom::Profile::Rg < Zoom::Profile
     def grep_like_format_flags(all = false)
         super
-        @format_flags = "-e --nocolor --nogroup --numbers"
-        @format_flags = "#{@format_flags} --hidden -U" if (all)
+        @format_flags = [
+            "--color never",
+            "-H",
+            "-n",
+            "--no-heading",
+            "--no-messages"
+        ].join(" ")
+        @format_flags = "#{@format_flags} -uuu" if (all)
         @taggable = true
     end
 
     def initialize(n = nil, t = nil, f = nil, b = nil, a = nil)
         f ||= "-S"
-        t ||= "pt"
+        t ||= "rg"
         super(n, t, f, b, a)
     end
 
     def only_exts_and_files
-        if (!@exts.empty? || !@files.empty?)
-            return "-G \"\.(#{@exts.join("|")})$|#{@files.join("|")}\""
+        f = Array.new
+        @exts.each do |ext|
+            f.push("--type-add \"zoom:*.#{ext}\"")
         end
-        return ""
+        @files.each do |file|
+            f.push("--type-add \"zoom:#{file}\"")
+        end
+        f.push("-t zoom") if (!@exts.empty? || !@files.empty?)
+        return f.join(" ")
     end
 
     def translate(from)
@@ -29,7 +40,7 @@ class Zoom::Profile::Pt < Zoom::Profile
                 to.push("--follow")
             when "ignore"
                 value.each do |v|
-                    to.push("--ignore=#{v}")
+                    to.push("--iglob=\"!#{v}\"")
                 end
             when "word-regexp"
                 to.push("-w")

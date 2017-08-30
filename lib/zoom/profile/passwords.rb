@@ -1,16 +1,8 @@
 class Zoom::SecurityProfile::Passwords < Zoom::SecurityProfile
-    def initialize(n = nil, o = nil, f = nil, b = nil, a = nil)
-        case Zoom::ProfileManager.default_profile
-        when /^ack(-grep)?$/
-            f ||= "--smart-case"
-        when "ag", "pt"
-            f ||= "-SU --hidden"
-        when "grep"
-            f ||= "-ai"
-        end
-
-        super(n, nil, f, b, a)
-        @pattern = "(key|pa?ss(w(o?r)?d)?)[^:=,>]? *[:=,>]"
-        @taggable = true
+    def initialize(n = nil, t = nil, f = nil, b = nil, a = nil)
+        super(n, t, f, b, a)
+        # Don't search binary files
+        # grep_like_format_flags(true)
+        @regex = "(key|pa?ss(w(o?r)?d)?)[^:=,>]? *[:=,>]"
     end
 end

@@ -6,58 +6,18 @@ class ZoomTest < Minitest::Test
     def setup
         @zoom = Zoom.new("/tmp/zoom_cache", "/tmp/zoomrc")
         @zoom.config.add_security_profiles
+        @tools = @zoom.config.get_profile_names.select do |tool|
+            case tool
+            when "ack", "ag", "grep", "pt", "rg"
+                true
+            else
+                false
+            end
+        end
     end
 
     def teardown
         system("rm -f /tmp/zoom_cache /tmp/zoomrc")
-    end
-
-    def test_ack
-        if (!@zoom.config.has_profile?("ack"))
-            skip "Ack profile not found"
-        end
-
-        header = Hash.new
-        header["paths"] = "test/test_src/ack_ag_find_grep_pt"
-        header["pattern"] = "eval"
-        header["profile_name"] = "ack"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(8, results.length)
-
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(8, results.length)
-
-        header["translate"] = Hash.new
-        header["translate"]["ignore"] = [".*php.*"]
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(3, results.length)
-    end
-
-    def test_ag
-        if (!@zoom.config.has_profile?("ag"))
-            skip "Ag profile not found"
-        end
-
-        header = Hash.new
-        header["paths"] = "test/test_src/ack_ag_find_grep_pt"
-        header["pattern"] = "eval"
-        header["profile_name"] = "ag"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(8, results.length)
-
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(8, results.length)
-
-        header["translate"] = Hash.new
-        header["translate"]["ignore"] = ["*php*"]
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(3, results.length)
     end
 
     def test_find
@@ -66,203 +26,224 @@ class ZoomTest < Minitest::Test
         end
 
         header = Hash.new
-        header["paths"] = "test/test_src/ack_ag_find_grep_pt"
-        header["pattern"] = "*php*"
+        header["paths"] = "test/test_src"
+        header["regex"] = "*php*"
         header["profile_name"] = "find"
+
+        @zoom.run(header, false)
+        results = @zoom.cache.get_results
+        assert_equal(11, results.length)
+
+        @zoom.repeat(false)
+        results = @zoom.cache.get_results
+        assert_equal(11, results.length)
+
+        header["translate"] = Hash.new
+        header["translate"]["ignore"] = ["unsafe_php"]
+
         @zoom.run(header, false)
         results = @zoom.cache.get_results
         assert_equal(5, results.length)
 
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(5, results.length)
+        header["args"] = "-type"
+        header["paths"] = "test/test_src/tools"
+        header["regex"] = "f"
+        header["translate"] = Hash.new
 
-        header["args"] = "-type f"
-        header["pattern"] = ""
         @zoom.run(header, false)
         results = @zoom.cache.get_results
         assert_equal(14, results.length)
     end
 
-    def test_grep
-        if (!@zoom.config.has_profile?("grep"))
-            skip "Grep profile not found"
-        end
-
-        header = Hash.new
-        header["paths"] = "test/test_src/ack_ag_find_grep_pt"
-        header["pattern"] = "eval"
-        header["profile_name"] = "grep"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(8, results.length)
-
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(8, results.length)
-
-        header["translate"] = Hash.new
-        header["translate"]["ignore"] = ["*php*"]
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(3, results.length)
-    end
-
     def test_multiple_matches
-        if (!@zoom.config.has_profile?("grep"))
-            skip "Grep profile not found"
+        @tools.each do |tool|
+            header = Hash.new
+            header["paths"] = "test/test_src/multiple_matches"
+            header["regex"] = "(as)(df)"
+            header["profile_name"] = tool
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.3", "#{tool}.#{results.length}")
+
+            @zoom.repeat(false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.3", "#{tool}.#{results.length}")
         end
-
-        header = Hash.new
-        header["paths"] = "test/test_src/multiple_matches"
-        header["pattern"] = "(as)(df)"
-        header["profile_name"] = "grep"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(3, results.length)
-
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(3, results.length)
     end
 
     def test_passwords
-        header = Hash.new
-        header["paths"] = "test/test_src/passwords"
-        header["profile_name"] = "passwords"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(36, results.length)
+        @tools.each do |tool|
+            Zoom::ProfileManager.force_tool(tool)
 
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(36, results.length)
+            header = Hash.new
+            header["paths"] = "test/test_src/passwords"
+            header["profile_name"] = "passwords"
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.36", "#{tool}.#{results.length}")
+
+            @zoom.repeat(false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.36", "#{tool}.#{results.length}")
+        end
     end
 
-    def test_pt
-        if (!@zoom.config.has_profile?("pt"))
-            skip "Pt profile not found"
+    def test_search_tools
+        @tools.each do |tool|
+            header = Hash.new
+            header["paths"] = "test/test_src/tools"
+            header["regex"] = "eval"
+            header["profile_name"] = tool
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.8", "#{tool}.#{results.length}")
+
+            @zoom.repeat(false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.8", "#{tool}.#{results.length}")
+
+            header["translate"] = Hash.new
+            header["translate"]["ignore"] = ["*.php*"]
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.3", "#{tool}.#{results.length}")
         end
-
-        header = Hash.new
-        header["paths"] = "test/test_src/ack_ag_find_grep_pt"
-        header["pattern"] = "eval"
-        header["profile_name"] = "pt"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(8, results.length)
-
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(8, results.length)
-
-        header["translate"] = Hash.new
-        header["translate"]["ignore"] = ["*php*"]
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(3, results.length)
     end
 
     def test_unsafe_c
-        header = Hash.new
-        header["paths"] = "test/test_src/unsafe_c"
-        header["profile_name"] = "unsafe_c"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(70, results.length)
+        @tools.each do |tool|
+            Zoom::ProfileManager.force_tool(tool)
 
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(70, results.length)
+            header = Hash.new
+            header["paths"] = "test/test_src/unsafe_c"
+            header["profile_name"] = "unsafe_c"
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.195", "#{tool}.#{results.length}")
+
+            @zoom.repeat(false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.195", "#{tool}.#{results.length}")
+        end
     end
 
     def test_unsafe_java
-        header = Hash.new
-        header["paths"] = "test/test_src/unsafe_java"
-        header["profile_name"] = "unsafe_java"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(10, results.length)
+        @tools.each do |tool|
+            Zoom::ProfileManager.force_tool(tool)
 
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(10, results.length)
+            header = Hash.new
+            header["paths"] = "test/test_src/unsafe_java"
+            header["profile_name"] = "unsafe_java"
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.10", "#{tool}.#{results.length}")
+
+            @zoom.repeat(false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.10", "#{tool}.#{results.length}")
+        end
     end
 
     def test_unsafe_js
-        header = Hash.new
-        header["paths"] = "test/test_src/unsafe_js"
-        header["profile_name"] = "unsafe_js"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(4, results.length)
+        @tools.each do |tool|
+            Zoom::ProfileManager.force_tool(tool)
 
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(4, results.length)
+            header = Hash.new
+            header["paths"] = "test/test_src/unsafe_js"
+            header["profile_name"] = "unsafe_js"
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.12", "#{tool}.#{results.length}")
+
+            @zoom.repeat(false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.12", "#{tool}.#{results.length}")
+        end
     end
 
     def test_unsafe_php
-        header = Hash.new
-        header["paths"] = "test/test_src/unsafe_php"
-        header["profile_name"] = "unsafe_php"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(336, results.length)
+        @tools.each do |tool|
+            Zoom::ProfileManager.force_tool(tool)
 
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(336, results.length)
+            header = Hash.new
+            header["paths"] = "test/test_src/unsafe_php"
+            header["profile_name"] = "unsafe_php"
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.336", "#{tool}.#{results.length}")
+
+            @zoom.repeat(false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.336", "#{tool}.#{results.length}")
+        end
     end
 
     def test_unsafe_python
-        header = Hash.new
-        header["paths"] = "test/test_src/unsafe_python"
-        header["profile_name"] = "unsafe_python"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(8, results.length)
+        @tools.each do |tool|
+            Zoom::ProfileManager.force_tool(tool)
 
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(8, results.length)
+            header = Hash.new
+            header["paths"] = "test/test_src/unsafe_python"
+            header["profile_name"] = "unsafe_python"
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.8", "#{tool}.#{results.length}")
+
+            @zoom.repeat(false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.8", "#{tool}.#{results.length}")
+        end
     end
 
     def test_unsafe_ruby
-        header = Hash.new
-        header["paths"] = "test/test_src/unsafe_ruby"
-        header["profile_name"] = "unsafe_ruby"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(48, results.length)
+        @tools.each do |tool|
+            Zoom::ProfileManager.force_tool(tool)
 
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(48, results.length)
+            header = Hash.new
+            header["paths"] = "test/test_src/unsafe_ruby"
+            header["profile_name"] = "unsafe_ruby"
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.66", "#{tool}.#{results.length}")
+
+            @zoom.repeat(false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.66", "#{tool}.#{results.length}")
+        end
     end
 
     def test_word_regexp
-        if (!@zoom.config.has_profile?("grep"))
-            skip "Grep profile not found"
+        @tools.each do |tool|
+            header = Hash.new
+            header["paths"] = "test/test_src/tools"
+            header["regex"] = "scanf"
+            header["profile_name"] = tool
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.24", "#{tool}.#{results.length}")
+
+            header["translate"] = Hash.new
+            header["translate"]["word-regexp"] = ""
+
+            @zoom.run(header, false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.4", "#{tool}.#{results.length}")
+
+            @zoom.repeat(false)
+            results = @zoom.cache.get_results
+            assert_equal("#{tool}.4", "#{tool}.#{results.length}")
         end
-
-        header = Hash.new
-        header["paths"] = "test/test_src/unsafe_c"
-        header["pattern"] = "str"
-        header["profile_name"] = "grep"
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(30, results.length)
-
-        header["translate"] = Hash.new
-        header["translate"]["word-regexp"] = ""
-        @zoom.run(header, false)
-        results = @zoom.cache.get_results
-        assert_equal(0, results.length)
-
-        @zoom.repeat(false)
-        results = @zoom.cache.get_results
-        assert_equal(0, results.length)
     end
 
     def test_zoom_exceptions

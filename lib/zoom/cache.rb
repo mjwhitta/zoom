@@ -111,11 +111,6 @@ class Zoom::Cache
         return @header["paths"]
     end
 
-    def pattern
-        return nil if (@header.nil?)
-        return @header["pattern"]
-    end
-
     def profile_name
         return nil if (@header.nil?)
         return @header["profile_name"]
@@ -155,6 +150,11 @@ class Zoom::Cache
         end
     end
 
+    def regex
+        return nil if (@header.nil?)
+        return @header["regex"]
+    end
+
     def shortcut(config)
         return if (empty?)
 
@@ -184,7 +184,7 @@ class Zoom::Cache
                     config.hilight_tag("[#{result.tag}]"),
                     "#{config.hilight_lineno(result.lineno)}:",
                     result.match.gsub(
-                        /(#{pattern})/i,
+                        /(#{regex})/i,
                         config.hilight_match("\\1")
                     )
                 ].join(" ")
@@ -204,7 +204,7 @@ class Zoom::Cache
         end
     end
 
-    def write(str, pattern = nil)
+    def write(str, r = nil)
         return if (str.nil?)
 
         if (!str.valid_encoding?)
@@ -217,15 +217,16 @@ class Zoom::Cache
 
         File.open(@cache_file, "a") do |f|
             str.gsub(/\r/, "^M").split("\n").each do |line|
-                if (pattern && line.match(/^[^:]+:[0-9]+:.+$/))
+                if (r && line.match(/^[^:]+:[0-9]+:.+$/))
                     line.match(/^([^:]+:[0-9]+:)(.+)$/) do |m|
                         m[2].scan(
-                            /(.{0,128}#{pattern}.{0,128})/i
+                            /(.{0,128}#{r}.{0,128})/i
                         ) do |n|
                             f.write("#{m[1]}#{n[0]}\n")
                         end
                     end
                 else
+                    line.gsub!(/^(.{128}).*(.{128})$/, "\\1...\\2")
                     f.write("#{line}\n")
                 end
             end
