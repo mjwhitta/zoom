@@ -107,6 +107,7 @@ class Zoom
 
         # Ensure header is formatted properly and valid
         header = ensure_valid_header(header) if (!repeat)
+        header["pwd"] = Dir.pwd if (repeat)
 
         profile_name = header["profile_name"]
         profile = @config.get_profile(profile_name)
