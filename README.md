@@ -19,13 +19,13 @@ directory!
 
 Open a terminal and run the following:
 
-```bash
+```
 $ gem install ruby-zoom
 ```
 
 Or install from source:
 
-```bash
+```
 $ git clone https://gitlab.com/mjwhitta/zoom.git
 $ cd zoom
 $ bundle install && rake install
@@ -46,7 +46,7 @@ $ bundle install && rake install
 To use a proper grep, you need to install [homebrew](http://brew.sh)
 and then run the following commands before using Zoom:
 
-```bash
+```
 $ brew tap homebrew/dupes
 $ brew install grep
 $ mkdir -p ~/bin
@@ -60,14 +60,14 @@ $ echo "export PATH=~/bin:$PATH" >>~/.bashrc
 You can use Zoom basically the same way you use grep. Use the
 following command for more info:
 
-```bash
+```
 $ z --help
 ```
 
 If you encounter any errors, most Zoom exceptions should be fixable by
 running:
 
-```bash
+```
 $ z --rc
 ```
 
@@ -112,7 +112,7 @@ test/test_src/tools/test.php3
 
 Now you can jump to result 7 with one of the following command:
 
-```bash
+```
 $ z --go 7
 ```
 
@@ -122,7 +122,7 @@ When you perform a search with Zoom, all results are cached. Using the
 following commands will allow you to see the previous search results
 again:
 
-```bash
+```
 $ z --cache
 ```
 
@@ -136,7 +136,7 @@ Profiles allow you to create shortcuts to your favorite commands. Some
 profiles are created for you when you first run Zoom. Use the
 following command to list your profiles:
 
-```bash
+```
 $ z --list
 ```
 
@@ -333,7 +333,7 @@ If you find it tedious to use Zoom with the flags, there are currently
 You can also symlink zoom to a profile name in order to quickly
 execute favorite profiles.
 
-```bash
+```
 $ cd ~/bin
 $ ln -s z test
 $ ./test # same as 'z --use test'
@@ -352,7 +352,7 @@ are not created by default with `z --rc`. To create them run `z
 These profiles have a hard-coded regex so if you want to change the
 regex used, you can run the following command to change the code:
 
-```bash
+```
 $ gem open ruby-zoom
 ```
 
@@ -360,7 +360,7 @@ Navigate to `lib/zoom/profile` directory and select a profile to make
 changes. If you want the revert your changes, run the following
 command:
 
-```bash
+```
 $ gem pristine ruby-zoom
 ```
 
@@ -409,13 +409,12 @@ Zoom which attempts to streamline the process for you.
 For some simple zsh completion with Zoom, you can add the following to
 your `~/.zshrc`:
 
-```bash
+```
 compdef _gnu_generic z zc zf zg zl zr
 ```
 
 ## Links
 
-- [Homepage](https://mjwhitta.github.io/zoom)
 - [Source](https://gitlab.com/mjwhitta/zoom)
 - [Mirror](https://github.com/mjwhitta/zoom)
 - [RubyGems](https://rubygems.org/gems/ruby-zoom)
