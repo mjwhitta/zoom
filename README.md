@@ -416,7 +416,6 @@ compdef _gnu_generic z zc zf zg zl zr
 ## Links
 
 - [Source](https://gitlab.com/mjwhitta/zoom)
-- [Mirror](https://github.com/mjwhitta/zoom)
 - [RubyGems](https://rubygems.org/gems/ruby-zoom)
 
 ## TODO
