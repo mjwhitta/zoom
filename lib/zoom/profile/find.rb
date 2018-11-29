@@ -43,7 +43,7 @@ class Zoom::Profile::Find < Zoom::Profile
 
         # If regex was provided then assume it's an iname search
         if (!header["regex"].empty?)
-            header["regex"] = "-iname \"#{header["regex"]}\""
+            header["regex"] = "-iregex \"#{header["regex"]}\""
         end
 
         return header
