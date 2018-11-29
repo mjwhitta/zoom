@@ -23,6 +23,7 @@ class Zoom::Profile::Find < Zoom::Profile
 
     def grep_like_format_flags(all = false)
         super
+        @grep_like_tags = false
         @taggable = true
     end
 
@@ -41,9 +42,12 @@ class Zoom::Profile::Find < Zoom::Profile
             header["regex"] = ""
         end
 
-        # If regex was provided then assume it's an iname search
+        # If regex was provided then assume it's an iregex search
         if (!header["regex"].empty?)
-            header["regex"] = "-iregex \"#{header["regex"]}\""
+            header["regex"] = [
+                "-regextype posix-extended",
+                "-iregex \".*#{header["regex"]}.*\""
+            ].join(" ")
         end
 
         return header

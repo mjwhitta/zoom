@@ -71,10 +71,11 @@ class Zoom::Cache
         end
     end
 
-    def initialize(file = nil)
+    def initialize(config, file = nil)
         file = "~/.cache/zoom/cache" if (file.nil?)
 
         @cache_file = Pathname.new(file).expand_path
+        @config = config
         @results = nil
         @thread = nil
         @header = Hash.new
@@ -128,6 +129,8 @@ class Zoom::Cache
         tag = 1
         @thread.kill if (@thread)
         @thread = Thread.new do
+            profile = nil
+
             # Read in cache
             File.open(@cache_file) do |cache|
                 cache.each do |line|
@@ -136,12 +139,25 @@ class Zoom::Cache
                         @header = JSON.parse(
                             line.gsub("ZOOM_HEADER=", "")
                         )
+
+                        if (!@config.has_profile?(profile_name))
+                            raise
+                            Zoom::Error::ProfileDoesNotExist.new(
+                                profile_name
+                            )
+                        end
+                        profile = @config.get_profile(profile_name)
                     elsif (line.match(/^-?-?$/))
                         # Ignore dividers when searching with context
                         # and empty lines
                     else
                         @results.push(
-                            Zoom::Cache::Result.new(tag, line, self)
+                            Zoom::Cache::Result.new(
+                                tag,
+                                line,
+                                self,
+                                profile.grep_like_tags?
+                            )
                         )
                         tag += 1
                     end
@@ -155,15 +171,15 @@ class Zoom::Cache
         return @header["regex"]
     end
 
-    def shortcut(config)
+    def shortcut
         return if (empty?)
 
-        config.validate_colors
-        if (!config.has_profile?(profile_name))
+        @config.validate_colors
+        if (!@config.has_profile?(profile_name))
             raise Zoom::Error::ProfileDoesNotExist.new(profile_name)
         end
 
-        profile = config.get_profile(profile_name)
+        profile = @config.get_profile(profile_name)
         if (!profile.taggable)
             get_results.each do |result|
                 puts result.contents
@@ -176,30 +192,30 @@ class Zoom::Cache
             if (result.grep_like?)
                 if (result.filename != curr_filename)
                     puts if (curr_filename)
-                    puts config.hilight_filename(result.filename)
+                    puts @config.hilight_filename(result.filename)
                     curr_filename = result.filename
                 end
 
                 puts [
-                    config.hilight_tag("[#{result.tag}]"),
-                    "#{config.hilight_lineno(result.lineno)}:",
+                    @config.hilight_tag("[#{result.tag}]"),
+                    "#{@config.hilight_lineno(result.lineno)}:",
                     result.match.gsub(
                         /(#{regex})/i,
-                        config.hilight_match("\\1")
+                        @config.hilight_match("\\1")
                     )
                 ].join(" ")
             else
                 if (result.filename)
                     if (result.filename != curr_filename)
                         puts if (curr_filename)
-                        puts config.hilight_filename(result.filename)
+                        puts @config.hilight_filename(result.filename)
                         curr_filename = result.filename
                     end
                 end
 
                 tag = result.tag
                 line = result.contents
-                puts [config.hilight_tag("[#{tag}]"), line].join(" ")
+                puts [@config.hilight_tag("[#{tag}]"), line].join(" ")
             end
         end
     end

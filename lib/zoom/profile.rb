@@ -86,6 +86,10 @@ class Zoom::Profile < Hash
         @taggable = false # Should results be tagged like grep
     end
 
+    def grep_like_tags?
+        return @grep_like_tags
+    end
+
     def hilight_after(str)
         return str if (!Zoom.hilight?)
         return str.yellow
@@ -148,6 +152,7 @@ class Zoom::Profile < Hash
 
         # In case someone overrides grep_like_format_flags
         @format_flags = ""
+        @grep_like_tags = true
         @taggable = false
 
         grep_like_format_flags

@@ -9,7 +9,7 @@ class Zoom::Cache::Result
         return @grep_like
     end
 
-    def initialize(tag, contents, cache)
+    def initialize(tag, contents, cache, grep_like_tags)
         @cache = cache
         @contents = contents.unpack("C*").pack("U*").gsub(
             /([\u0080-\u00ff]+)/,
@@ -21,21 +21,23 @@ class Zoom::Cache::Result
         @match = nil
         @tag = tag
 
-        case @contents
-        when /^Binary file (.+) matches\.$/
-            @contents.match(/^Binary file (.+) matches\.$/) do |m|
-                next if (m.nil?)
-                @filename = "Binary file"
-                @contents = m[1]
-            end
-        when /^([^:]+)[:-](\d+)[:-](.*)$/
-            @contents.match(/^([^:]+)[:-](\d+)[:-](.*)$/) do |m|
-                next if (m.nil?)
+        if (grep_like_tags)
+            case @contents
+            when /^Binary file (.+) matches\.$/
+                @contents.match(/^Binary file (.+) matches\.$/) do |m|
+                    next if (m.nil?)
+                    @filename = "Binary file"
+                    @contents = m[1]
+                end
+            when /^([^:]+)[:-](\d+)[:-](.*)$/
+                @contents.match(/^([^:]+)[:-](\d+)[:-](.*)$/) do |m|
+                    next if (m.nil?)
 
-                @grep_like = true
-                @filename = m[1].gsub(/^\.\//, "")
-                @lineno = m[2]
-                @match = m[3]
+                    @grep_like = true
+                    @filename = m[1].gsub(/^\.\//, "")
+                    @lineno = m[2]
+                    @match = m[3]
+                end
             end
         end
     end

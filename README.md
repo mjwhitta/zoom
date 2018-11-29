@@ -110,20 +110,22 @@ test/test_src/tools/test.php3
 [8] 11: eval()
 ```
 
-Now you can jump to result 7 with one of the following command:
+Now you can jump to result 7 with one of the following commands:
 
 ```
 $ z --go 7
+$ zg 7
 ```
 
 ### Persistent shortcuts
 
-When you perform a search with Zoom, all results are cached. Using the
-following commands will allow you to see the previous search results
-again:
+When you perform a search with Zoom, all results are cached. Using one
+of the following commands will allow you to see the previous search
+results again:
 
 ```
 $ z --cache
+$ zc
 ```
 
 This means your tags/shortcuts are persistent across all sessions. You
@@ -133,11 +135,12 @@ an editor.
 ## Profiles
 
 Profiles allow you to create shortcuts to your favorite commands. Some
-profiles are created for you when you first run Zoom. Use the
-following command to list your profiles:
+profiles are created for you when you first run Zoom. Use one of the
+following commands to list your profiles:
 
 ```
 $ z --list
+$ zl
 ```
 
 These profiles do not need to be limited to grep shortcuts.
@@ -234,6 +237,8 @@ class SearchProfile < Zoom::Profile
         @format_flags = "--color=never -EHInRs"
         @format_flags = "--color=never -aEHnRs" if (all)
         @taggable = true # Tag results (defaults to false)
+        # Parse results as grep results (defaults to true)
+        @grep_like_tags = true # Set to false for Find profiles
     end
 
     def initialize(

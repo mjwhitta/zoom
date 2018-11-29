@@ -329,7 +329,7 @@ begin
 
     case options["action"]
     when "cache"
-        zoom.cache.shortcut(zoom.config)
+        zoom.cache.shortcut
     when "configure"
         Zoom.hilight(false)
         djinni = Djinni.new

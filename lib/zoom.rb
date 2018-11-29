@@ -86,8 +86,8 @@ class Zoom
     end
 
     def initialize(cache = nil, rc = nil)
-        @cache = Zoom::Cache.new(cache)
         @config = Zoom::Config.new(rc)
+        @cache = Zoom::Cache.new(@config, cache)
         @@hilight = @config.hilight
     end
 
@@ -132,7 +132,7 @@ class Zoom
             @cache.write(profile.exe(header), header["regex"])
 
             # Display results from cache
-            @cache.shortcut(@config) if (shortcut)
+            @cache.shortcut if (shortcut)
         rescue Interrupt
             # ^C
         end
