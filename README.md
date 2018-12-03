@@ -160,32 +160,20 @@ class ListProfile < Zoom::Profile
     # You can redefine this method if you want, or leave it out to
     # accept the default functionality (shown below).
     # def exe(header)
-    #     case tool.split("/")[-1]
-    #     when "find"
-    #         cmd = [
-    #             before,
-    #             tool,
-    #             header["paths"],
-    #             flags,
-    #             header["args"],
-    #             header["regex"],
-    #             after
-    #         ].join(" ").strip
-    #     else
-    #         # Emulate grep
-    #         cmd = [
-    #             before,
-    #             tool,
-    #             @format_flags,
-    #             flags,
-    #             only_exts_and_files,
-    #             header["args"],
-    #             "--",
-    #             header["regex"].shellescape,
-    #             header["paths"],
-    #             after
-    #         ].join(" ").strip
-    #     end
+    #     # Emulate grep
+    #     cmd = [
+    #         before,
+    #         tool,
+    #         @format_flags,
+    #         flags,
+    #         only_exts_and_files,
+    #         header["translated"],
+    #         header["args"],
+    #         "--",
+    #         header["regex"].shellescape,
+    #         header["paths"],
+    #         after
+    #     ].join(" ").strip
     #
     #     if (header.has_key?("debug") && header["debug"])
     #         puts cmd
