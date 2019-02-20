@@ -3,7 +3,7 @@ class Zoom::Profile::Grep < Zoom::Profile
         super
         @format_flags = [
             "--color=never",
-            "-EHInrs",
+            "-#{"E" if (!flags.match(/-[^ -]*P/))}HInrs",
             "--exclude-dir=.bzr",
             "--exclude-dir=.git",
             "--exclude-dir=.git-crypt",
@@ -14,7 +14,7 @@ class Zoom::Profile::Grep < Zoom::Profile
     end
 
     def initialize(n = nil, t = nil, f = nil, b = nil, a = nil)
-        f ||= "-i"
+        f ||= "-iP"
         t ||= "grep"
         super(n, t, f, b, a)
     end

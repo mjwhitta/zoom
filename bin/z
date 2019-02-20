@@ -375,7 +375,7 @@ begin
         zoom.repeat
     when "rc"
         # zoom.config.default_config # Redundant
-        zoom.cache.clear
+        # zoom.cache.clear # Do nothing
     when "secprofs"
         zoom.config.add_security_profiles
     when "which"

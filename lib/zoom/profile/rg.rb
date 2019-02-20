@@ -13,7 +13,7 @@ class Zoom::Profile::Rg < Zoom::Profile
     end
 
     def initialize(n = nil, t = nil, f = nil, b = nil, a = nil)
-        f ||= "-S"
+        f ||= "-PS"
         t ||= "rg"
         super(n, t, f, b, a)
     end
