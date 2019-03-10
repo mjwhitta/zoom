@@ -1,21 +1,22 @@
 require "fileutils"
 require "rake/testtask"
 
-# These are no longer symlinks
-symlinks = ["bin/zc", "bin/zf", "bin/zg", "bin/zl", "bin/zr"]
+aliases = ["zc", "zf", "zg", "zl", "zr"].map do |aliaz|
+    "bin/#{aliaz}"
+end
 
 task :default => :gem
 
 desc "Clean up"
 task :clean do
-    system("rm -f *.gem Gemfile.lock #{symlinks.join(" ")}")
+    system("rm -f *.gem Gemfile.lock #{aliases.join(" ")}")
     system("chmod -R go-rwx bin lib")
 end
 
 desc "Build gem"
 task :gem do
-    symlinks.each do |symlink|
-        FileUtils.cp("bin/z", symlink)
+    aliases.each do |aliaz|
+        FileUtils.cp("bin/z", aliaz)
     end
     system("chmod -R u=rwX,go=rX bin lib")
     system("gem build -V *.gemspec")
