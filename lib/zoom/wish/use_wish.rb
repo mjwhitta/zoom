@@ -22,7 +22,7 @@ class UseWish < Djinni::Wish
             return
         end
 
-        config.current_profile_name(args)
+        config.set_current_profile_name(args)
 
         # Update prompt
         prompt_color = djinni_env["prompt_color"]
@@ -37,7 +37,7 @@ class UseWish < Djinni::Wish
     def tab_complete(input, djinni_env = {})
         return [{}, "", ""] if (input.include?(" "))
 
-        profiles = djinni_env["config"].get_profiles
+        profiles = djinni_env["config"].parse_profiles
         completions = Hash.new
 
         profiles.keys.sort do |a, b|

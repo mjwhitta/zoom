@@ -23,14 +23,14 @@ class RenameWish < Djinni::Wish
         elsif (config.has_profile?(new))
             puts "Profile already exists: #{new}"
         else
-            profiles = config.get_profiles
+            profiles = config.parse_profiles
             profiles[new] = profiles.delete(old)
             profiles[new].name(new)
             config.set_profiles(profiles)
 
             # Update prompt
-            if (config.current_profile_name == old)
-                config.current_profile_name(new)
+            if (config.get_current_profile_name == old)
+                config.set_current_profile_name(new)
                 prompt_color = djinni_env["prompt_color"]
                 if (prompt_color)
                     prompt = "zoom(#{new})> ".send(prompt_color)
@@ -45,7 +45,7 @@ class RenameWish < Djinni::Wish
     def tab_complete(input, djinni_env = {})
         return [{}, "", ""] if (input.include?(" "))
 
-        profiles = djinni_env["config"].get_profiles
+        profiles = djinni_env["config"].parse_profiles
         completions = Hash.new
 
         profiles.keys.sort do |a, b|

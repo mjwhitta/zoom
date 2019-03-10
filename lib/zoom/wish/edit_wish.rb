@@ -33,7 +33,7 @@ class EditWish < Djinni::Wish
             end
         end
 
-        profiles = config.get_profiles
+        profiles = config.parse_profiles
         profile = profiles[n]
 
         case f
@@ -80,7 +80,7 @@ class EditWish < Djinni::Wish
         n ||= ""
 
         if (input.nil?)
-            profiles = djinni_env["config"].get_profiles
+            profiles = djinni_env["config"].parse_profiles
             completions = Hash.new
 
             profiles.keys.sort do |a, b|

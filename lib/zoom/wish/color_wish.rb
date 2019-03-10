@@ -23,9 +23,9 @@ class ColorWish < Djinni::Wish
 
             case f
             when "off"
-                config.hilight(false)
+                config.no_hilight
             when "on"
-                config.hilight(true)
+                config.hilight
             else
                 usage
             end
@@ -44,7 +44,7 @@ class ColorWish < Djinni::Wish
                 end
             end
 
-            config.send("color_#{f}", c)
+            config.send("set_color_#{f}", c)
         end
     end
 

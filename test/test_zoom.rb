@@ -27,16 +27,16 @@ class ZoomTest < Minitest::Test
 
         header = Hash.new
         header["paths"] = "test/test_src"
-        header["regex"] = "*php*"
+        header["regex"] = ".*php.*"
         header["profile_name"] = "find"
 
         @zoom.run(header, false)
         results = @zoom.cache.get_results
-        assert_equal(11, results.length)
+        assert_equal(12, results.length)
 
         @zoom.repeat(false)
         results = @zoom.cache.get_results
-        assert_equal(11, results.length)
+        assert_equal(12, results.length)
 
         header["translate"] = Hash.new
         header["translate"]["ignore"] = ["unsafe_php"]
@@ -248,7 +248,7 @@ class ZoomTest < Minitest::Test
 
     def test_zoom_exceptions
         assert_raises(Zoom::Error::ExecutableNotFound) do
-            @zoom.config.editor("asdf")
+            @zoom.config.use_editor("asdf")
         end
     end
 end

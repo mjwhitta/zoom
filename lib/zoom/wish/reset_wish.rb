@@ -17,13 +17,13 @@ class ResetWish < Djinni::Wish
 
         FileUtils.rm_f(Pathname.new("~/.zoomrc").expand_path)
         config = djinni_env["config"]
-        config.default_config
+        config.default
 
         cache = djinni_env["cache"]
         cache.clear
 
         # Update prompt
-        default = config.current_profile_name
+        default = config.get_current_profile_name
         prompt_color = djinni_env["prompt_color"]
         if (prompt_color)
             prompt = "zoom(#{default})> ".send(prompt_color)

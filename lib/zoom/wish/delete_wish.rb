@@ -11,11 +11,11 @@ class DeleteWish < Djinni::Wish
 
     def execute(args, djinni_env = {})
         config = djinni_env["config"]
-        profiles = config.get_profiles
+        profiles = config.parse_profiles
         args.split(" ").each do |arg|
             if (!config.has_profile?(arg))
                 puts "Profile does not exist: #{arg}"
-            elsif (config.current_profile_name == arg)
+            elsif (config.get_current_profile_name == arg)
                 puts "Can't delete current profile: #{arg}"
             else
                 profiles.delete(arg)
@@ -25,7 +25,7 @@ class DeleteWish < Djinni::Wish
     end
 
     def tab_complete(input, djinni_env = {})
-        profiles = djinni_env["config"].get_profiles
+        profiles = djinni_env["config"].parse_profiles
         completions = Hash.new
 
         profiles.keys.sort do |a, b|

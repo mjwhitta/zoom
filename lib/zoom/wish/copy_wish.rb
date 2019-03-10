@@ -23,7 +23,7 @@ class CopyWish < Djinni::Wish
         elsif (config.has_profile?(new))
             puts "Profile already exists: #{new}"
         else
-            profiles = config.get_profiles
+            profiles = config.parse_profiles
             profiles[new] = profiles[name].clone
             profiles[new].name(new)
             config.set_profiles(profiles)
@@ -33,7 +33,7 @@ class CopyWish < Djinni::Wish
     def tab_complete(input, djinni_env = {})
         return [{}, "", ""] if (input.include?(" "))
 
-        profiles = djinni_env["config"].get_profiles
+        profiles = djinni_env["config"].parse_profiles
         completions = Hash.new
 
         profiles.keys.sort do |a, b|

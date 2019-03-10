@@ -21,14 +21,16 @@ class ListWish < Djinni::Wish
 
         case input
         when "la"
-            profiles = config.get_profiles
+            profiles = config.parse_profiles
             profiles.keys.sort do |a, b|
                 a.downcase <=> b.downcase
             end.each do |name|
                 print_profile(profiles[name])
             end
         else
-            profile = config.get_profiles[config.current_profile_name]
+            profile = config.get_profile(
+                config.get_current_profile_name
+            )
             print_profile(profile)
         end
     end

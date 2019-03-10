@@ -23,7 +23,7 @@ class AddWish < Djinni::Wish
         elsif (!@classes.has_key?(c))
             puts "Class does not exist: #{c}"
         else
-            profiles = config.get_profiles
+            profiles = config.parse_profiles
             profiles[n] = Zoom::Profile.profile_by_name(c).new(n)
             config.set_profiles(profiles)
         end

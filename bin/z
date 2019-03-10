@@ -343,7 +343,7 @@ begin
                 "prompt_color" => "white",
                 "zoom" => zoom
             },
-            "zoom(#{zoom.config.current_profile_name})> ".white
+            "zoom(#{zoom.config.get_current_profile_name})> ".white
         )
     when "go"
         if (options["use"])
@@ -351,11 +351,11 @@ begin
             zoom.open(results)
         end
     when "list_profiles"
-        profiles = zoom.config.get_profiles
+        profiles = zoom.config.parse_profiles
         profiles.keys.sort do |a, b|
             a.downcase <=> b.downcase
         end.each do |name|
-            if (name == zoom.config.current_profile_name)
+            if (name == zoom.config.get_current_profile_name)
                 print "*".red
             end
 
@@ -374,13 +374,13 @@ begin
     when "repeat"
         zoom.repeat
     when "rc"
-        # zoom.config.default_config # Redundant
+        # zoom.config.default # Redundant
         zoom.cache.clear
     when "secprofs"
         zoom.config.add_security_profiles
     when "which"
-        name = zoom.config.current_profile_name
-        profile = zoom.config.get_profiles[name]
+        name = zoom.config.get_current_profile_name
+        profile = zoom.config.get_profile(name)
 
         lines = profile.to_s.scan(/\S.{0,76}\S(?=\s|$)|\S+/)
         puts lines.delete_at(0)

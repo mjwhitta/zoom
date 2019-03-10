@@ -13,11 +13,14 @@ class Zoom::Cache
     end
 
     def clear
-        @cache_file.delete if (@cache_file.exist?)
-        @results = nil
+        # Kill thread first since it was using the file
         @thread.kill if (@thread)
         @thread = nil
+
+        # Delete cache file and reset header and results
+        @cache_file.delete if (@cache_file.exist?)
         @header = nil
+        @results = nil
     end
 
     def empty?

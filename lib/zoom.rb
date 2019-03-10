@@ -19,7 +19,7 @@ class Zoom
         # If no profile name, use the current profile
         profile_name = header["profile_name"]
         if (profile_name.empty?)
-            profile_name = @config.current_profile_name
+            profile_name = @config.get_current_profile_name
             header["profile_name"] = profile_name
         end
 
@@ -88,12 +88,12 @@ class Zoom
     def initialize(cache = nil, rc = nil)
         @config = Zoom::Config.new(rc)
         @cache = Zoom::Cache.new(@config, cache)
-        @@hilight = @config.hilight
+        @@hilight = @config.hilight?
     end
 
     def open(results)
         return if (results.nil? || results.empty?)
-        Zoom::Editor.new(@config.editor).open(results)
+        Zoom::Editor.new(@config.get_editor).open(results)
     end
 
     def repeat(shortcut = true)

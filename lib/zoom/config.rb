@@ -3,139 +3,79 @@ require "json_config"
 require "scoobydoo"
 
 class Zoom::Config < JSONConfig
+    extend JSONConfig::Keys
+
+    add_bool_key("hilight")
+    add_key("color_filename")
+    add_key("color_lineno")
+    add_key("color_match")
+    add_key("color_tag")
+    add_key("current_profile_name")
+    add_key("editor")
+    add_key("profiles")
+
     def add_security_profiles
-        profiles = get("profiles")
+        profiles = parse_profiles
         Zoom::ProfileManager::security_profiles.each do |profile|
             profiles[profile.name] = profile
         end
-        set("profiles", profiles)
-    end
-
-    def color(key, value)
-        if (value)
-            validate_color(value)
-            set(key, value)
-        end
-
-        value = get(key)
-        validate_color(value)
-        return value
-    end
-    private :color
-
-    def color_filename(clr = nil)
-        return color("color_filename", clr)
-    end
-    private :color_filename
-
-    def color_lineno(clr = nil)
-        return color("color_lineno", clr)
-    end
-    private :color_lineno
-
-    def color_match(clr = nil)
-        return color("color_match", clr)
-    end
-    private :color_match
-
-    def color_tag(clr = nil)
-        return color("color_tag", clr)
-    end
-    private :color_tag
-
-    def current_profile_name(name = nil)
-        set("current_profile_name", name) if (name)
-        return get("current_profile_name")
-    end
-
-    def default_config
-        default = Zoom::ProfileManager.default_tool
-        profiles = Zoom::ProfileManager.default_profiles
-
-        clear
-        set("color", true)
-        set("color_filename", "green")
-        set("color_lineno", "white")
-        set("color_match", "black.on_white")
-        set("color_tag", "red")
-        set("current_profile_name", default)
-        set("editor", "")
-        set("profiles", profiles)
-    end
-
-    def editor(ed = nil)
-        if (ed && !ed.empty?)
-            e = ed.split(" ")[0]
-            if (ScoobyDoo.where_are_you(e).nil?)
-                raise Zoom::Error::ExecutableNotFound.new(e)
-            end
-            set("editor", ed)
-        end
-
-        e = get("editor")
-        e = ENV["EDITOR"] if (e.nil? || e.empty?)
-        e = "vim" if (e.nil? || e.empty?)
-
-        e, _, f = e.partition(" ")
-        e = ScoobyDoo.where_are_you(e)
-
-        if (e.nil?)
-            e = ScoobyDoo.where_are_you("vi")
-            f = ""
-        end
-
-        raise Zoom::Error::ExecutableNotFound.new("vi") if (e.nil?)
-
-        return "#{e} #{f}".strip
+        set_profiles(profiles)
     end
 
     def has_profile?(name)
-        return get("profiles").has_key?(name)
-    end
-
-    def hilight(flag = nil)
-        set("color", flag) if (!flag.nil?)
-        return get("color")
+        return profiles? && get_profiles.has_key?(name)
     end
 
     def hilight_filename(str)
-        return str if (!hilight)
-        color_filename.split(".").inject(str, :send)
+        return str if (!hilight?)
+        get_color_filename.split(".").inject(str, :send)
     end
 
     def hilight_lineno(str)
-        return str if (!hilight)
-        color_lineno.split(".").inject(str, :send)
+        return str if (!hilight?)
+        get_color_lineno.split(".").inject(str, :send)
     end
 
     def hilight_match(str)
-        return str if (!hilight)
-        color_match.split(".").inject(str, :send)
+        return str if (!hilight?)
+        get_color_match.split(".").inject(str, :send)
     end
 
     def hilight_tag(str)
-        return str if (!hilight)
-        color_tag.split(".").inject(str, :send)
+        return str if (!hilight?)
+        get_color_tag.split(".").inject(str, :send)
     end
 
     def initialize(file = nil)
-        file ||= "~/.zoomrc"
+        file ||= "~/.config/zoom/rc"
+        defaultprof = Zoom::ProfileManager.default_tool
+        profiles = Zoom::ProfileManager.default_profiles
+        @defaults = {
+            "color_filename" => "green",
+            "color_lineno" => "white",
+            "color_match" => "black.on_white",
+            "color_tag" => "red",
+            "current_profile_name" => defaultprof,
+            "editor" => nil,
+            "hilight" => true,
+            "profiles" => profiles
+        }
         super(file)
     end
 
     def get_profile(name)
-        return get_profiles(false)[name]
+        return parse_profiles(false)[name]
     end
 
     def get_profile_names
-        return get("profiles").keys.sort do |a, b|
+        return get_profiles.keys.sort do |a, b|
             a.downcase <=> b.downcase
         end
     end
 
-    def get_profiles(display_error = true)
+    def parse_profiles(display_error = true)
         profiles = Hash.new
-        get("profiles").each do |name, prof|
+        get_profiles.each do |name, prof|
             begin
                 profiles[name] = Zoom::Profile.from_json(prof)
             rescue Zoom::Error => e
@@ -145,8 +85,23 @@ class Zoom::Config < JSONConfig
         return profiles
     end
 
-    def set_profiles(profiles)
-        set("profiles", profiles)
+    def use_editor(ed)
+        if (ed.nil? || ed.empty?)
+            set_editor(nil)
+            return
+        end
+
+        bad, _, _ = ed.partition(" ")
+        if (ScoobyDoo.where_are_you(bad))
+            set_editor(ed)
+            return
+        end
+
+        ed = ENV["EDITOR"] || "vim"
+        ed = "vi" if (ScoobyDoo.where_are_you(ed).nil?)
+        set_editor(ed) if (ScoobyDoo.where_are_you(ed))
+
+        raise Zoom::Error::ExecutableNotFound.new(bad) if (bad)
     end
 
     def validate_color(clr)
@@ -160,9 +115,9 @@ class Zoom::Config < JSONConfig
 
     def validate_colors
         # Validate colors
-        color_filename
-        color_lineno
-        color_match
-        color_tag
+        validate_color(get_color_filename)
+        validate_color(get_color_lineno)
+        validate_color(get_color_match)
+        validate_color(get_color_tag)
     end
 end

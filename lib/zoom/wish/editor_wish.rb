@@ -15,7 +15,7 @@ class EditorWish < Djinni::Wish
             return
         end
 
-        djinni_env["config"].editor(args)
+        djinni_env["config"].use_editor(args)
     end
 
     def usage
