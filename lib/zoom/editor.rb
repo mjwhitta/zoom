@@ -1,5 +1,6 @@
 require "fileutils"
 require "io/wait"
+require "scoobydoo"
 
 class Zoom::Editor
     def default(results)
@@ -42,7 +43,12 @@ class Zoom::Editor
     private :default
 
     def initialize(editor)
-        @editor, _, @flags = editor.partition(" ")
+        @editor, _, @flags = editor.partition(" ") if (editor)
+        if (editor.nil?)
+            @editor = ENV["EDITOR"] || "vim"
+            @editor= "vi" if (ScoobyDoo.where_are_you(@editor).nil?)
+            @flags = ""
+        end
     end
 
     def open(results)

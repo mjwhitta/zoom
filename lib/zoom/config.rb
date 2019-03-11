@@ -85,23 +85,14 @@ class Zoom::Config < JSONConfig
         return profiles
     end
 
-    def use_editor(ed)
-        if (ed.nil? || ed.empty?)
-            set_editor(nil)
-            return
+    def use_editor(editor)
+        if (editor && !editor.empty?)
+            ed, _, _ = editor.partition(" ")
+            if (ScoobyDoo.where_are_you(ed).nil?)
+                raise Zoom::Error::ExecutableNotFound.new(ed)
+            end
         end
-
-        bad, _, _ = ed.partition(" ")
-        if (ScoobyDoo.where_are_you(bad))
-            set_editor(ed)
-            return
-        end
-
-        ed = ENV["EDITOR"] || "vim"
-        ed = "vi" if (ScoobyDoo.where_are_you(ed).nil?)
-        set_editor(ed) if (ScoobyDoo.where_are_you(ed))
-
-        raise Zoom::Error::ExecutableNotFound.new(bad) if (bad)
+        set_editor(editor)
     end
 
     def validate_color(clr)
