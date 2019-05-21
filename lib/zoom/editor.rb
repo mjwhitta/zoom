@@ -64,16 +64,20 @@ class Zoom::Editor
 
     def open_result(result)
         if (result.grep_like?)
-            filename = result.filename
+            if (result.filename.start_with?("/"))
+                filename = result.filename
+            else
+                filename = result.pwd + "/" + result.filename
+            end
             lineno = result.lineno
-            pwd = result.pwd
-            system(
-                "#{@editor} #{@flags} +#{lineno} '#{pwd}/#{filename}'"
-            )
+            system("#{@editor} #{@flags} +#{lineno} '#{filename}'")
         else
-            filename = result.contents
-            pwd = result.pwd
-            system("#{@editor} #{@flags} '#{pwd}/#{filename}'")
+            if (result.contents.start_with?("/"))
+                filename = result.contents
+            else
+                filename = result.pwd + "/" + result.contents
+            end
+            system("#{@editor} #{@flags} '#{filename}'")
         end
     end
     private :open_result
@@ -101,19 +105,30 @@ class Zoom::Editor
 
         files = Array.new
         results.each do |result|
-            filename = result.filename if (result.grep_like?)
-            filename ||= result.contents
+            if (result.grep_like?)
+                if (result.filename.start_with?("/"))
+                    filename = result.filename
+                else
+                    filename = result.pwd + "/" + result.filename
+                end
+            else
+                if (result.contents.start_with?("/"))
+                    filename = result.contents
+                else
+                    filename = result.pwd + "/" + result.contents
+                end
+            end
+
             lineno = result.lineno
             match = result.match
-            pwd = result.pwd
 
-            if (!files.include?("#{pwd}/#{filename}"))
-                files.push("#{pwd}/#{filename}")
+            if (!files.include?(filename))
+                files.push(filename)
                 zs.write("#{lineno}\nbnext\n") if (result.grep_like?)
             end
 
             if (result.grep_like?)
-                zq.write("#{pwd}/#{filename}:#{lineno}: #{match}\n")
+                zq.write("#{filename}:#{lineno}: #{match}\n")
             end
         end
         zs.write("silent cfile #{quickfix}\n")
