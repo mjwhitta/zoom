@@ -185,7 +185,7 @@ class Zoom::Cache
         profile = @config.get_profile(profile_name)
         if (!profile.taggable)
             get_results.each do |result|
-                puts result.contents
+                puts(result.contents)
             end
             return
         end
@@ -195,30 +195,39 @@ class Zoom::Cache
             if (result.grep_like?)
                 if (result.filename != curr_filename)
                     puts if (curr_filename)
-                    puts @config.hilight_filename(result.filename)
+                    puts(@config.hilight_filename(result.filename))
                     curr_filename = result.filename
                 end
 
-                puts [
-                    @config.hilight_tag("[#{result.tag}]"),
-                    "#{@config.hilight_lineno(result.lineno)}:",
-                    result.match.gsub(
-                        /(#{regex})/i,
-                        @config.hilight_match("\\1")
-                    )
-                ].join(" ")
+                puts(
+                    [
+                        @config.hilight_tag("[#{result.tag}]"),
+                        "#{@config.hilight_lineno(result.lineno)}:",
+                        result.match.gsub(
+                            /(#{regex})/i,
+                            @config.hilight_match("\\1")
+                        )
+                    ].join(" ")
+                )
             else
                 if (result.filename)
                     if (result.filename != curr_filename)
                         puts if (curr_filename)
-                        puts @config.hilight_filename(result.filename)
+                        puts(
+                            @config.hilight_filename(result.filename)
+                        )
                         curr_filename = result.filename
                     end
                 end
 
                 tag = result.tag
                 line = result.contents
-                puts [@config.hilight_tag("[#{tag}]"), line].join(" ")
+                puts(
+                    [
+                        @config.hilight_tag("[#{tag}]"),
+                        line
+                    ].join(" ")
+                )
             end
         end
     end

@@ -14,9 +14,9 @@ class DeleteWish < Djinni::Wish
         profiles = config.parse_profiles
         args.split(" ").each do |arg|
             if (!config.has_profile?(arg))
-                puts "Profile does not exist: #{arg}"
+                puts("Profile does not exist: #{arg}")
             elsif (config.get_current_profile_name == arg)
-                puts "Can't delete current profile: #{arg}"
+                puts("Can't delete current profile: #{arg}")
             else
                 profiles.delete(arg)
             end
@@ -45,7 +45,7 @@ class DeleteWish < Djinni::Wish
     end
 
     def usage
-        puts "#{aliases.join(", ")} <name>...[name]"
-        puts "    #{description}."
+        puts("#{aliases.join(", ")} <name>...[name]")
+        puts("    #{description}.")
     end
 end

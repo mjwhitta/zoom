@@ -34,7 +34,7 @@ class ResetWish < Djinni::Wish
     end
 
     def usage
-        puts "#{aliases.join(", ")}"
-        puts "    #{description}."
+        puts("#{aliases.join(", ")}")
+        puts("    #{description}.")
     end
 end

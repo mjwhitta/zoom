@@ -19,9 +19,9 @@ class RenameWish < Djinni::Wish
 
         old, new = args.split(" ")
         if (!config.has_profile?(old))
-            puts "Profile does not exist: #{old}"
+            puts("Profile does not exist: #{old}")
         elsif (config.has_profile?(new))
-            puts "Profile already exists: #{new}"
+            puts("Profile already exists: #{new}")
         else
             profiles = config.parse_profiles
             profiles[new] = profiles.delete(old)
@@ -63,7 +63,7 @@ class RenameWish < Djinni::Wish
     end
 
     def usage
-        puts "#{aliases.join(", ")} <old_name> <new_name>"
-        puts "    #{description}."
+        puts("#{aliases.join(", ")} <old_name> <new_name>")
+        puts("    #{description}.")
     end
 end

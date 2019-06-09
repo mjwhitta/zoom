@@ -19,7 +19,7 @@ class EditorWish < Djinni::Wish
     end
 
     def usage
-        puts "#{aliases.join(", ")} <value>"
-        puts "    #{description}."
+        puts("#{aliases.join(", ")} <value>")
+        puts("    #{description}.")
     end
 end

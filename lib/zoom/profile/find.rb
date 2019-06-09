@@ -14,7 +14,7 @@ class Zoom::Profile::Find < Zoom::Profile
         ].join(" ").strip
 
         if (header.has_key?("debug") && header["debug"])
-            puts cmd
+            puts(cmd)
             return ""
         else
             return %x(#{cmd})

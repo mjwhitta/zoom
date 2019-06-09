@@ -39,7 +39,7 @@ class ColorWish < Djinni::Wish
         else
             c.split(".").each do |color|
                 if (!@colors.include?(color))
-                    puts "Invalid color: #{color}"
+                    puts("Invalid color: #{color}")
                     return
                 end
             end
@@ -131,17 +131,17 @@ class ColorWish < Djinni::Wish
     end
 
     def usage
-        puts "#{aliases.join(", ")} <field> [color]"
-        puts "    #{description}."
+        puts("#{aliases.join(", ")} <field> [color]")
+        puts("    #{description}.")
         puts
-        puts "FIELDS"
+        puts("FIELDS")
         @fields.each do |field, desc|
-            puts "    #{field}"
+            puts("    #{field}")
         end
         puts
-        puts "COLORS"
+        puts("COLORS")
         @colors.each do |color|
-            puts "    #{color}"
+            puts("    #{color}")
         end
     end
 end

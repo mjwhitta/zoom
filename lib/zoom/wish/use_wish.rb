@@ -18,7 +18,7 @@ class UseWish < Djinni::Wish
         config = djinni_env["config"]
 
         if (!config.has_profile?(args))
-            puts "Profile does not exist: #{args}"
+            puts("Profile does not exist: #{args}")
             return
         end
 
@@ -55,7 +55,7 @@ class UseWish < Djinni::Wish
     end
 
     def usage
-        puts "#{aliases.join(", ")} <name>"
-        puts "    #{description}."
+        puts("#{aliases.join(", ")} <name>")
+        puts("    #{description}.")
     end
 end

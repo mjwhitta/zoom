@@ -19,7 +19,7 @@ class EditWish < Djinni::Wish
 
         config = djinni_env["config"]
         if (!config.has_profile?(n))
-            puts "Profile does not exist: #{n}"
+            puts("Profile does not exist: #{n}")
             return
         end
 
@@ -43,7 +43,7 @@ class EditWish < Djinni::Wish
             profile.before(v)
         when "class"
             if (!@classes.has_key?(v))
-                puts "Class does not exist: #{v}"
+                puts("Class does not exist: #{v}")
                 return
             end
 
@@ -119,12 +119,12 @@ class EditWish < Djinni::Wish
     end
 
     def usage
-        puts "#{aliases.join(", ")} <name> <field> <value>"
-        puts "    #{description}."
+        puts("#{aliases.join(", ")} <name> <field> <value>")
+        puts("    #{description}.")
         puts
-        puts "FIELDS"
+        puts("FIELDS")
         @fields.each do |field, desc|
-            puts "    #{field}"
+            puts("    #{field}")
         end
     end
 end

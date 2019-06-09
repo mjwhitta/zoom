@@ -79,7 +79,7 @@ class Zoom::Config < JSONConfig
             begin
                 profiles[name] = Zoom::Profile.from_json(prof)
             rescue Zoom::Error => e
-                puts e.message if (display_error)
+                puts(e.message) if (display_error)
             end
         end
         return profiles

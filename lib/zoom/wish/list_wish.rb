@@ -39,10 +39,10 @@ class ListWish < Djinni::Wish
         first = true
         profile.to_s.scan(/\S.{0,76}\S(?=\s|$)|\S+/).each do |line|
             if (first)
-                puts line
+                puts(line)
                 first = false
             else
-                puts "    #{line}"
+                puts("    #{line}")
             end
         end
     end
@@ -54,7 +54,7 @@ class ListWish < Djinni::Wish
     end
 
     def usage
-        puts "#{aliases.join(", ")} [all]"
-        puts "    #{description}."
+        puts("#{aliases.join(", ")} [all]")
+        puts("    #{description}.")
     end
 end

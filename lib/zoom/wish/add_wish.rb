@@ -19,9 +19,9 @@ class AddWish < Djinni::Wish
         c, n = args.split(" ")
 
         if (config.has_profile?(n))
-            puts "Profile already exists: #{n}"
+            puts("Profile already exists: #{n}")
         elsif (!@classes.has_key?(c))
-            puts "Class does not exist: #{c}"
+            puts("Class does not exist: #{c}")
         else
             profiles = config.parse_profiles
             profiles[n] = Zoom::Profile.profile_by_name(c).new(n)
@@ -47,12 +47,12 @@ class AddWish < Djinni::Wish
     end
 
     def usage
-        puts "#{aliases.join(", ")} <class> <name>"
-        puts "    #{description}."
+        puts("#{aliases.join(", ")} <class> <name>")
+        puts("    #{description}.")
         puts
-        puts "CLASSES"
+        puts("CLASSES")
         @classes.each do |clas, desc|
-            puts "    #{clas}"
+            puts("    #{clas}")
         end
     end
 end

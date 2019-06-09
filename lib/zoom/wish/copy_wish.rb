@@ -19,9 +19,9 @@ class CopyWish < Djinni::Wish
 
         name, new = args.split(" ")
         if (!config.has_profile?(name))
-            puts "Profile does not exist: #{name}"
+            puts("Profile does not exist: #{name}")
         elsif (config.has_profile?(new))
-            puts "Profile already exists: #{new}"
+            puts("Profile already exists: #{new}")
         else
             profiles = config.parse_profiles
             profiles[new] = profiles[name].clone
@@ -51,7 +51,7 @@ class CopyWish < Djinni::Wish
     end
 
     def usage
-        puts "#{aliases.join(", ")} <name> <new_name>"
-        puts "    #{description}."
+        puts("#{aliases.join(", ")} <name> <new_name>")
+        puts("    #{description}.")
     end
 end
