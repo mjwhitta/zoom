@@ -320,7 +320,7 @@ options = parse(ARGV)
 
 begin
     if (options["action"] == "rc")
-        FileUtils.rm_f(Pathname.new("~/.zoomrc").expand_path)
+        FileUtils.rm_f(Pathname.new("~/.config/zoom/rc").expand_path)
     end
 
     Zoom::ProfileManager.force_tool(options["tool"])

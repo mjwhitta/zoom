@@ -15,7 +15,7 @@ class ResetWish < Djinni::Wish
             return
         end
 
-        FileUtils.rm_f(Pathname.new("~/.zoomrc").expand_path)
+        FileUtils.rm_f(Pathname.new("~/.config/zoom/rc").expand_path)
         config = djinni_env["config"]
         config.default
 
