@@ -5,13 +5,14 @@ class Zoom::SecurityProfile::UnsafeJs < Zoom::SecurityProfile
         super(n, t, f, b, a)
         @exts = ["js", "jsx", "vue"]
         @regex = [
-            "\\.",
+            "\\.?",
             "(",
             [
                 "(append|eval|html)\\(",
-                "innerHTML"
+                "innerHTML\\s*="
             ].join("|"),
-            ")"
+            ")",
+            "\\s*($|([\"'][^\"']+[\"']\\s*\\+\\s*)?[^\"'; )]+)"
         ].join
     end
 end
