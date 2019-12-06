@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
     s.add_runtime_dependency("djinni", "~> 2.2", ">= 2.2.5")
     s.add_runtime_dependency("fagin", "~> 1.2", ">= 1.2.2")
     s.add_runtime_dependency("hilighter", "~> 1.5", ">= 1.5.1")
-    s.add_runtime_dependency("json_config", "~> 1.1", ">= 1.1.1")
+    s.add_runtime_dependency("jsoncfg", "~> 1.1", ">= 1.1.3")
     s.add_runtime_dependency("scoobydoo", "~> 1.0", ">= 1.0.1")
     s.authors = ["Miles Whittaker"]
     s.date = Time.new.strftime("%Y-%m-%d")
@@ -33,5 +33,5 @@ Gem::Specification.new do |s|
     s.summary = [
         "Quickly open CLI search results in your favorite editor!"
     ].join(" ")
-    s.version = "5.4.4"
+    s.version = "5.4.5"
 end

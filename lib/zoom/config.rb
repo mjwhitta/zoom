@@ -1,5 +1,5 @@
 require "hilighter"
-require "json_config"
+require "jsoncfg"
 require "scoobydoo"
 
 class Zoom::Config < JSONConfig
