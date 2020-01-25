@@ -228,9 +228,9 @@ def parse(args)
             options["verbose"] = true
         end
 
-        opts.on("--version", "Show version") do
+        opts.on("-V", "--version", "Show version") do
             __FILE__.match(/ruby-zoom-(\d+\.\d+\.\d+)/) do |m|
-                puts(m[1])
+                puts("zoom version #{m[1]}")
             end
             exit ZoomExit::GOOD
         end
