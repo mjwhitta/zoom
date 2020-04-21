@@ -80,41 +80,16 @@ If you are still having issues, please create a [GitLab issue].
 ## Shortcuts
 
 Zoom prefixes shortcut tags to search results. If you use Zoom to
-search for `eval` in Zoom's `test/test_src/tools` directory, you would
-see something like the following:
+search for `eval` ignoring Zoom's `test` directory, you would see
+something like the following:
+
+![Example search](./imgs/screenshot.png)
+
+Now you can jump to result 3 with one of the following commands:
 
 ```
-$ z "eval" test/test_src/tools
-test/test_src/tools/test.phtml
-[1] 11: eval()
-
-test/test_src/tools/test.py
-[2] 4: eval()
-
-test/test_src/tools/test.php
-[3] 11: eval()
-
-test/test_src/tools/test.php4
-[4] 11: eval()
-
-test/test_src/tools/test.js
-[5] 3: test.eval()
-
-test/test_src/tools/test.phpt
-[6] 11: eval()
-
-test/test_src/tools/test.php5
-[7] 11: eval()
-
-test/test_src/tools/test.php3
-[8] 11: eval()
-```
-
-Now you can jump to result 7 with one of the following commands:
-
-```
-$ z --go 7
-$ zg 7
+$ z --go 3
+$ zg 3
 ```
 
 ### Persistent shortcuts
