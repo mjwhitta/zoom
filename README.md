@@ -1,5 +1,7 @@
 # Zoom
 
+<a href="https://www.buymeacoffee.com/mjwhitta">🍪 Buy me a cookie</a>
+
 ## Inspired by [sack](https://github.com/sampson-chen/sack)
 
 ### Quickly open CLI search results in your favorite editor!
