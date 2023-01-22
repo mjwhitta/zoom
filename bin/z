@@ -424,7 +424,7 @@ rescue Exception => e
         ].join(" ").wrap
     )
     $stderr.puts
-    $stderr.puts("  https://gitlab.com/mjwhitta/zoom/issues")
+    $stderr.puts("  https://github.com/mjwhitta/zoom/issues")
     $stderr.puts
     $stderr.puts(
         [

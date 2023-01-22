@@ -28,7 +28,7 @@ $ gem install ruby-zoom
 Or install from source:
 
 ```
-$ git clone https://gitlab.com/mjwhitta/zoom.git
+$ git clone https://github.com/mjwhitta/zoom.git
 $ cd zoom
 $ bundle install && rake install
 ```
@@ -75,9 +75,9 @@ $ z --rc
 
 `WARNING: This resets all your settings!`
 
-If you are still having issues, please create a [GitLab issue].
+If you are still having issues, please create a [GitHub issue].
 
-[GitLab issue]: https://gitlab.com/mjwhitta/zoom/issues
+[GitHub issue]: https://github.com/mjwhitta/zoom/issues
 
 ## Shortcuts
 
@@ -385,7 +385,7 @@ compdef _gnu_generic z zc zf zg zl zr
 
 ## Links
 
-- [Source](https://gitlab.com/mjwhitta/zoom)
+- [Source](https://github.com/mjwhitta/zoom)
 - [RubyGems](https://rubygems.org/gems/ruby-zoom)
 
 ## TODO
