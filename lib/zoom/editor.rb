@@ -1,5 +1,4 @@
 require "fileutils"
-require "io/wait"
 require "scoobydoo"
 
 class Zoom::Editor

@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
-    s.add_development_dependency("minitest", "~> 5.12", ">= 5.12.2")
-    s.add_development_dependency("rake", "~> 13.0", ">= 13.0.0")
+    s.add_development_dependency("minitest", "~> 6.0", ">= 6.0.6")
+    s.add_development_dependency("rake", "~> 13.4", ">= 13.4.2")
     s.add_runtime_dependency("djinni", "~> 2.2", ">= 2.2.5")
     s.add_runtime_dependency("fagin", "~> 1.2", ">= 1.2.2")
-    s.add_runtime_dependency("hilighter", "~> 1.5", ">= 1.5.1")
+    s.add_runtime_dependency("hilighter", "~> 1.6", ">= 1.6.0")
     s.add_runtime_dependency("jsoncfg", "~> 1.2", ">= 1.2.11")
     s.add_runtime_dependency("scoobydoo", "~> 1.0", ">= 1.0.1")
     s.authors = ["Miles Whittaker"]
@@ -27,11 +27,12 @@ Gem::Specification.new do |s|
     end
     s.files = Dir["lib/**/*.rb"]
     s.homepage = "https://github.com/mjwhitta/zoom"
-    s.license = "GPL-3.0"
+    s.license = "GPL-3.0-or-later"
     s.metadata = {"source_code_uri" => s.homepage}
     s.name = "ruby-zoom"
+    s.required_ruby_version = ">= 3.2"
     s.summary = [
         "Quickly open CLI search results in your favorite editor!"
     ].join(" ")
-    s.version = "5.4.6"
+    s.version = "5.5.0"
 end
